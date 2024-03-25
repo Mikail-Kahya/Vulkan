@@ -117,7 +117,7 @@ VkPhysicalDevice mk::PickPhysicalDevice(VkInstance instance)
         throw std::runtime_error("Failed to find a suitable GPU");
        
 
-    return VkPhysicalDevice();
+    return physicalDevice;
 }
 
 bool mk::IsDeviceSuitable(VkPhysicalDevice device)

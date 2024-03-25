@@ -23,6 +23,7 @@ namespace mk
 		// Vulkan initialization
 		void CreateInstance(); // Links device to library
 		void SetupDebugMessenger();
+		void CreateLogicalDevice();
 
 		// STATICS
 		static constexpr uint32_t SCREEN_WIDTH{ 800 };
@@ -34,6 +35,8 @@ namespace mk
 		VkInstance m_Instance{ VK_NULL_HANDLE };
 		VkDebugUtilsMessengerEXT m_DebugMessenger{ VK_NULL_HANDLE };
 		VkPhysicalDevice m_PhysicalDevice{ VK_NULL_HANDLE };
+
 		VkDevice m_Device{ VK_NULL_HANDLE };
+		VkQueue m_GraphicsQueue{ VK_NULL_HANDLE };
 	};
 }
