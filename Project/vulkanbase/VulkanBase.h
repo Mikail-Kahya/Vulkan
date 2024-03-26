@@ -26,6 +26,7 @@ namespace mk
 		void CreateLogicalDevice(); // Interacts between physical device and queue
 		void CreateSurface();
 		void CreateSwapChain();
+		void CreateImageViews();
 
 		// STATICS
 		static constexpr uint32_t SCREEN_WIDTH{ 800 };
@@ -47,5 +48,6 @@ namespace mk
 		VkExtent2D m_SwapChainExtent{};
 		VkFormat m_SwapChainImageFormat{};
 		std::vector<VkImage> m_SwapChainImages{};
+		std::vector<VkImageView> m_SwapChainImageViews{};
 	};
 }
