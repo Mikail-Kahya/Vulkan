@@ -36,10 +36,10 @@ namespace mk
 		const VkAllocationCallbacks* pAllocator);
 	void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
-	[[nodiscard]] VkPhysicalDevice PickPhysicalDevice(VkInstance instance);
-	bool IsDeviceSuitable(VkPhysicalDevice device);
-	uint32_t RateDeviceSuitability(VkPhysicalDevice device);
-	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device, VkQueueFlagBits queueFamilyType = VK_QUEUE_GRAPHICS_BIT);
+	[[nodiscard]] VkPhysicalDevice PickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface);
+	bool IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
+	uint32_t RateDeviceSuitability(VkPhysicalDevice device, VkSurfaceKHR surface);
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
 }
 
 

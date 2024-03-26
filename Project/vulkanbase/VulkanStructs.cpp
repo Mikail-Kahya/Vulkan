@@ -4,5 +4,5 @@ using namespace mk;
 
 bool QueueFamilyIndices::IsComplete() const
 {
-	return graphicsFamily.has_value();
+	return graphicsFamily.has_value() && presentFamily.has_value();
 }

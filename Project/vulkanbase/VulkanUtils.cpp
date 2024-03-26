@@ -41,7 +41,8 @@ std::vector<const char*> mk::GetRequiredExtensions()
     const char** glfwExtensions{ glfwGetRequiredInstanceExtensions(&glfwExtensionCount) };
 
     std::vector<const char*> extensions{ glfwExtensions, glfwExtensions + glfwExtensionCount };
-    if constexpr (ENABLE_VALIDATION_LAYERS)
+
+	if constexpr (ENABLE_VALIDATION_LAYERS)
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
 	return extensions;
@@ -90,7 +91,7 @@ void mk::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& cr
     createInfo.pfnUserCallback = &DebugCallback;
 }
 
-VkPhysicalDevice mk::PickPhysicalDevice(VkInstance instance)
+VkPhysicalDevice mk::PickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
 {
     uint32_t deviceCount{};
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -105,7 +106,7 @@ VkPhysicalDevice mk::PickPhysicalDevice(VkInstance instance)
     uint32_t bestScore{};
     for (const auto& device : devices)
     {
-        const uint32_t newScore{ RateDeviceSuitability(device) };
+        const uint32_t newScore{ RateDeviceSuitability(device, surface) };
         if (newScore > bestScore)
         {
             physicalDevice = device;
@@ -120,15 +121,15 @@ VkPhysicalDevice mk::PickPhysicalDevice(VkInstance instance)
     return physicalDevice;
 }
 
-bool mk::IsDeviceSuitable(VkPhysicalDevice device)
+bool mk::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
     VkPhysicalDeviceFeatures deviceFeatures{};
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-    return deviceFeatures.geometryShader && FindQueueFamilies(device).IsComplete();
+    return deviceFeatures.geometryShader && FindQueueFamilies(device, surface).IsComplete();
 }
 
-uint32_t mk::RateDeviceSuitability(VkPhysicalDevice device)
+uint32_t mk::RateDeviceSuitability(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
     VkPhysicalDeviceProperties deviceProperties{};
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -137,7 +138,7 @@ uint32_t mk::RateDeviceSuitability(VkPhysicalDevice device)
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
     // Application can't function without geometry shaders
-    if (!deviceFeatures.geometryShader)
+    if (!IsDeviceSuitable(device, surface))
         return 0;
 
     uint32_t score{};
@@ -152,7 +153,7 @@ uint32_t mk::RateDeviceSuitability(VkPhysicalDevice device)
     return score;
 }
 
-QueueFamilyIndices mk::FindQueueFamilies(VkPhysicalDevice device, VkQueueFlagBits queueFamilyType)
+QueueFamilyIndices mk::FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
     QueueFamilyIndices indices{};
 
@@ -162,10 +163,17 @@ QueueFamilyIndices mk::FindQueueFamilies(VkPhysicalDevice device, VkQueueFlagBit
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-    for (int idx{}; idx < queueFamilyCount; ++idx)
+    for (uint32_t idx{}; idx < queueFamilyCount; ++idx)
     {
-        if (queueFamilies[idx].queueFlags & queueFamilyType)
+        // Check if queue family is able to use drawing commands
+        if (queueFamilies[idx].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             indices.graphicsFamily = idx;
+
+        // Check if queue family can present to the screen
+        VkBool32 presentSupport{ false };
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, idx, surface, &presentSupport);
+        if (presentSupport)
+            indices.presentFamily = idx;
 
         if (indices.IsComplete())
             break;
