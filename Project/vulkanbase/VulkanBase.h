@@ -25,6 +25,7 @@ namespace mk
 		void SetupDebugMessenger();
 		void CreateLogicalDevice(); // Interacts between physical device and queue
 		void CreateSurface();
+		void CreateSwapChain();
 
 		// STATICS
 		static constexpr uint32_t SCREEN_WIDTH{ 800 };
@@ -41,5 +42,10 @@ namespace mk
 		VkDevice m_Device{ VK_NULL_HANDLE }; // Logical device interaction between physical and queues
 		VkQueue m_GraphicsQueue{ VK_NULL_HANDLE };
 		VkQueue m_PresentQueue{ VK_NULL_HANDLE };
+
+		VkSwapchainKHR m_SwapChain{ VK_NULL_HANDLE };
+		VkExtent2D m_SwapChainExtent{};
+		VkFormat m_SwapChainImageFormat{};
+		std::vector<VkImage> m_SwapChainImages{};
 	};
 }
