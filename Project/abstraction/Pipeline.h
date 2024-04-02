@@ -12,6 +12,11 @@ namespace mk
 		Pipeline() = default;
 		~Pipeline();
 
+		Pipeline(const Pipeline& other)					= delete;
+		Pipeline(Pipeline&& other) noexcept				= delete;
+		Pipeline& operator=(const Pipeline& other)		= delete;
+		Pipeline& operator=(Pipeline&& other) noexcept	= delete;
+
 		void Initialize(const std::string& shaderName);
 		void Destroy();
 
