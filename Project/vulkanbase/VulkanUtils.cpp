@@ -3,6 +3,7 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
+#include <fstream>
 #include <vulkan/vulkan_core.h>
 
 using namespace mk;
@@ -272,4 +273,26 @@ VkExtent2D mk::ChooseSwapExtent2D(const VkSurfaceCapabilitiesKHR& capabilities, 
     actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 
     return actualExtent;
+}
+
+std::vector<char> mk::ReadFile(const std::string& fileName)
+{
+    // ate =  AT End
+    std::ifstream file(fileName, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open())
+        throw std::runtime_error("Failed to open file " + fileName);
+
+    // get file size as we are at the end
+    const size_t fileSize{ static_cast<size_t>(file.tellg()) };
+    std::vector<char> buffer(fileSize);
+
+    // go back to beginning to read
+    file.seekg(0);
+    file.read(buffer.data(), fileSize);
+
+    file.close();
+
+    return buffer;
+
 }

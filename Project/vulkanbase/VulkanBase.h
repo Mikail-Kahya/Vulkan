@@ -6,13 +6,24 @@
 #include <GLFW/glfw3.h>
 
 #include "VulkanStructs.h"
+#include "abstraction/Pipeline.h"
+#include "interfaces/Singleton.h"
 
 namespace mk
 {
-	class VulkanBase final {
+	class VulkanBase final : public Singleton<VulkanBase>
+	{
 	public:
 		VulkanBase() = default;
 		void Run();
+
+		const VkDevice& GetDevice() const;
+		const VkPhysicalDevice& GetPhysicalDevice() const;
+		const VkFormat& GetSwapChainImageFormat() const;
+		float GetWidth() const;
+		float GetHeight() const;
+		VkViewport GetViewport() const;
+		VkRect2D GetScissor() const;
 
 	private:
 		void InitWindow();
@@ -49,5 +60,7 @@ namespace mk
 		VkFormat m_SwapChainImageFormat{};
 		std::vector<VkImage> m_SwapChainImages{};
 		std::vector<VkImageView> m_SwapChainImageViews{};
+
+		Pipeline m_Pipeline{};
 	};
 }

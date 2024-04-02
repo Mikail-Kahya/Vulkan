@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <string>
+
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_core.h>
 #include "VulkanStructs.h"
@@ -51,7 +53,9 @@ namespace mk
 	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	VkExtent2D ChooseSwapExtent2D(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* windowPtr);
-}
+
+	std::vector<char> ReadFile(const std::string& fileName);
+;}
 
 
 /*

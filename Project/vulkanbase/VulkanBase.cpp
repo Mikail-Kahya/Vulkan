@@ -21,6 +21,52 @@ void VulkanBase::Run()
 	Cleanup();
 }
 
+const VkDevice& VulkanBase::GetDevice() const
+{
+	return m_Device;
+}
+
+const VkPhysicalDevice& VulkanBase::GetPhysicalDevice() const
+{
+	return m_PhysicalDevice;
+}
+
+const VkFormat& VulkanBase::GetSwapChainImageFormat() const
+{
+	return m_SwapChainImageFormat;
+}
+
+float VulkanBase::GetWidth() const
+{
+	return static_cast<float>(m_SwapChainExtent.width);
+}
+
+float VulkanBase::GetHeight() const
+{
+	return static_cast<float>(m_SwapChainExtent.height);
+}
+
+VkViewport VulkanBase::GetViewport() const
+{
+	VkViewport viewport{};
+	viewport.x = 0;
+	viewport.y = 0;
+	viewport.width = GetWidth();
+	viewport.height = GetHeight();
+	viewport.minDepth = 0;
+	viewport.maxDepth = 1;
+
+	return viewport;
+}
+
+VkRect2D VulkanBase::GetScissor() const
+{
+	VkRect2D scissor{};
+	scissor.offset = { 0, 0 };
+	scissor.extent = m_SwapChainExtent;
+	return scissor;
+}
+
 void VulkanBase::InitWindow()
 {
 	glfwInit();
@@ -36,6 +82,9 @@ void VulkanBase::InitVulkan()
 	CreateSurface();
 	m_PhysicalDevice = PickPhysicalDevice(m_Instance, m_Surface);
 	CreateLogicalDevice();
+	CreateSwapChain();
+	CreateImageViews();
+	m_Pipeline.Initialize("shader");
 }
 
 void VulkanBase::MainLoop()
@@ -48,6 +97,8 @@ void VulkanBase::MainLoop()
 
 void VulkanBase::Cleanup()
 {
+	m_Pipeline.Destroy();
+
 	for (auto imageView : m_SwapChainImageViews)
 		vkDestroyImageView(m_Device, imageView, nullptr);
 

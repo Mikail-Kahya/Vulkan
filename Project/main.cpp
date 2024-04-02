@@ -6,10 +6,9 @@ int main() {
 	//DISABLE_LAYER_NV_OPTIMUS_1 = 1
 	//_putenv_s("DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1", "1");
 	//_putenv_s("DISABLE_LAYER_NV_OPTIMUS_1", "1");
-	mk::VulkanBase app;
 
 	try {
-		app.Run();
+		mk::VulkanBase::GetInstance().Run();
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
