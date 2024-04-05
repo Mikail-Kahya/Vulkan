@@ -1,4 +1,5 @@
 #include "CommandPool.h"
+#include "CommandPool.h"
 
 #include <stdexcept>
 
@@ -29,8 +30,20 @@ void CommandPool::Destroy()
 	vkDestroyCommandPool(device, m_CommandPool, nullptr);
 }
 
-void CommandPool::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIdx)
+VkCommandBuffer CommandPool::CreateCommandBuffer() const
 {
+	VkCommandBuffer commandBuffer{ VK_NULL_HANDLE };
+
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = m_CommandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+
+	if (vkAllocateCommandBuffers(VulkanBase::GetInstance().GetDevice(), &allocInfo, &commandBuffer) != VK_SUCCESS)
+		throw std::runtime_error("Failed to allocate command buffers");
+
+	return commandBuffer;
 }
 
 void CommandPool::CreateCommandPool()

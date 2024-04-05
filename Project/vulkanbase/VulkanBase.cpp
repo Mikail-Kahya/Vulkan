@@ -46,6 +46,11 @@ const SwapChain& VulkanBase::GetSwapChain() const
 	return m_SwapChain;
 }
 
+const CommandPool& VulkanBase::GetCommandPool() const
+{
+	return m_CommandPool;
+}
+
 void VulkanBase::InitWindow()
 {
 	glfwInit();

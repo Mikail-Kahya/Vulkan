@@ -3,6 +3,8 @@
 
 namespace mk
 {
+	class CommandBuffer;
+
 	class CommandPool final
 	{
 	public:
@@ -17,7 +19,7 @@ namespace mk
 		void Initialize();
 		void Destroy();
 
-		void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIdx);
+		VkCommandBuffer CreateCommandBuffer() const;
 
 	private:
 		void CreateCommandPool();

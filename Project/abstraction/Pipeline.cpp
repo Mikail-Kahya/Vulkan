@@ -16,25 +16,64 @@ Pipeline::~Pipeline()
 void Pipeline::Initialize(const std::string& shaderName)
 {
 	m_Destroyed = false;
+
 	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
 	CreatePipelineLayout();
 	CreateRenderPass();
 	CreatePipeline();
+
+	m_CommandBuffer = VulkanBase::GetInstance().GetCommandPool().CreateCommandBuffer();
 }
 
 void Pipeline::Destroy()
 {
 	m_Destroyed = true;
+
 	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
 
 	for (auto framebuffer : m_SwapChainFramebuffers)
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
 
 	m_Shader->DestroyModules(device);
-	vkDestroyPipeline(device, m_Pipeline, nullptr);
+	vkDestroyPipeline(device, m_GraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device, m_PipelineLayout,nullptr);
 	vkDestroyRenderPass(device, m_RenderPass, nullptr);
+}
+
+void Pipeline::Draw() const
+{
+	//const CommandPool& commandPool{ VulkanBase::GetInstance().GetCommandPool() };
+	const SwapChain& swapChain{ VulkanBase::GetInstance().GetSwapChain() };
+	auto scissor{ swapChain.GetScissor() };
+	auto viewport{ swapChain.GetViewport() };
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = 0; // Optional
+	beginInfo.pInheritanceInfo = nullptr; // Optional
+
+	if (vkBeginCommandBuffer(m_CommandBuffer, &beginInfo) != VK_SUCCESS)
+		throw std::runtime_error("Failed to begin recording command buffer");
+
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = m_RenderPass;
+	renderPassInfo.framebuffer = m_SwapChainFramebuffers[m_ImageIdx];
+	renderPassInfo.renderArea = scissor;
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &m_ClearColor;
+
+	vkCmdBeginRenderPass(m_CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
+	vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
+	vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
+
+	vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
+	vkCmdEndRenderPass(m_CommandBuffer);
+
+	if (vkEndCommandBuffer(m_CommandBuffer) != VK_SUCCESS)
+		throw std::runtime_error("Failed to record command buffer");
 }
 
 void Pipeline::CreatePipelineLayout()
@@ -120,7 +159,7 @@ void Pipeline::CreatePipeline()
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
 	pipelineInfo.basePipelineIndex = -1; // optional
 
-	if (vkCreateGraphicsPipelines(VulkanBase::GetInstance().GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline) != VK_SUCCESS)
+	if (vkCreateGraphicsPipelines(VulkanBase::GetInstance().GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create graphics pipeline");
 }
 

@@ -20,6 +20,8 @@ namespace mk
 		void Initialize(const std::string& shaderName);
 		void Destroy();
 
+		void Draw() const;
+
 	private:
 		void CreatePipelineLayout();
 		void CreateRenderPass();
@@ -39,8 +41,13 @@ namespace mk
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
-		VkPipeline m_Pipeline{};
+		VkPipeline m_GraphicsPipeline{};
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
+
+		VkCommandBuffer m_CommandBuffer{ VK_NULL_HANDLE };
+		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
+		uint32_t m_ImageIdx{};
+
 		bool m_Destroyed{ true };
 	};
 }

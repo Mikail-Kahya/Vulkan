@@ -25,6 +25,7 @@ namespace mk
 		const VkPhysicalDevice& GetPhysicalDevice() const;
 		const VkSurfaceKHR& GetSurface() const;
 		const SwapChain& GetSwapChain() const;
+		const CommandPool& GetCommandPool() const;
 
 	private:
 		void InitWindow();
