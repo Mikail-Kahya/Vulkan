@@ -33,7 +33,7 @@ set(SOURCES
 
     "abstraction/Shader.cpp"
     "abstraction/structs.cpp"
-  "abstraction/Pipeline.cpp" "abstraction/SwapChain.cpp")
+  "abstraction/Pipeline.cpp" "abstraction/SwapChain.cpp" "abstraction/CommandPool.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})

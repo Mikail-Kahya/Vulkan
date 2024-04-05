@@ -61,6 +61,7 @@ void VulkanBase::InitVulkan()
 	CreateSurface();
 	m_PhysicalDevice = PickPhysicalDevice(m_Instance, m_Surface);
 	CreateLogicalDevice();
+	m_CommandPool.Initialize();
 	m_SwapChain.Initialize();
 	m_Pipeline.Initialize("shader");
 }
@@ -77,6 +78,7 @@ void VulkanBase::Cleanup()
 {
 	m_Pipeline.Destroy();
 	m_SwapChain.Destroy();
+	m_CommandPool.Destroy();
 	
 	vkDestroyDevice(m_Device, nullptr);
 	if constexpr (ENABLE_VALIDATION_LAYERS)

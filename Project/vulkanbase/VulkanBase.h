@@ -8,6 +8,7 @@
 #include "VulkanStructs.h"
 #include "interfaces/Singleton.h"
 
+#include "abstraction/CommandPool.h"
 #include "abstraction/Pipeline.h"
 #include "abstraction/SwapChain.h"
 
@@ -55,5 +56,6 @@ namespace mk
 
 		Pipeline m_Pipeline{};
 		SwapChain m_SwapChain{};
+		CommandPool m_CommandPool{};
 	};
 }

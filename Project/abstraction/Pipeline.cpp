@@ -28,6 +28,9 @@ void Pipeline::Destroy()
 	m_Destroyed = true;
 	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
 
+	for (auto framebuffer : m_SwapChainFramebuffers)
+		vkDestroyFramebuffer(device, framebuffer, nullptr);
+
 	m_Shader->DestroyModules(device);
 	vkDestroyPipeline(device, m_Pipeline, nullptr);
 	vkDestroyPipelineLayout(device, m_PipelineLayout,nullptr);
@@ -119,6 +122,30 @@ void Pipeline::CreatePipeline()
 
 	if (vkCreateGraphicsPipelines(VulkanBase::GetInstance().GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create graphics pipeline");
+}
+
+void Pipeline::CreateBuffers()
+{
+	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
+	m_SwapChainFramebuffers.resize(swapChain.GetNrImages());
+
+	for (int idx{}; idx < swapChain.GetNrImages(); ++idx)
+	{
+		VkImageView attachments[]{ swapChain.GetImage(idx) };
+
+		VkFramebufferCreateInfo framebufferInfo{};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = m_RenderPass;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.width = swapChain.GetWidth();
+		framebufferInfo.height = swapChain.GetHeight();
+		framebufferInfo.layers = 1;
+
+		if (vkCreateFramebuffer(vulkanBase.GetDevice(), &framebufferInfo, nullptr, &m_SwapChainFramebuffers[idx]) != VK_SUCCESS)
+			throw std::runtime_error("Failed to create framebuffer");
+	}
 }
 
 VkPipelineDynamicStateCreateInfo Pipeline::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)

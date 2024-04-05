@@ -24,6 +24,7 @@ namespace mk
 		void CreatePipelineLayout();
 		void CreateRenderPass();
 		void CreatePipeline();
+		void CreateBuffers();
 
 		// Fixed functions
 		static VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
@@ -39,6 +40,7 @@ namespace mk
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
 		VkPipeline m_Pipeline{};
+		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
 		bool m_Destroyed{ true };
 	};
 }

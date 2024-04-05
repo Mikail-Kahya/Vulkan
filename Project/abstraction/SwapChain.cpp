@@ -1,5 +1,6 @@
 #include "SwapChain.h"
 
+#include <cassert>
 #include <iostream>
 #include <vulkan/vulkan_core.h>
 
@@ -37,14 +38,14 @@ const VkFormat& SwapChain::GetSwapChainImageFormat() const
 	return m_SwapChainImageFormat;
 }
 
-float SwapChain::GetWidth() const
+uint32_t SwapChain::GetWidth() const
 {
-	return static_cast<float>(m_SwapChainExtent.width);
+	return m_SwapChainExtent.width;
 }
 
-float SwapChain::GetHeight() const
+uint32_t SwapChain::GetHeight() const
 {
-	return static_cast<float>(m_SwapChainExtent.height);
+	return m_SwapChainExtent.height;
 }
 
 VkViewport SwapChain::GetViewport() const
@@ -52,8 +53,8 @@ VkViewport SwapChain::GetViewport() const
 	VkViewport viewport{};
 	viewport.x = 0;
 	viewport.y = 0;
-	viewport.width = GetWidth();
-	viewport.height = GetHeight();
+	viewport.width = static_cast<float>(GetWidth());
+	viewport.height = static_cast<float>(GetHeight());
 	viewport.minDepth = 0;
 	viewport.maxDepth = 1;
 
@@ -66,6 +67,22 @@ VkRect2D SwapChain::GetScissor() const
 	scissor.offset = { 0, 0 };
 	scissor.extent = m_SwapChainExtent;
 	return scissor;
+}
+
+int SwapChain::GetNrImages() const
+{
+	return static_cast<int>(m_SwapChainImageViews.size());
+}
+
+VkImageView SwapChain::GetImage(uint32_t idx) const
+{
+	if (idx >= static_cast<uint32_t>(GetNrImages()))
+	{
+		assert(false && "Out of range");
+		return {};
+	}
+
+	return m_SwapChainImageViews[idx];
 }
 
 void SwapChain::CreateSwapChain()

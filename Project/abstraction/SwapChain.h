@@ -19,10 +19,12 @@ namespace mk
 		void Destroy();
 
 		const VkFormat& GetSwapChainImageFormat() const;
-		float GetWidth() const;
-		float GetHeight() const;
+		uint32_t GetWidth() const;
+		uint32_t GetHeight() const;
 		VkViewport GetViewport() const;
 		VkRect2D GetScissor() const;
+		int GetNrImages() const;
+		VkImageView GetImage(uint32_t idx) const;
 
 	private:
 		void CreateSwapChain();
@@ -33,7 +35,7 @@ namespace mk
 		VkFormat m_SwapChainImageFormat{};
 		std::vector<VkImage> m_SwapChainImages{};
 		std::vector<VkImageView> m_SwapChainImageViews{};
-		std::vector<VkFramebuffer> m_SwapChainBuffers{};
+		
 		bool m_Destroyed{ true };
 	};
 }
