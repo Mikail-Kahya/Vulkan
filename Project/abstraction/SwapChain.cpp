@@ -28,14 +28,75 @@ void SwapChain::Destroy()
 	m_Destroyed = true;
 	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
 
-	vkDestroySemaphore(device, m_ImageAvailableSemaphore, nullptr);
-	vkDestroySemaphore(device, m_RenderFinishedSemaphore, nullptr);
-	vkDestroyFence(device, m_InFlightFence, nullptr);
+	for (int idx{}; idx < VulkanBase::MAX_FRAMES_IN_FLIGHT; ++idx)
+	{
+		vkDestroySemaphore(device, m_ImageAvailableSemaphores[idx], nullptr);
+		vkDestroySemaphore(device, m_RenderFinishedSemaphores[idx], nullptr);
+		vkDestroyFence(device, m_InFlightFences[idx], nullptr);
+	}
 
-	for (auto imageView : m_SwapChainImageViews)
+	for (const auto imageView : m_SwapChainImageViews)
 		vkDestroyImageView(device, imageView, nullptr);
 
 	vkDestroySwapchainKHR(device, m_SwapChain, nullptr);
+}
+
+void SwapChain::Wait()
+{
+	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+
+	const VkResult result = vkWaitForFences(device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
+		Update();
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+		throw std::runtime_error("Failed to acquire swap chain image");
+
+	vkResetFences(device, 1, &m_InFlightFences[m_CurrentFrame]);
+}
+
+void SwapChain::Present(uint32_t imageIdx)
+{
+	VkPresentInfoKHR presentInfo{};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+	const auto signalSemaphores{ GetSignalSemaphores() };
+	presentInfo.waitSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
+	presentInfo.pWaitSemaphores = signalSemaphores.data();
+
+	const VkSwapchainKHR swapChains[] = { m_SwapChain };
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIdx;
+	presentInfo.pResults = nullptr; // Optional
+
+	const VkResult result = vkQueuePresentKHR(VulkanBase::GetInstance().GetPresentQueue(), &presentInfo);
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+		Update();
+	else if (result != VK_SUCCESS)
+		throw std::runtime_error("Failed to present swap chain image");
+}
+
+void SwapChain::NextFrame()
+{
+	m_CurrentFrame = (m_CurrentFrame + 1) % VulkanBase::MAX_FRAMES_IN_FLIGHT;
+}
+
+void SwapChain::Update()
+{
+	VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	int width, height{};
+	glfwGetFramebufferSize(vulkanBase.GetWindow(), &width, &height);
+	while (width == 0 || height == 0)
+	{
+		glfwGetFramebufferSize(vulkanBase.GetWindow(), &width, &height);
+		glfwWaitEvents();
+	}
+
+	vkDeviceWaitIdle(VulkanBase::GetInstance().GetDevice());
+	vulkanBase.WindowChanged();
+	Destroy();
+	Initialize();
 }
 
 const VkFormat& SwapChain::GetSwapChainImageFormat() const
@@ -90,52 +151,36 @@ VkImageView SwapChain::GetImageView(uint32_t idx) const
 	return m_SwapChainImageViews[idx];
 }
 
-uint32_t SwapChain::GetImageIdx() const
+uint32_t SwapChain::GetImageIdx()
 {
 	uint32_t imageIdx{};
-	vkAcquireNextImageKHR(VulkanBase::GetInstance().GetDevice(), m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIdx);
+	const VkResult result = vkAcquireNextImageKHR(VulkanBase::GetInstance().GetDevice(), m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIdx);
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
+		Update();
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+		throw std::runtime_error("Failed to acquire swap chain image");
+
 	return imageIdx;
 }
 
-void SwapChain::Wait() const
+uint32_t SwapChain::GetCurrentFrame() const
 {
-	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
-
-	vkWaitForFences(device, 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
-	vkResetFences(device, 1, &m_InFlightFence);
-}
-
-void SwapChain::Present(uint32_t imageIdx) const
-{
-	VkPresentInfoKHR presentInfo{};
-	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-	const auto signalSemaphores{ GetSignalSemaphores() };
-	presentInfo.waitSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
-	presentInfo.pWaitSemaphores = signalSemaphores.data();
-
-	const VkSwapchainKHR swapChains[] = { m_SwapChain };
-	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = swapChains;
-	presentInfo.pImageIndices = &imageIdx;
-	presentInfo.pResults = nullptr; // Optional
-
-	vkQueuePresentKHR(VulkanBase::GetInstance().GetPresentQueue(), &presentInfo);
+	return m_CurrentFrame;
 }
 
 std::vector<VkSemaphore> SwapChain::GetWaitSemaphores() const
 {
-	return { m_ImageAvailableSemaphore };
+	return { m_ImageAvailableSemaphores[m_CurrentFrame] };
 }
 
 std::vector<VkSemaphore> SwapChain::GetSignalSemaphores() const
 {
-	return { m_RenderFinishedSemaphore };
+	return { m_RenderFinishedSemaphores[m_CurrentFrame] };
 }
 
 const VkFence& SwapChain::GetWaitingFence() const
 {
-	return m_InFlightFence;
+	return m_InFlightFences[m_CurrentFrame];
 }
 
 void SwapChain::CreateSwapChain()
@@ -230,6 +275,9 @@ void SwapChain::CreateImageViews()
 void SwapChain::CreateSyncObjects()
 {
 	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	m_ImageAvailableSemaphores.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
+	m_RenderFinishedSemaphores.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
+	m_InFlightFences.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 
 	VkSemaphoreCreateInfo semaphoreInfo{};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -238,8 +286,11 @@ void SwapChain::CreateSyncObjects()
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
-		vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS ||
-		vkCreateFence(device, &fenceInfo, nullptr, &m_InFlightFence) != VK_SUCCESS)
-		throw std::runtime_error("Failed to create semaphores");
+	for (int idx{}; idx < VulkanBase::MAX_FRAMES_IN_FLIGHT; ++idx)
+	{
+		if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphores[idx]) != VK_SUCCESS ||
+			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphores[idx]) != VK_SUCCESS ||
+			vkCreateFence(device, &fenceInfo, nullptr, &m_InFlightFences[idx]) != VK_SUCCESS)
+			throw std::runtime_error("Failed to create synchronization objects for frame " + std::to_string(idx));
+	}
 }

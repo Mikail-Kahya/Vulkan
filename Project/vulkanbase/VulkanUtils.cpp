@@ -6,6 +6,8 @@
 #include <fstream>
 #include <vulkan/vulkan_core.h>
 
+#include "VulkanBase.h"
+
 using namespace mk;
 
 bool mk::CheckValidationLayerSupport()
@@ -295,4 +297,10 @@ std::vector<char> mk::ReadFile(const std::string& fileName)
 
     return buffer;
 
+}
+
+void mk::FrameBufferResizeCallback(GLFWwindow* windowPtr, int width, int height)
+{
+    auto app = reinterpret_cast<VulkanBase*>(glfwGetWindowUserPointer(windowPtr));
+    app->WindowChanged();
 }

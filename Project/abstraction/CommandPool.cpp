@@ -30,20 +30,20 @@ void CommandPool::Destroy()
 	vkDestroyCommandPool(device, m_CommandPool, nullptr);
 }
 
-VkCommandBuffer CommandPool::CreateCommandBuffer() const
+std::vector<VkCommandBuffer> CommandPool::CreateCommandBuffer(int nrBuffers) const
 {
-	VkCommandBuffer commandBuffer{ VK_NULL_HANDLE };
+	std::vector<VkCommandBuffer> commandBuffers(nrBuffers);
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = m_CommandPool;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.commandBufferCount = nrBuffers;
 
-	if (vkAllocateCommandBuffers(VulkanBase::GetInstance().GetDevice(), &allocInfo, &commandBuffer) != VK_SUCCESS)
+	if (vkAllocateCommandBuffers(VulkanBase::GetInstance().GetDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 		throw std::runtime_error("Failed to allocate command buffers");
 
-	return commandBuffer;
+	return commandBuffers;
 }
 
 void CommandPool::CreateCommandPool()

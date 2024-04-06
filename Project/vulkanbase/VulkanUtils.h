@@ -55,6 +55,7 @@ namespace mk
 	VkExtent2D ChooseSwapExtent2D(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* windowPtr);
 
 	std::vector<char> ReadFile(const std::string& fileName);
+	void FrameBufferResizeCallback(GLFWwindow* windowPtr, int width, int height);
 ;}
 
 

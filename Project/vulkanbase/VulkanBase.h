@@ -19,6 +19,7 @@ namespace mk
 	public:
 		VulkanBase() = default;
 		void Run();
+		void WindowChanged();
 
 		GLFWwindow* GetWindow() const;
 		const VkDevice& GetDevice() const;
@@ -29,12 +30,14 @@ namespace mk
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
 
+		static constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
+
 	private:
 		void InitWindow();
 		void InitVulkan();
 		void MainLoop();
 		void Cleanup();
-		void DrawFrame() const;
+		void DrawFrame();
 
 		// Vulkan initialization
 		void CreateInstance(); // Links device to library
@@ -61,5 +64,7 @@ namespace mk
 		Pipeline m_Pipeline{};
 		SwapChain m_SwapChain{};
 		CommandPool m_CommandPool{};
+
+		bool m_FrameBufferResized{ false };
 	};
 }

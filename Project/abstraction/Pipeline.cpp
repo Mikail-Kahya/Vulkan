@@ -22,7 +22,7 @@ void Pipeline::Initialize(const std::string& shaderName)
 	CreatePipelineLayout();
 	CreateRenderPass();
 	CreatePipeline();
-	m_CommandBuffer = VulkanBase::GetInstance().GetCommandPool().CreateCommandBuffer();
+	m_CommandBuffers = VulkanBase::GetInstance().GetCommandPool().CreateCommandBuffer(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 	CreateBuffers();
 }
 
@@ -46,10 +46,19 @@ void Pipeline::Draw(uint32_t imageIdx) const
 	const SwapChain& swapChain{ VulkanBase::GetInstance().GetSwapChain() };
 	const auto scissor{ swapChain.GetScissor() };
 	const auto viewport{ swapChain.GetViewport() };
+	const VkCommandBuffer commandBuffer{ m_CommandBuffers[swapChain.GetCurrentFrame()] };
 
 	// reset command buffer before filling up
-	vkResetCommandBuffer(m_CommandBuffer, 0);
-	StartCommandBuffer();
+	vkResetCommandBuffer(commandBuffer, 0);
+
+	// Start command buffer
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = 0; // Optional
+	beginInfo.pInheritanceInfo = nullptr; // Optional
+
+	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
+		throw std::runtime_error("Failed to begin recording command buffer");
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -59,16 +68,16 @@ void Pipeline::Draw(uint32_t imageIdx) const
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &m_ClearColor;
 
-	vkCmdBeginRenderPass(m_CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	vkCmdBindPipeline(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
-	vkCmdSetViewport(m_CommandBuffer, 0, 1, &viewport);
-	vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
-	vkCmdDraw(m_CommandBuffer, 3, 1, 0, 0);
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
+	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
-	vkCmdEndRenderPass(m_CommandBuffer);
+	vkCmdEndRenderPass(commandBuffer);
 
-	if (vkEndCommandBuffer(m_CommandBuffer) != VK_SUCCESS)
+	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
 		throw std::runtime_error("Failed to record command buffer");
 
 	SubmitCommandBuffer();
@@ -195,24 +204,13 @@ void Pipeline::CreateBuffers()
 	}
 }
 
-void Pipeline::StartCommandBuffer() const
-{
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = 0; // Optional
-	beginInfo.pInheritanceInfo = nullptr; // Optional
-
-	if (vkBeginCommandBuffer(m_CommandBuffer, &beginInfo) != VK_SUCCESS)
-		throw std::runtime_error("Failed to begin recording command buffer");
-}
-
 void Pipeline::SubmitCommandBuffer() const
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
 	const auto waitSemaphores{ swapChain.GetWaitSemaphores() };
 	const auto signalSemaphores{ swapChain.GetSignalSemaphores() };
-	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -224,7 +222,7 @@ void Pipeline::SubmitCommandBuffer() const
 	submitInfo.pWaitDstStageMask = waitStages;
 
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &m_CommandBuffer;
+	submitInfo.pCommandBuffers = &m_CommandBuffers[swapChain.GetCurrentFrame()];
 
 	if (vkQueueSubmit(vulkanBase.GetGraphicsQueue(), 1, &submitInfo, swapChain.GetWaitingFence()))
 		throw std::runtime_error("Failed to submit draw command buffer");

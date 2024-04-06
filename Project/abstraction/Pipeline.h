@@ -28,7 +28,6 @@ namespace mk
 		void CreatePipeline();
 		void CreateBuffers();
 
-		void StartCommandBuffer() const;
 		void SubmitCommandBuffer() const;
 
 		// Fixed functions
@@ -47,7 +46,7 @@ namespace mk
 		VkPipeline m_GraphicsPipeline{};
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
 
-		VkCommandBuffer m_CommandBuffer{ VK_NULL_HANDLE };
+		std::vector<VkCommandBuffer> m_CommandBuffers{  };
 		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
 
 		bool m_Destroyed{ true };

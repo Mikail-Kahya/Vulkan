@@ -21,6 +21,11 @@ void VulkanBase::Run()
 	Cleanup();
 }
 
+void VulkanBase::WindowChanged()
+{
+	m_FrameBufferResized = true;
+}
+
 GLFWwindow* VulkanBase::GetWindow() const
 {
 	return m_WindowPtr;
@@ -65,8 +70,10 @@ void VulkanBase::InitWindow()
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	//glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	m_WindowPtr = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Vulkan", nullptr, nullptr);
+	glfwSetWindowUserPointer(m_WindowPtr, this);
+	glfwSetFramebufferSizeCallback(m_WindowPtr, &FrameBufferResizeCallback);
 }
 
 void VulkanBase::InitVulkan()
@@ -109,12 +116,13 @@ void VulkanBase::Cleanup()
 	glfwTerminate();
 }
 
-void VulkanBase::DrawFrame() const
+void VulkanBase::DrawFrame()
 {
 	m_SwapChain.Wait();
 	const uint32_t imageIdx{ m_SwapChain.GetImageIdx() };
 	m_Pipeline.Draw(imageIdx);
 	m_SwapChain.Present(imageIdx);
+	m_SwapChain.NextFrame();
 }
 
 void VulkanBase::CreateInstance()

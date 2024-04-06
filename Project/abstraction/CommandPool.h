@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace mk
@@ -19,7 +20,7 @@ namespace mk
 		void Initialize();
 		void Destroy();
 
-		VkCommandBuffer CreateCommandBuffer() const;
+		std::vector<VkCommandBuffer> CreateCommandBuffer(int nrBuffers = 1) const;
 
 	private:
 		void CreateCommandPool();
