@@ -108,7 +108,7 @@ void Shader::End() const
 
 void Shader::Reset() const
 {
-	vkResetCommandBuffer(m_CommandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
+	//vkResetCommandBuffer(m_CommandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
 }
 
 VkShaderModule Shader::CreateShaderModule(const VkDevice& device, const std::vector<char>& code) const

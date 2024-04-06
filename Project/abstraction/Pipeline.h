@@ -20,13 +20,16 @@ namespace mk
 		void Initialize(const std::string& shaderName);
 		void Destroy();
 
-		void Draw() const;
+		void Draw(uint32_t imageIdx) const;
 
 	private:
 		void CreatePipelineLayout();
 		void CreateRenderPass();
 		void CreatePipeline();
 		void CreateBuffers();
+
+		void StartCommandBuffer() const;
+		void SubmitCommandBuffer() const;
 
 		// Fixed functions
 		static VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
@@ -46,7 +49,6 @@ namespace mk
 
 		VkCommandBuffer m_CommandBuffer{ VK_NULL_HANDLE };
 		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
-		uint32_t m_ImageIdx{};
 
 		bool m_Destroyed{ true };
 	};

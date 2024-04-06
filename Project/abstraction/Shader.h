@@ -42,8 +42,6 @@ namespace mk
 		const std::string m_VertexShaderFile{};
 		const std::string m_FragmentShaderFile{};
 
-		// Every shader holds their command buffer that the renderer will access
-		VkCommandBuffer m_CommandBuffer{};
 		std::vector<VkPipelineShaderStageCreateInfo> m_ShaderStages{};
 	};
 }

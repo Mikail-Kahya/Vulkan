@@ -41,6 +41,16 @@ const VkSurfaceKHR& VulkanBase::GetSurface() const
 	return m_Surface;
 }
 
+const VkQueue& VulkanBase::GetGraphicsQueue() const
+{
+	return m_GraphicsQueue;
+}
+
+const VkQueue& VulkanBase::GetPresentQueue() const
+{
+	return m_PresentQueue;
+}
+
 const SwapChain& VulkanBase::GetSwapChain() const
 {
 	return m_SwapChain;
@@ -76,7 +86,10 @@ void VulkanBase::MainLoop()
 	while (!glfwWindowShouldClose(m_WindowPtr))
 	{
 		glfwPollEvents();
+		DrawFrame();
 	}
+
+	vkDeviceWaitIdle(m_Device);
 }
 
 void VulkanBase::Cleanup()
@@ -94,6 +107,14 @@ void VulkanBase::Cleanup()
 
 	glfwDestroyWindow(m_WindowPtr);
 	glfwTerminate();
+}
+
+void VulkanBase::DrawFrame() const
+{
+	m_SwapChain.Wait();
+	const uint32_t imageIdx{ m_SwapChain.GetImageIdx() };
+	m_Pipeline.Draw(imageIdx);
+	m_SwapChain.Present(imageIdx);
 }
 
 void VulkanBase::CreateInstance()

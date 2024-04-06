@@ -24,6 +24,8 @@ namespace mk
 		const VkDevice& GetDevice() const;
 		const VkPhysicalDevice& GetPhysicalDevice() const;
 		const VkSurfaceKHR& GetSurface() const;
+		const VkQueue& GetGraphicsQueue() const;
+		const VkQueue& GetPresentQueue() const;
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
 
@@ -32,6 +34,7 @@ namespace mk
 		void InitVulkan();
 		void MainLoop();
 		void Cleanup();
+		void DrawFrame() const;
 
 		// Vulkan initialization
 		void CreateInstance(); // Links device to library

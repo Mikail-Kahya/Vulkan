@@ -20,12 +20,17 @@ void SwapChain::Initialize()
 	m_Destroyed = false;
 	CreateSwapChain();
 	CreateImageViews();
+	CreateSyncObjects();
 }
 
 void SwapChain::Destroy()
 {
 	m_Destroyed = true;
 	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+
+	vkDestroySemaphore(device, m_ImageAvailableSemaphore, nullptr);
+	vkDestroySemaphore(device, m_RenderFinishedSemaphore, nullptr);
+	vkDestroyFence(device, m_InFlightFence, nullptr);
 
 	for (auto imageView : m_SwapChainImageViews)
 		vkDestroyImageView(device, imageView, nullptr);
@@ -69,20 +74,68 @@ VkRect2D SwapChain::GetScissor() const
 	return scissor;
 }
 
-int SwapChain::GetNrImages() const
+int SwapChain::GetNrImagesViews() const
 {
 	return static_cast<int>(m_SwapChainImageViews.size());
 }
 
-VkImageView SwapChain::GetImage(uint32_t idx) const
+VkImageView SwapChain::GetImageView(uint32_t idx) const
 {
-	if (idx >= static_cast<uint32_t>(GetNrImages()))
+	if (idx >= static_cast<uint32_t>(GetNrImagesViews()))
 	{
 		assert(false && "Out of range");
 		return {};
 	}
 
 	return m_SwapChainImageViews[idx];
+}
+
+uint32_t SwapChain::GetImageIdx() const
+{
+	uint32_t imageIdx{};
+	vkAcquireNextImageKHR(VulkanBase::GetInstance().GetDevice(), m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIdx);
+	return imageIdx;
+}
+
+void SwapChain::Wait() const
+{
+	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+
+	vkWaitForFences(device, 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
+	vkResetFences(device, 1, &m_InFlightFence);
+}
+
+void SwapChain::Present(uint32_t imageIdx) const
+{
+	VkPresentInfoKHR presentInfo{};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+	const auto signalSemaphores{ GetSignalSemaphores() };
+	presentInfo.waitSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
+	presentInfo.pWaitSemaphores = signalSemaphores.data();
+
+	const VkSwapchainKHR swapChains[] = { m_SwapChain };
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIdx;
+	presentInfo.pResults = nullptr; // Optional
+
+	vkQueuePresentKHR(VulkanBase::GetInstance().GetPresentQueue(), &presentInfo);
+}
+
+std::vector<VkSemaphore> SwapChain::GetWaitSemaphores() const
+{
+	return { m_ImageAvailableSemaphore };
+}
+
+std::vector<VkSemaphore> SwapChain::GetSignalSemaphores() const
+{
+	return { m_RenderFinishedSemaphore };
+}
+
+const VkFence& SwapChain::GetWaitingFence() const
+{
+	return m_InFlightFence;
 }
 
 void SwapChain::CreateSwapChain()
@@ -172,4 +225,21 @@ void SwapChain::CreateImageViews()
 		if (vkCreateImageView(VulkanBase::GetInstance().GetDevice(), &createInfo, nullptr, &m_SwapChainImageViews[idx]) != VK_SUCCESS)
 			throw std::runtime_error("Failed to create image views");
 	}
+}
+
+void SwapChain::CreateSyncObjects()
+{
+	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+
+	VkSemaphoreCreateInfo semaphoreInfo{};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkFenceCreateInfo fenceInfo{};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
+		vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS ||
+		vkCreateFence(device, &fenceInfo, nullptr, &m_InFlightFence) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create semaphores");
 }
