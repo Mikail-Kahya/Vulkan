@@ -120,9 +120,18 @@ void VulkanBase::DrawFrame()
 {
 	m_SwapChain.Wait();
 	const uint32_t imageIdx{ m_SwapChain.GetImageIdx() };
+	if (m_FrameBufferResized)
+		UpdateWindow();
 	m_Pipeline.Draw(imageIdx);
 	m_SwapChain.Present(imageIdx);
 	m_SwapChain.NextFrame();
+}
+
+void VulkanBase::UpdateWindow()
+{
+	vkDeviceWaitIdle(m_Device);
+	m_FrameBufferResized = false;
+	m_Pipeline.Update();
 }
 
 void VulkanBase::CreateInstance()

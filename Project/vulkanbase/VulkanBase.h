@@ -38,6 +38,7 @@ namespace mk
 		void MainLoop();
 		void Cleanup();
 		void DrawFrame();
+		void UpdateWindow();
 
 		// Vulkan initialization
 		void CreateInstance(); // Links device to library

@@ -41,6 +41,14 @@ void Pipeline::Destroy()
 	vkDestroyRenderPass(device, m_RenderPass, nullptr);
 }
 
+void Pipeline::Update()
+{
+	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	for (auto framebuffer : m_SwapChainFramebuffers)
+		vkDestroyFramebuffer(device, framebuffer, nullptr);
+	CreateBuffers();
+}
+
 void Pipeline::Draw(uint32_t imageIdx) const
 {
 	const SwapChain& swapChain{ VulkanBase::GetInstance().GetSwapChain() };

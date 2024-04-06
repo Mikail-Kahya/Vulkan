@@ -19,6 +19,7 @@ namespace mk
 
 		void Initialize(const std::string& shaderName);
 		void Destroy();
+		void Update();
 
 		void Draw(uint32_t imageIdx) const;
 
