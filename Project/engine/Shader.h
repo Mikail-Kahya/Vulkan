@@ -3,7 +3,7 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "structs.h"
+#include "Structs.h"
 
 namespace mk
 {

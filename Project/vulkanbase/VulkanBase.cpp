@@ -11,12 +11,16 @@
 
 #include <vector>
 
+#include "engine/ResourceManager.h"
+#include "engine/SceneManager.h"
+
 using namespace mk;
 
 void VulkanBase::Run()
 {
 	InitWindow();
 	InitVulkan();
+	InitScenes();
 	MainLoop();
 	Cleanup();
 }
@@ -85,7 +89,19 @@ void VulkanBase::InitVulkan()
 	CreateLogicalDevice();
 	m_CommandPool.Initialize();
 	m_SwapChain.Initialize();
-	m_Pipeline.Initialize("shader");
+}
+
+void VulkanBase::InitScenes()
+{
+	const std::string shaderName{ "shader" };
+	ResourceManager::GetInstance().LoadShader(shaderName);
+	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
+	scenePtr->AddMesh(shaderName)->AddVertices(
+	{ {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	});
+
 }
 
 void VulkanBase::MainLoop()
@@ -101,7 +117,7 @@ void VulkanBase::MainLoop()
 
 void VulkanBase::Cleanup()
 {
-	m_Pipeline.Destroy();
+	ResourceManager::GetInstance().Cleanup();
 	m_SwapChain.Destroy();
 	m_CommandPool.Destroy();
 	
@@ -122,7 +138,7 @@ void VulkanBase::DrawFrame()
 	const uint32_t imageIdx{ m_SwapChain.GetImageIdx() };
 	if (m_FrameBufferResized)
 		UpdateWindow();
-	m_Pipeline.Draw(imageIdx);
+	SceneManager::GetInstance().Draw(imageIdx);
 	m_SwapChain.Present(imageIdx);
 	m_SwapChain.NextFrame();
 }
@@ -131,7 +147,7 @@ void VulkanBase::UpdateWindow()
 {
 	vkDeviceWaitIdle(m_Device);
 	m_FrameBufferResized = false;
-	m_Pipeline.Update();
+	ResourceManager::GetInstance().Update();
 }
 
 void VulkanBase::CreateInstance()

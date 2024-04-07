@@ -13,9 +13,9 @@ namespace mk
 		~Pipeline();
 
 		Pipeline(const Pipeline& other)					= delete;
-		Pipeline(Pipeline&& other) noexcept				= delete;
+		Pipeline(Pipeline&& other) noexcept;
 		Pipeline& operator=(const Pipeline& other)		= delete;
-		Pipeline& operator=(Pipeline&& other) noexcept	= delete;
+		Pipeline& operator=(Pipeline&& other) noexcept;
 
 		void Initialize(const std::string& shaderName);
 		void Destroy();
@@ -44,10 +44,10 @@ namespace mk
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
-		VkPipeline m_GraphicsPipeline{};
+		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
 
-		std::vector<VkCommandBuffer> m_CommandBuffers{  };
+		std::vector<VkCommandBuffer> m_CommandBuffers{};
 		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
 
 		bool m_Destroyed{ true };

@@ -8,9 +8,9 @@
 #include "VulkanStructs.h"
 #include "interfaces/Singleton.h"
 
-#include "abstraction/CommandPool.h"
-#include "abstraction/Pipeline.h"
-#include "abstraction/SwapChain.h"
+#include "engine/CommandPool.h"
+#include "engine/Pipeline.h"
+#include "engine/SwapChain.h"
 
 namespace mk
 {
@@ -35,6 +35,7 @@ namespace mk
 	private:
 		void InitWindow();
 		void InitVulkan();
+		void InitScenes();
 		void MainLoop();
 		void Cleanup();
 		void DrawFrame();

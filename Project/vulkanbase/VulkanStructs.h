@@ -2,6 +2,7 @@
 #include <optional>
 #include <vector>
 #include "vulkan/vulkan_core.h"
+#include "glm/glm.hpp"
 
 namespace mk
 {

@@ -13,6 +13,41 @@ Pipeline::~Pipeline()
 		Destroy();
 }
 
+Pipeline::Pipeline(Pipeline&& other) noexcept
+	: m_Shader{ std::move(other.m_Shader) }
+	, m_PipelineLayout{ other.m_PipelineLayout }
+	, m_RenderPass{ other.m_RenderPass }
+	, m_GraphicsPipeline{ other.m_GraphicsPipeline }
+	, m_SwapChainFramebuffers{ std::move(other.m_SwapChainFramebuffers) }
+	, m_CommandBuffers{ std::move(other.m_CommandBuffers) }
+	, m_ClearColor{ other.m_ClearColor }
+	, m_Destroyed{ other.m_Destroyed }
+{
+	other.m_PipelineLayout = nullptr;
+	other.m_RenderPass = nullptr;
+	other.m_GraphicsPipeline = nullptr;
+	other.m_Destroyed = true;
+}
+
+Pipeline& Pipeline::operator=(Pipeline&& other) noexcept
+{
+	m_Shader = std::move(other.m_Shader);
+	m_PipelineLayout = other.m_PipelineLayout;
+	m_RenderPass = other.m_RenderPass;
+	m_GraphicsPipeline = other.m_GraphicsPipeline;
+	m_SwapChainFramebuffers = std::move(other.m_SwapChainFramebuffers);
+	m_CommandBuffers = std::move(other.m_CommandBuffers);
+	m_ClearColor = other.m_ClearColor;
+	m_Destroyed = other.m_Destroyed;
+
+	other.m_PipelineLayout = nullptr;
+	other.m_RenderPass = nullptr;
+	other.m_GraphicsPipeline = nullptr;
+	other.m_Destroyed = true;
+
+	return *this;
+}
+
 void Pipeline::Initialize(const std::string& shaderName)
 {
 	m_Destroyed = false;

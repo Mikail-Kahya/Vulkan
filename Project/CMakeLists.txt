@@ -31,9 +31,14 @@ set(SOURCES
     "vulkanbase/VulkanUtils.cpp" 
     "vulkanbase/VulkanBase.cpp"
 
-    "abstraction/Shader.cpp"
-    "abstraction/structs.cpp"
-  "abstraction/Pipeline.cpp" "abstraction/SwapChain.cpp" "abstraction/CommandPool.cpp" )
+    "engine/Shader.cpp"
+    "engine/structs.cpp"
+    "engine/Pipeline.cpp" 
+    "engine/SwapChain.cpp" 
+    "engine/CommandPool.cpp" 
+
+    "engine/Mesh.cpp"
+ "engine/Scene.cpp" "engine/ResourceManager.cpp" "engine/SceneManager.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})
