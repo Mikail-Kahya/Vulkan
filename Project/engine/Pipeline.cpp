@@ -84,7 +84,7 @@ void Pipeline::Update()
 	CreateBuffers();
 }
 
-void Pipeline::Draw(uint32_t imageIdx) const
+void Pipeline::Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const
 {
 	const SwapChain& swapChain{ VulkanBase::GetInstance().GetSwapChain() };
 	const auto scissor{ swapChain.GetScissor() };
@@ -116,7 +116,9 @@ void Pipeline::Draw(uint32_t imageIdx) const
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+
+	for (Mesh* mesh : meshes)
+		mesh->Draw(commandBuffer);
 
 	vkCmdEndRenderPass(commandBuffer);
 
@@ -282,12 +284,14 @@ VkPipelineDynamicStateCreateInfo Pipeline::CreateDynamicState(const std::vector<
 
 VkPipelineVertexInputStateCreateInfo Pipeline::CreateVertexInfo()
 {
+	const auto attributeDescriptions = Vertex::GetAttributeDescriptions();
+
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr;
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.pVertexBindingDescriptions = Vertex::GetBindingDescription();
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions->size());
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions->data();
 	return vertexInputInfo;
 }
 

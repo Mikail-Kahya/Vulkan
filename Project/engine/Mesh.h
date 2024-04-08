@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "Structs.h"
+#include "VertexBuffer.h"
 
 namespace mk
 {
@@ -9,16 +10,17 @@ namespace mk
 	{
 	public:
 		Mesh()	= default;
-		~Mesh()	= default;
+		~Mesh();
 
 		Mesh(const Mesh& other)					= delete;
 		Mesh(Mesh&& other) noexcept				= delete;
 		Mesh& operator=(const Mesh& other)		= delete;
 		Mesh& operator=(Mesh&& other) noexcept	= delete;
 
-		void AddVertices(const std::vector<Vertex>& vertices);
+		void Draw(VkCommandBuffer commandBuffer) const;
+		void Load(const std::vector<Vertex>& vertices);
 
 	private:
-		std::vector<Vertex> m_Vertices{};
+		VertexBuffer m_VertexBuffer{};
 	};
 }

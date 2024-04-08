@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include "Mesh.h"
 
@@ -11,6 +12,7 @@ namespace mk
 
 	class Scene final
 	{
+		using Meshes = std::vector<std::unique_ptr<Mesh>>;
 	public:
 		Scene()		= default;
 		~Scene()	= default;
@@ -26,7 +28,6 @@ namespace mk
 		void RemoveMesh(Mesh* meshPtr);
 
 	private:
-		using AllocatedMesh = std::pair<Pipeline*, std::unique_ptr<Mesh>>;
-		std::vector<AllocatedMesh> m_Meshes;
+		std::unordered_map<Pipeline*, Meshes> m_MeshSets{};
 	};
 }

@@ -22,14 +22,6 @@ namespace mk
 		const std::vector<VkPipelineShaderStageCreateInfo>& GetShaderStages() const;
 		void DestroyModules(const VkDevice& vkDevice);
 
-		VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo() const;
-		VkPipelineInputAssemblyStateCreateInfo CreateInputAssemblyStateInfo() const;
-
-		void Start() const;
-		void Record(const std::vector<Vertex>& vertices);
-		void End() const;
-		void Reset() const;
-
 	private:
 		VkPipelineShaderStageCreateInfo CreateShaderStageInfo(const VkDevice& device, const std::string& fileName, VkShaderStageFlagBits stage) const;
 		VkPipelineShaderStageCreateInfo CreateVertexShaderInfo(const VkDevice& device, const std::string& fileName) const;

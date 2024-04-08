@@ -19,6 +19,7 @@ namespace mk
 		SceneManager& operator=(SceneManager&& other) noexcept	= delete;
 
 		void Draw(uint32_t imageIdx) const;
+		void Cleanup();
 
 		Scene* LoadScene(const std::string& sceneName);
 		void RemoveScene(const std::string& sceneName);

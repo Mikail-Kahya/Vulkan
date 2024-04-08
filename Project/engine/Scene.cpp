@@ -8,26 +8,32 @@ using namespace mk;
 
 void Scene::Draw(uint32_t imageIdx) const
 {
-	for (const auto& mesh : m_Meshes)
-		mesh.first->Draw(imageIdx);
+	std::vector<Mesh*> meshes{};
+	for (const auto& meshSet : m_MeshSets)
+	{
+		for (const auto& mesh : meshSet.second)
+			meshes.push_back(mesh.get());
+
+		meshSet.first->Draw(imageIdx, meshes);
+		meshes.clear();
+	}
+		
 }
 
 Mesh* Scene::AddMesh(const std::string& shader)
 {
 	Pipeline* pipeline = ResourceManager::GetInstance().LoadShader(shader);
-	
-	std::unique_ptr<Mesh> mesh{ std::make_unique<Mesh>() };
-	Mesh* meshPtr{ mesh.get() };
-	m_Meshes.emplace_back(std::make_pair(pipeline, std::move(mesh)));
-	return meshPtr;
+
+	m_MeshSets[pipeline].emplace_back(std::make_unique<Mesh>());
+
+	return m_MeshSets[pipeline].back().get();
 }
 
 void Scene::RemoveMesh(Mesh* meshPtr)
 {
-	const auto foundIter = std::find_if(m_Meshes.begin(), m_Meshes.end(), [meshPtr](const AllocatedMesh& mesh)
-		{
-			return mesh.second.get() == meshPtr;
-		});
-
-	m_Meshes.erase(foundIter);
+	for (auto& meshSet : m_MeshSets)
+	{
+		if (std::erase_if(meshSet.second, [meshPtr](const std::unique_ptr<Mesh>& mesh) { return mesh.get() == meshPtr; }))
+			return;
+	}
 }

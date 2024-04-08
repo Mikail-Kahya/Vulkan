@@ -96,10 +96,10 @@ void VulkanBase::InitScenes()
 	const std::string shaderName{ "shader" };
 	ResourceManager::GetInstance().LoadShader(shaderName);
 	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-	scenePtr->AddMesh(shaderName)->AddVertices(
+	scenePtr->AddMesh(shaderName)->Load(
 	{ {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	{{-0.8f, 0.8f}, {0.0f, 0.0f, 1.0f}}
 	});
 
 }
@@ -117,6 +117,7 @@ void VulkanBase::MainLoop()
 
 void VulkanBase::Cleanup()
 {
+	SceneManager::GetInstance().Cleanup();
 	ResourceManager::GetInstance().Cleanup();
 	m_SwapChain.Destroy();
 	m_CommandPool.Destroy();

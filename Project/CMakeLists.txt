@@ -38,7 +38,7 @@ set(SOURCES
     "engine/CommandPool.cpp" 
 
     "engine/Mesh.cpp"
- "engine/Scene.cpp" "engine/ResourceManager.cpp" "engine/SceneManager.cpp")
+ "engine/Scene.cpp" "engine/ResourceManager.cpp" "engine/SceneManager.cpp" "engine/VertexBuffer.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})

@@ -2,7 +2,17 @@
 
 using namespace mk;
 
-void Mesh::AddVertices(const std::vector<Vertex>& vertices)
+Mesh::~Mesh()
 {
-	m_Vertices.insert(m_Vertices.begin(), vertices.begin(), vertices.end());
+	m_VertexBuffer.Destroy();
+}
+
+void Mesh::Draw(VkCommandBuffer commandBuffer) const
+{
+	m_VertexBuffer.Draw(commandBuffer);
+}
+
+void Mesh::Load(const std::vector<Vertex>& vertices)
+{
+	m_VertexBuffer.SetVertices(vertices);
 }

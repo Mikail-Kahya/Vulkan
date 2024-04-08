@@ -304,3 +304,17 @@ void mk::FrameBufferResizeCallback(GLFWwindow* windowPtr, int width, int height)
     auto app = reinterpret_cast<VulkanBase*>(glfwGetWindowUserPointer(windowPtr));
     app->WindowChanged();
 }
+
+uint32_t mk::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+    VkPhysicalDeviceMemoryProperties memProperties{};
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+    for (uint32_t idx{}; idx < memProperties.memoryTypeCount; idx++) {
+        if (typeFilter & (1 << idx) && 
+            (memProperties.memoryTypes[idx].propertyFlags & properties) == properties)
+            return idx;
+    }
+
+    throw std::runtime_error("Failed to find suitable memory type");
+}

@@ -2,6 +2,7 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
+#include "Mesh.h"
 #include "Shader.h"
 
 namespace mk
@@ -21,7 +22,7 @@ namespace mk
 		void Destroy();
 		void Update();
 
-		void Draw(uint32_t imageIdx) const;
+		void Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const;
 
 	private:
 		void CreatePipelineLayout();

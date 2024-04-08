@@ -55,62 +55,6 @@ VkPipelineShaderStageCreateInfo Shader::CreateFragmentShaderInfo(const VkDevice&
 	return CreateShaderStageInfo(device, fileName + ".frag", VK_SHADER_STAGE_FRAGMENT_BIT);
 }
 
-VkPipelineVertexInputStateCreateInfo Shader::CreateVertexInputStateInfo() const
-{
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-	//
-	//auto bindingDescription{ Vertex::GetBindingDescription() };
-	//auto attributeDescription{ Vertex::GetAttributeDescriptions() };
-	//
-	//vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	//vertexInputInfo.vertexBindingDescriptionCount = 1;
-	//vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescription.size());
-	//vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-	//vertexInputInfo.pVertexAttributeDescriptions = attributeDescription.data();
-	//
-	return vertexInputInfo;
-}
-
-VkPipelineInputAssemblyStateCreateInfo Shader::CreateInputAssemblyStateInfo() const
-{
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	inputAssembly.primitiveRestartEnable = VK_FALSE;
-	return inputAssembly;
-}
-
-void Shader::Start() const
-{
-	//VkCommandBufferBeginInfo beginInfo{};
-	//beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	//beginInfo.flags = 0; // Optional
-	//beginInfo.pInheritanceInfo = nullptr; // Optional
-	//
-	//if (vkBeginCommandBuffer(m_CommandBuffer, &beginInfo) != VK_SUCCESS)
-	//	throw std::runtime_error("failed to begin recording command buffer!");
-}
-
-void Shader::Record(const std::vector<Vertex>& vertices)
-{
-	//VkBuffer vertexBuffers[] = { m_VertexBuffer };
-	//VkDeviceSize offsets[] = { 0 };
-	//vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, vertexBuffers, offsets);
-	//
-	//vkCmdDraw(m_CommandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-}
-
-void Shader::End() const
-{
-	//if (vkEndCommandBuffer(m_CommandBuffer) != VK_SUCCESS)
-	//	throw std::runtime_error("failed to record command buffer!");
-}
-
-void Shader::Reset() const
-{
-	//vkResetCommandBuffer(m_CommandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
-}
-
 VkShaderModule Shader::CreateShaderModule(const VkDevice& device, const std::vector<char>& code) const
 {
 	VkShaderModuleCreateInfo createInfo{};
