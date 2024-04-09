@@ -96,11 +96,20 @@ void VulkanBase::InitScenes()
 	const std::string shaderName{ "shader" };
 	ResourceManager::GetInstance().LoadShader(shaderName);
 	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-	scenePtr->AddMesh(shaderName)->Load(
-	{ {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{-0.8f, 0.8f}, {0.0f, 0.0f, 1.0f}}
-	});
+	Mesh* meshPtr = scenePtr->AddMesh(shaderName);
+
+	const std::vector<Vertex> vertices = {
+	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	};
+
+	const std::vector<uint16_t> indices = {
+		0, 1, 2, 2, 3, 0
+	};
+
+	meshPtr->Load(vertices, indices);
 
 }
 
