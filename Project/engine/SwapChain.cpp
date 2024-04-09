@@ -26,7 +26,7 @@ void SwapChain::Initialize()
 void SwapChain::Destroy()
 {
 	m_Destroyed = true;
-	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	for (int idx{}; idx < VulkanBase::MAX_FRAMES_IN_FLIGHT; ++idx)
 	{
@@ -43,7 +43,7 @@ void SwapChain::Destroy()
 
 void SwapChain::Wait()
 {
-	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	const VkResult result = vkWaitForFences(device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
@@ -186,8 +186,8 @@ const VkFence& SwapChain::GetWaitingFence() const
 void SwapChain::CreateSwapChain()
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	const VkPhysicalDevice& physicalDevice{ vulkanBase.GetPhysicalDevice() };
-	const VkDevice& device{ vulkanBase.GetDevice() };
+	VkPhysicalDevice physicalDevice{ vulkanBase.GetPhysicalDevice() };
+	VkDevice device{ vulkanBase.GetDevice() };
 	const VkSurfaceKHR surface{ vulkanBase.GetSurface() };
 
 	SwapChainSupportDetails swapChainSupport{ QuerySwapChainSupport(physicalDevice, surface) };
@@ -274,7 +274,7 @@ void SwapChain::CreateImageViews()
 
 void SwapChain::CreateSyncObjects()
 {
-	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 	m_ImageAvailableSemaphores.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 	m_RenderFinishedSemaphores.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 	m_InFlightFences.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);

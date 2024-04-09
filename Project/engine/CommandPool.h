@@ -2,6 +2,8 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
+#include "VertexBuffer.h"
+
 namespace mk
 {
 	class CommandBuffer;
@@ -21,6 +23,7 @@ namespace mk
 		void Destroy();
 
 		std::vector<VkCommandBuffer> CreateCommandBuffer(int nrBuffers = 1) const;
+		void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
 
 	private:
 		void CreateCommandPool();

@@ -23,6 +23,7 @@ namespace mk
 
 	private:
 		void CreateVertexBuffer(const Vertices& vertices);
+		static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 		VkBuffer m_VertexBuffer{ VK_NULL_HANDLE };
 		VkDeviceMemory m_VertexBufferMemory{ VK_NULL_HANDLE };

@@ -58,7 +58,7 @@ namespace mk
 	void FrameBufferResizeCallback(GLFWwindow* windowPtr, int width, int height);
 
 	uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
-;}
+}
 
 
 /*

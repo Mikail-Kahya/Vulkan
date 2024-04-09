@@ -13,7 +13,7 @@ Shader::Shader(const std::string& vertexShaderFile, const std::string& fragmentS
 {
 }
 
-void Shader::Initialize(const VkDevice& vkDevice)
+void Shader::Initialize(VkDevice vkDevice)
 {
 	m_ShaderStages.emplace_back(CreateVertexShaderInfo(vkDevice, m_VertexShaderFile));
 	m_ShaderStages.emplace_back(CreateFragmentShaderInfo(vkDevice, m_FragmentShaderFile));
@@ -24,14 +24,14 @@ const std::vector<VkPipelineShaderStageCreateInfo>& Shader::GetShaderStages() co
 	return m_ShaderStages;
 }
 
-void Shader::DestroyModules(const VkDevice& vkDevice)
+void Shader::DestroyModules(VkDevice vkDevice)
 {
 	for (VkPipelineShaderStageCreateInfo& stageInfo : m_ShaderStages)
 		vkDestroyShaderModule(vkDevice, stageInfo.module, nullptr);
 	m_ShaderStages.clear();
 }
 
-VkPipelineShaderStageCreateInfo Shader::CreateShaderStageInfo(const VkDevice& device, const std::string& fileName, VkShaderStageFlagBits stage) const
+VkPipelineShaderStageCreateInfo Shader::CreateShaderStageInfo(VkDevice device, const std::string& fileName, VkShaderStageFlagBits stage) const
 {
 	const std::string path{ SHADER_FOLDER + fileName + EXTENSION };
 	std::vector<char> shaderCode = ReadFile(path);
@@ -45,17 +45,17 @@ VkPipelineShaderStageCreateInfo Shader::CreateShaderStageInfo(const VkDevice& de
 	return shaderStageInfo;
 }
 
-VkPipelineShaderStageCreateInfo Shader::CreateVertexShaderInfo(const VkDevice& device, const std::string& fileName) const
+VkPipelineShaderStageCreateInfo Shader::CreateVertexShaderInfo(VkDevice device, const std::string& fileName) const
 {
 	return CreateShaderStageInfo(device, fileName + ".vert", VK_SHADER_STAGE_VERTEX_BIT);
 }
 
-VkPipelineShaderStageCreateInfo Shader::CreateFragmentShaderInfo(const VkDevice& device, const std::string& fileName) const
+VkPipelineShaderStageCreateInfo Shader::CreateFragmentShaderInfo(VkDevice device, const std::string& fileName) const
 {
 	return CreateShaderStageInfo(device, fileName + ".frag", VK_SHADER_STAGE_FRAGMENT_BIT);
 }
 
-VkShaderModule Shader::CreateShaderModule(const VkDevice& device, const std::vector<char>& code) const
+VkShaderModule Shader::CreateShaderModule(VkDevice device, const std::vector<char>& code) const
 {
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

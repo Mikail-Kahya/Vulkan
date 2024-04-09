@@ -65,7 +65,7 @@ void Pipeline::Destroy()
 {
 	m_Destroyed = true;
 
-	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	for (auto framebuffer : m_SwapChainFramebuffers)
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
@@ -78,7 +78,7 @@ void Pipeline::Destroy()
 
 void Pipeline::Update()
 {
-	const VkDevice& device{ VulkanBase::GetInstance().GetDevice() };
+	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 	for (auto framebuffer : m_SwapChainFramebuffers)
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
 	CreateBuffers();

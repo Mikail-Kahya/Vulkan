@@ -22,11 +22,11 @@ namespace mk
 		void WindowChanged();
 
 		GLFWwindow* GetWindow() const;
-		const VkDevice& GetDevice() const;
-		const VkPhysicalDevice& GetPhysicalDevice() const;
-		const VkSurfaceKHR& GetSurface() const;
-		const VkQueue& GetGraphicsQueue() const;
-		const VkQueue& GetPresentQueue() const;
+		VkDevice GetDevice() const;
+		VkPhysicalDevice GetPhysicalDevice() const;
+		VkSurfaceKHR GetSurface() const;
+		VkQueue GetGraphicsQueue() const;
+		VkQueue GetPresentQueue() const;
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
 

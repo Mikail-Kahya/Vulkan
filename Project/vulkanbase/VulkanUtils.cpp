@@ -318,3 +318,5 @@ uint32_t mk::FindMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter
 
     throw std::runtime_error("Failed to find suitable memory type");
 }
+
+

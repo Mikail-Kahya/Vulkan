@@ -35,27 +35,27 @@ GLFWwindow* VulkanBase::GetWindow() const
 	return m_WindowPtr;
 }
 
-const VkDevice& VulkanBase::GetDevice() const
+VkDevice VulkanBase::GetDevice() const
 {
 	return m_Device;
 }
 
-const VkPhysicalDevice& VulkanBase::GetPhysicalDevice() const
+VkPhysicalDevice VulkanBase::GetPhysicalDevice() const
 {
 	return m_PhysicalDevice;
 }
 
-const VkSurfaceKHR& VulkanBase::GetSurface() const
+VkSurfaceKHR VulkanBase::GetSurface() const
 {
 	return m_Surface;
 }
 
-const VkQueue& VulkanBase::GetGraphicsQueue() const
+VkQueue VulkanBase::GetGraphicsQueue() const
 {
 	return m_GraphicsQueue;
 }
 
-const VkQueue& VulkanBase::GetPresentQueue() const
+VkQueue VulkanBase::GetPresentQueue() const
 {
 	return m_PresentQueue;
 }
