@@ -1,39 +1,67 @@
 #include "Scene.h"
 
-#include "Mesh.h"
-#include "Pipeline.h"
+#include "Mesh2D.h"
+#include "Pipeline2D.h"
+#include "Pipeline3D.h"
 #include "ResourceManager.h"
 
 using namespace mk;
 
 void Scene::Draw(uint32_t imageIdx) const
 {
-	std::vector<Mesh*> meshes{};
-	for (const auto& meshSet : m_MeshSets)
+	std::vector<Mesh3D*> meshes3D{};
+	for (const auto& meshSet : m_Mesh3DSets)
 	{
 		for (const auto& mesh : meshSet.second)
-			meshes.push_back(mesh.get());
+			meshes3D.push_back(mesh.get());
 
-		meshSet.first->Draw(imageIdx, meshes);
-		meshes.clear();
+		meshSet.first->Draw(imageIdx, meshes3D);
+		meshes3D.clear();
 	}
-		
-}
 
-Mesh* Scene::AddMesh(const std::string& shader)
-{
-	Pipeline* pipeline = ResourceManager::GetInstance().LoadShader(shader);
-
-	m_MeshSets[pipeline].emplace_back(std::make_unique<Mesh>());
-
-	return m_MeshSets[pipeline].back().get();
-}
-
-void Scene::RemoveMesh(Mesh* meshPtr)
-{
-	for (auto& meshSet : m_MeshSets)
+	std::vector<Mesh2D*> meshes2D{};
+	for (const auto& meshSet : m_Mesh2DSets)
 	{
-		if (std::erase_if(meshSet.second, [meshPtr](const std::unique_ptr<Mesh>& mesh) { return mesh.get() == meshPtr; }))
+		for (const auto& mesh : meshSet.second)
+			meshes2D.push_back(mesh.get());
+
+		meshSet.first->Draw(imageIdx, meshes2D);
+		meshes2D.clear();
+	}
+}
+
+Mesh2D* Scene::AddMesh2D(const std::string& shader)
+{
+	Pipeline2D* pipeline = ResourceManager::GetInstance().LoadShader2D(shader);
+
+	m_Mesh2DSets[pipeline].emplace_back(std::make_unique<Mesh2D>());
+
+	return m_Mesh2DSets[pipeline].back().get();
+}
+
+Mesh3D* Scene::AddMesh3D(const std::string& shader)
+{
+	Pipeline3D* pipeline = ResourceManager::GetInstance().LoadShader3D(shader);
+
+	m_Mesh3DSets[pipeline].emplace_back(std::make_unique<Mesh3D>());
+
+	return m_Mesh3DSets[pipeline].back().get();
+}
+
+void Scene::RemoveMesh(Mesh2D* meshPtr)
+{
+	for (auto& meshSet : m_Mesh2DSets)
+	{
+		if (std::erase_if(meshSet.second, [meshPtr](const std::unique_ptr<Mesh2D>& mesh) { return mesh.get() == meshPtr; }))
+			return;
+	}
+}
+
+void Scene::RemoveMesh(Mesh3D* meshPtr)
+{
+	for (auto& meshSet : m_Mesh3DSets)
+	{
+		if (std::erase_if(meshSet.second, [meshPtr](const std::unique_ptr<Mesh3D>& mesh) { return mesh.get() == meshPtr; }))
 			return;
 	}
 }

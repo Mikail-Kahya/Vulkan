@@ -6,7 +6,7 @@
 
 namespace mk
 {
-	struct Vertex
+	struct Vertex2D
 	{
 		glm::vec2 pos;
 		glm::vec3 color;
@@ -14,4 +14,14 @@ namespace mk
 		static VkVertexInputBindingDescription* GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>* GetAttributeDescriptions();
 	};
+
+	struct Vertex3D
+	{
+		glm::vec3 pos;
+		glm::vec3 color;
+
+		static VkVertexInputBindingDescription* GetBindingDescription();
+		static std::vector<VkVertexInputAttributeDescription>* GetAttributeDescriptions();
+	};
+
 }

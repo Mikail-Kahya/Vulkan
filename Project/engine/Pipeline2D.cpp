@@ -1,4 +1,4 @@
-#include "Pipeline.h"
+#include "Pipeline2D.h"
 
 #include <stdexcept>
 #include <vector>
@@ -7,13 +7,12 @@
 
 using namespace mk;
 
-Pipeline::~Pipeline()
+Pipeline2D::~Pipeline2D()
 {
-	if (!m_Destroyed)
-		Destroy();
+	Destroy();
 }
 
-Pipeline::Pipeline(Pipeline&& other) noexcept
+Pipeline2D::Pipeline2D(Pipeline2D&& other) noexcept
 	: m_Shader{ std::move(other.m_Shader) }
 	, m_PipelineLayout{ other.m_PipelineLayout }
 	, m_RenderPass{ other.m_RenderPass }
@@ -21,15 +20,13 @@ Pipeline::Pipeline(Pipeline&& other) noexcept
 	, m_SwapChainFramebuffers{ std::move(other.m_SwapChainFramebuffers) }
 	, m_CommandBuffers{ std::move(other.m_CommandBuffers) }
 	, m_ClearColor{ other.m_ClearColor }
-	, m_Destroyed{ other.m_Destroyed }
 {
 	other.m_PipelineLayout = nullptr;
 	other.m_RenderPass = nullptr;
 	other.m_GraphicsPipeline = nullptr;
-	other.m_Destroyed = true;
 }
 
-Pipeline& Pipeline::operator=(Pipeline&& other) noexcept
+Pipeline2D& Pipeline2D::operator=(Pipeline2D&& other) noexcept
 {
 	m_Shader = std::move(other.m_Shader);
 	m_PipelineLayout = other.m_PipelineLayout;
@@ -38,20 +35,16 @@ Pipeline& Pipeline::operator=(Pipeline&& other) noexcept
 	m_SwapChainFramebuffers = std::move(other.m_SwapChainFramebuffers);
 	m_CommandBuffers = std::move(other.m_CommandBuffers);
 	m_ClearColor = other.m_ClearColor;
-	m_Destroyed = other.m_Destroyed;
 
 	other.m_PipelineLayout = nullptr;
 	other.m_RenderPass = nullptr;
 	other.m_GraphicsPipeline = nullptr;
-	other.m_Destroyed = true;
 
 	return *this;
 }
 
-void Pipeline::Initialize(const std::string& shaderName)
+void Pipeline2D::Initialize(const std::string& shaderName)
 {
-	m_Destroyed = false;
-
 	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
 	CreatePipelineLayout();
@@ -61,22 +54,40 @@ void Pipeline::Initialize(const std::string& shaderName)
 	CreateBuffers();
 }
 
-void Pipeline::Destroy()
+void Pipeline2D::Destroy()
 {
-	m_Destroyed = true;
-
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	for (auto framebuffer : m_SwapChainFramebuffers)
-		vkDestroyFramebuffer(device, framebuffer, nullptr);
+	{
+		if (framebuffer != VK_NULL_HANDLE)
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+	}
+	m_SwapChainFramebuffers.clear();
 
-	m_Shader->DestroyModules(device);
-	vkDestroyPipeline(device, m_GraphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(device, m_PipelineLayout,nullptr);
-	vkDestroyRenderPass(device, m_RenderPass, nullptr);
+	if (m_Shader)
+		m_Shader->DestroyModules(device);
+
+	if (m_GraphicsPipeline != VK_NULL_HANDLE)
+	{
+		vkDestroyPipeline(device, m_GraphicsPipeline, nullptr);
+		m_GraphicsPipeline = VK_NULL_HANDLE;
+	}
+
+	if (m_PipelineLayout != VK_NULL_HANDLE)
+	{
+		vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
+		m_PipelineLayout = VK_NULL_HANDLE;
+	}
+
+	if (m_RenderPass != VK_NULL_HANDLE)
+	{
+		vkDestroyRenderPass(device, m_RenderPass, nullptr);
+		m_RenderPass = VK_NULL_HANDLE;
+	}
 }
 
-void Pipeline::Update()
+void Pipeline2D::Update()
 {
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 	for (auto framebuffer : m_SwapChainFramebuffers)
@@ -84,7 +95,7 @@ void Pipeline::Update()
 	CreateBuffers();
 }
 
-void Pipeline::Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const
+void Pipeline2D::Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const
 {
 	const SwapChain& swapChain{ VulkanBase::GetInstance().GetSwapChain() };
 	const auto scissor{ swapChain.GetScissor() };
@@ -128,7 +139,7 @@ void Pipeline::Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const
 	SubmitCommandBuffer();
 }
 
-void Pipeline::CreatePipelineLayout()
+void Pipeline2D::CreatePipelineLayout()
 {
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -141,7 +152,7 @@ void Pipeline::CreatePipelineLayout()
 		throw std::runtime_error("failed to create pipeline layout!");
 }
 
-void Pipeline::CreateRenderPass()
+void Pipeline2D::CreateRenderPass()
 {
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = VulkanBase::GetInstance().GetSwapChain().GetSwapChainImageFormat();
@@ -183,7 +194,7 @@ void Pipeline::CreateRenderPass()
 		throw std::runtime_error("Failed to create render pass");
 }
 
-void Pipeline::CreatePipeline()
+void Pipeline2D::CreatePipeline()
 {
 	const std::vector<VkDynamicState> dynamicStates{
 		VK_DYNAMIC_STATE_VIEWPORT,
@@ -225,7 +236,7 @@ void Pipeline::CreatePipeline()
 		throw std::runtime_error("Failed to create graphics pipeline");
 }
 
-void Pipeline::CreateBuffers()
+void Pipeline2D::CreateBuffers()
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
@@ -249,7 +260,7 @@ void Pipeline::CreateBuffers()
 	}
 }
 
-void Pipeline::SubmitCommandBuffer() const
+void Pipeline2D::SubmitCommandBuffer() const
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
@@ -273,7 +284,7 @@ void Pipeline::SubmitCommandBuffer() const
 		throw std::runtime_error("Failed to submit draw command buffer");
 }
 
-VkPipelineDynamicStateCreateInfo Pipeline::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)
+VkPipelineDynamicStateCreateInfo Pipeline2D::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)
 {
 	VkPipelineDynamicStateCreateInfo dynamicState{};
 	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -282,7 +293,7 @@ VkPipelineDynamicStateCreateInfo Pipeline::CreateDynamicState(const std::vector<
 	return dynamicState;
 }
 
-VkPipelineVertexInputStateCreateInfo Pipeline::CreateVertexInfo()
+VkPipelineVertexInputStateCreateInfo Pipeline2D::CreateVertexInfo()
 {
 	const auto attributeDescriptions = Vertex::GetAttributeDescriptions();
 
@@ -295,7 +306,7 @@ VkPipelineVertexInputStateCreateInfo Pipeline::CreateVertexInfo()
 	return vertexInputInfo;
 }
 
-VkPipelineInputAssemblyStateCreateInfo Pipeline::CreateInputAssembly()
+VkPipelineInputAssemblyStateCreateInfo Pipeline2D::CreateInputAssembly()
 {
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -304,7 +315,7 @@ VkPipelineInputAssemblyStateCreateInfo Pipeline::CreateInputAssembly()
 	return inputAssembly;
 }
 
-VkPipelineViewportStateCreateInfo Pipeline::CreateViewportState()
+VkPipelineViewportStateCreateInfo Pipeline2D::CreateViewportState()
 {
 	VkPipelineViewportStateCreateInfo viewportState{};
 	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -313,7 +324,7 @@ VkPipelineViewportStateCreateInfo Pipeline::CreateViewportState()
 	return viewportState;
 }
 
-VkPipelineRasterizationStateCreateInfo Pipeline::CreateRasterizer()
+VkPipelineRasterizationStateCreateInfo Pipeline2D::CreateRasterizer()
 {
 	VkPipelineRasterizationStateCreateInfo rasterizer{};
 	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -330,7 +341,7 @@ VkPipelineRasterizationStateCreateInfo Pipeline::CreateRasterizer()
 	return rasterizer;
 }
 
-VkPipelineMultisampleStateCreateInfo Pipeline::CreateMultisampling()
+VkPipelineMultisampleStateCreateInfo Pipeline2D::CreateMultisampling()
 {
 	VkPipelineMultisampleStateCreateInfo multisampling{};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -343,7 +354,7 @@ VkPipelineMultisampleStateCreateInfo Pipeline::CreateMultisampling()
 	return multisampling;
 }
 
-VkPipelineColorBlendAttachmentState Pipeline::CreateColorBlendAttachment()
+VkPipelineColorBlendAttachmentState Pipeline2D::CreateColorBlendAttachment()
 {
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -365,7 +376,7 @@ VkPipelineColorBlendAttachmentState Pipeline::CreateColorBlendAttachment()
 	return colorBlendAttachment;
 }
 
-VkPipelineColorBlendStateCreateInfo Pipeline::CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment)
+VkPipelineColorBlendStateCreateInfo Pipeline2D::CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment)
 {
 	VkPipelineColorBlendStateCreateInfo colorBlending{};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

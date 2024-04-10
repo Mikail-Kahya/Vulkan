@@ -3,12 +3,11 @@
 #include <string>
 
 #include "interfaces/Singleton.h"
+#include "Pipeline2D.h"
+#include "Pipeline3D.h"
 
 namespace mk
 {
-	class Mesh;
-	class Pipeline;
-
 	class ResourceManager final : public Singleton<ResourceManager>
 	{
 	public:
@@ -20,11 +19,13 @@ namespace mk
 		ResourceManager& operator=(const ResourceManager& other)		= delete;
 		ResourceManager& operator=(ResourceManager&& other) noexcept	= delete;
 
-		Pipeline* LoadShader(const std::string& shader);
+		Pipeline2D* LoadShader2D(const std::string& shader);
+		Pipeline3D* LoadShader3D(const std::string& shader);
 		void Update();
 		void Cleanup();
 
 	private:
-		std::map<std::string, Pipeline> m_Pipelines{};
+		std::map<std::string, Pipeline2D> m_Pipelines2D{};
+		std::map<std::string, Pipeline3D> m_Pipelines3D{};
 	};
 }

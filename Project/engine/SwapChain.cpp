@@ -11,13 +11,11 @@ using namespace mk;
 
 SwapChain::~SwapChain()
 {
-	if (!m_Destroyed)
-		Destroy();
+	Destroy();
 }
 
 void SwapChain::Initialize()
 {
-	m_Destroyed = false;
 	CreateSwapChain();
 	CreateImageViews();
 	CreateSyncObjects();
@@ -25,20 +23,35 @@ void SwapChain::Initialize()
 
 void SwapChain::Destroy()
 {
-	m_Destroyed = true;
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	for (int idx{}; idx < VulkanBase::MAX_FRAMES_IN_FLIGHT; ++idx)
 	{
-		vkDestroySemaphore(device, m_ImageAvailableSemaphores[idx], nullptr);
-		vkDestroySemaphore(device, m_RenderFinishedSemaphores[idx], nullptr);
-		vkDestroyFence(device, m_InFlightFences[idx], nullptr);
+		if (!m_ImageAvailableSemaphores.empty())
+			vkDestroySemaphore(device, m_ImageAvailableSemaphores[idx], nullptr);
+			
+		if (!m_RenderFinishedSemaphores.empty())
+			vkDestroySemaphore(device, m_RenderFinishedSemaphores[idx], nullptr);
+			
+		if (!m_InFlightFences.empty())
+			vkDestroyFence(device, m_InFlightFences[idx], nullptr);
 	}
 
-	for (const auto imageView : m_SwapChainImageViews)
+	m_ImageAvailableSemaphores.clear();
+	m_RenderFinishedSemaphores.clear();
+	m_InFlightFences.clear();
+
+	for (auto imageView : m_SwapChainImageViews)
 		vkDestroyImageView(device, imageView, nullptr);
 
-	vkDestroySwapchainKHR(device, m_SwapChain, nullptr);
+	m_SwapChainImageViews.clear();
+
+	if (m_SwapChain != VK_NULL_HANDLE)
+	{
+		vkDestroySwapchainKHR(device, m_SwapChain, nullptr);
+		m_SwapChain = VK_NULL_HANDLE;
+	}
+		
 }
 
 void SwapChain::Wait()

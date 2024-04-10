@@ -1,4 +1,4 @@
-#include "VertexBuffer.h"
+#include "VertexBuffer2D.h"
 
 #include <stdexcept>
 
@@ -7,12 +7,12 @@
 
 using namespace mk;
 
-VertexBuffer::~VertexBuffer()
+VertexBuffer2D::~VertexBuffer2D()
 {
 	Destroy();
 }
 
-void VertexBuffer::Draw(VkCommandBuffer commandBuffer) const
+void VertexBuffer2D::Draw(VkCommandBuffer commandBuffer) const
 {
 	if (!IsValid())
 		return;
@@ -25,7 +25,7 @@ void VertexBuffer::Draw(VkCommandBuffer commandBuffer) const
 	vkCmdDrawIndexed(commandBuffer, m_NrIndices, 1, 0, 0, 0);
 }
 
-void VertexBuffer::SetVertices(const Vertices& vertices)
+void VertexBuffer2D::SetVertices(const Vertices& vertices)
 {
 	DestroyVertices();
 
@@ -33,7 +33,7 @@ void VertexBuffer::SetVertices(const Vertices& vertices)
 		CreateVertexBuffer(vertices);
 }
 
-void VertexBuffer::SetIndices(const Indices& indices)
+void VertexBuffer2D::SetIndices(const Indices& indices)
 {
 	DestroyIndices();
 
@@ -45,13 +45,13 @@ void VertexBuffer::SetIndices(const Indices& indices)
 		
 }
 
-void VertexBuffer::Destroy()
+void VertexBuffer2D::Destroy()
 {
 	DestroyIndices();
 	DestroyVertices();
 }
 
-void VertexBuffer::CreateVertexBuffer(const Vertices& vertices)
+void VertexBuffer2D::CreateVertexBuffer(const Vertices& vertices)
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	VkDevice device{ vulkanBase.GetDevice() };
@@ -79,7 +79,7 @@ void VertexBuffer::CreateVertexBuffer(const Vertices& vertices)
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void VertexBuffer::CreateIndexBuffer(const Indices& indices)
+void VertexBuffer2D::CreateIndexBuffer(const Indices& indices)
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	VkDevice device{ vulkanBase.GetDevice() };
@@ -105,13 +105,13 @@ void VertexBuffer::CreateIndexBuffer(const Indices& indices)
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void VertexBuffer::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+void VertexBuffer2D::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
                                 VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	VkDevice device{ vulkanBase.GetDevice() };
 
-	VertexBuffer vertexBuffer{};
+	VertexBuffer2D vertexBuffer{};
 
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -136,7 +136,7 @@ void VertexBuffer::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
 	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void VertexBuffer::DestroyVertices()
+void VertexBuffer2D::DestroyVertices()
 {
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
@@ -153,7 +153,7 @@ void VertexBuffer::DestroyVertices()
 	}
 }
 
-void VertexBuffer::DestroyIndices()
+void VertexBuffer2D::DestroyIndices()
 {
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
@@ -170,7 +170,7 @@ void VertexBuffer::DestroyIndices()
 	}
 }
 
-bool VertexBuffer::IsValid() const
+bool VertexBuffer2D::IsValid() const
 {
 	return	m_NrIndices != 0 &&
 			m_VertexBuffer != VK_NULL_HANDLE &&

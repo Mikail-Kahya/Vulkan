@@ -1,18 +1,15 @@
 #include "VulkanBase.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <iostream>
 #include <set>
-#include <GLFW/glfw3native.h>
-
 #include <stdexcept>
-
-#include "VulkanUtils.h"
-
 #include <vector>
 
+#include "VulkanUtils.h"
 #include "engine/ResourceManager.h"
 #include "engine/SceneManager.h"
+#include "engine/Mesh2D.h"
+#include "engine/Pipeline2D.h"
 
 using namespace mk;
 
@@ -93,23 +90,32 @@ void VulkanBase::InitVulkan()
 
 void VulkanBase::InitScenes()
 {
-	const std::string shaderName{ "shader" };
-	ResourceManager::GetInstance().LoadShader(shaderName);
+	const std::string shaderName{ "shader2D" };
 	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-	Mesh* meshPtr = scenePtr->AddMesh(shaderName);
+	Mesh3D* mesh3DPtr = scenePtr->AddMesh3D("shader3D");
+	//Mesh2D* meshPtr = scenePtr->AddMesh2D(shaderName);
 
-	const std::vector<Vertex> vertices = {
+	const std::vector<Vertex2D> vertices = {
 	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
 	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
 	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 	};
 
+	const std::vector<Vertex3D> vertices3D = {
+	{{-0.5f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, -0.5f, 2.f}, {0.0f, 1.0f, 0.0f}},
+	{{0.5f, 0.5f, 1.f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f, 1.f}, {1.0f, 1.0f, 1.0f}}
+	};
+
+
 	const std::vector<uint16_t> indices = {
 		0, 1, 2, 2, 3, 0
 	};
 
-	meshPtr->Load(vertices, indices);
+	mesh3DPtr->Load(vertices3D, indices);
+	//meshPtr->Load(vertices, indices);
 
 }
 

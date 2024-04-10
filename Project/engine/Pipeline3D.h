@@ -2,21 +2,23 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
-#include "Mesh.h"
+#include "Mesh3D.h"
 #include "Shader.h"
 
 namespace mk
 {
-	class Pipeline final
+	class Pipeline3D final
 	{
+		using Vertex = Vertex3D;
+		using Mesh = Mesh3D;
 	public:
-		Pipeline() = default;
-		~Pipeline();
+		Pipeline3D() = default;
+		~Pipeline3D();
 
-		Pipeline(const Pipeline& other)					= delete;
-		Pipeline(Pipeline&& other) noexcept;
-		Pipeline& operator=(const Pipeline& other)		= delete;
-		Pipeline& operator=(Pipeline&& other) noexcept;
+		Pipeline3D(const Pipeline3D& other)					= delete;
+		Pipeline3D(Pipeline3D&& other) noexcept;
+		Pipeline3D& operator=(const Pipeline3D& other)		= delete;
+		Pipeline3D& operator=(Pipeline3D&& other) noexcept;
 
 		void Initialize(const std::string& shaderName);
 		void Destroy();
@@ -50,7 +52,5 @@ namespace mk
 
 		std::vector<VkCommandBuffer> m_CommandBuffers{};
 		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
-
-		bool m_Destroyed{ true };
 	};
 }

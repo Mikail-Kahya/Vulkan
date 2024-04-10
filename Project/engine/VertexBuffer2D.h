@@ -5,18 +5,18 @@
 
 namespace mk
 {
-	class VertexBuffer final
+	class VertexBuffer2D final
 	{
-		using Vertices = std::vector<Vertex>;
+		using Vertices = std::vector<Vertex2D>;
 		using Indices = std::vector<uint16_t>;
 	public:
-		VertexBuffer()	= default;
-		~VertexBuffer();
+		VertexBuffer2D()	= default;
+		~VertexBuffer2D();
 
-		VertexBuffer(const VertexBuffer& other)					= default;
-		VertexBuffer(VertexBuffer&& other) noexcept				= default;
-		VertexBuffer& operator=(const VertexBuffer& other)		= default;
-		VertexBuffer& operator=(VertexBuffer&& other) noexcept	= default;
+		VertexBuffer2D(const VertexBuffer2D& other)					= default;
+		VertexBuffer2D(VertexBuffer2D&& other) noexcept				= default;
+		VertexBuffer2D& operator=(const VertexBuffer2D& other)		= default;
+		VertexBuffer2D& operator=(VertexBuffer2D&& other) noexcept	= default;
 
 		void Draw(VkCommandBuffer commandBuffer) const;
 		void SetVertices(const Vertices& vertices);

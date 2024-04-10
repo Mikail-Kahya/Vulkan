@@ -2,14 +2,12 @@
 
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
-#include <vector>
 #include <GLFW/glfw3.h>
 
 #include "VulkanStructs.h"
 #include "interfaces/Singleton.h"
 
 #include "engine/CommandPool.h"
-#include "engine/Pipeline.h"
 #include "engine/SwapChain.h"
 
 namespace mk
@@ -63,7 +61,6 @@ namespace mk
 		VkQueue m_GraphicsQueue{ VK_NULL_HANDLE };
 		VkQueue m_PresentQueue{ VK_NULL_HANDLE };
 
-		Pipeline m_Pipeline{};
 		SwapChain m_SwapChain{};
 		CommandPool m_CommandPool{};
 

@@ -11,23 +11,23 @@ using namespace mk;
 
 CommandPool::~CommandPool()
 {
-	if (!m_Destroy)
-		Destroy();
+	Destroy();
 }
 
 void CommandPool::Initialize()
 {
-	m_Destroy = false;
-
 	CreateCommandPool();
 }
 
 void CommandPool::Destroy()
 {
-	m_Destroy = true;
-
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
-	vkDestroyCommandPool(device, m_CommandPool, nullptr);
+
+	if (m_CommandPool != VK_NULL_HANDLE)
+	{
+		vkDestroyCommandPool(device, m_CommandPool, nullptr);
+		m_CommandPool = VK_NULL_HANDLE;
+	}
 }
 
 std::vector<VkCommandBuffer> CommandPool::CreateCommandBuffer(int nrBuffers) const

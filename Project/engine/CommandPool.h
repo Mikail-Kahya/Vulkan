@@ -2,7 +2,7 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "VertexBuffer.h"
+#include "VertexBuffer2D.h"
 
 namespace mk
 {
@@ -29,6 +29,5 @@ namespace mk
 		void CreateCommandPool();
 
 		VkCommandPool m_CommandPool{ VK_NULL_HANDLE };
-		bool m_Destroy{ true };
 	};
 }

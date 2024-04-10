@@ -31,14 +31,23 @@ set(SOURCES
     "vulkanbase/VulkanUtils.cpp" 
     "vulkanbase/VulkanBase.cpp"
 
+    "engine/ResourceManager.cpp" 
+    "engine/SceneManager.cpp" 
+    "engine/Scene.cpp" 
+
     "engine/Shader.cpp"
     "engine/structs.cpp"
-    "engine/Pipeline.cpp" 
     "engine/SwapChain.cpp" 
     "engine/CommandPool.cpp" 
 
-    "engine/Mesh.cpp"
- "engine/Scene.cpp" "engine/ResourceManager.cpp" "engine/SceneManager.cpp" "engine/VertexBuffer.cpp")
+    "engine/Pipeline2D.cpp" 
+    "engine/VertexBuffer2D.cpp" 
+    "engine/Mesh2D.cpp"
+
+    "engine/Pipeline3D.cpp" 
+    "engine/VertexBuffer3D.cpp" 
+    "engine/Mesh3D.cpp"
+    )
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})

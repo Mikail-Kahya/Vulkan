@@ -56,7 +56,5 @@ namespace mk
 		std::vector<VkFence> m_InFlightFences{};
 
 		uint32_t m_CurrentFrame{ 0 };
-
-		bool m_Destroyed{ true };
 	};
 }
