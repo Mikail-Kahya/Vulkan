@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "Structs.h"
+#include "UniformBuffer.h"
 #include "VertexBuffer3D.h"
 
 namespace mk
@@ -20,9 +21,30 @@ namespace mk
 		Mesh3D& operator=(Mesh3D&& other) noexcept	= delete;
 
 		void Draw(VkCommandBuffer commandBuffer) const;
+		void Update();
 		void Load(const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
 
+		void SetPosition(const glm::vec3& position);
+		void SetRotation(const glm::vec3& rotation);
+		void SetScale(const glm::vec3& scale);
+
+		void AddPosition(const glm::vec3& position);
+		void AddRotation(const glm::vec3& rotation);
+		void AddScale(const glm::vec3& scale);
+
 	private:
+		void ClampRotation();
+		float ClampAxis(float angle) const;
+		void SetTransform();
+		void FlagTransform();
+
+		UniformBuffer m_UniformBuffer{};
 		VertexBuffer m_VertexBuffer{};
+		glm::mat4 m_WorldTransform{};
+		glm::vec3 m_Position{};
+		glm::vec3 m_Rotation{};
+		glm::vec3 m_Scale{};
+
+		bool m_FlagTransform{ false };
 	};
 }

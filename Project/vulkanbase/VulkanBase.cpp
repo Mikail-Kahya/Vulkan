@@ -67,6 +67,16 @@ const CommandPool& VulkanBase::GetCommandPool() const
 	return m_CommandPool;
 }
 
+const Camera& VulkanBase::GetCamera() const
+{
+	return m_Camera;
+}
+
+uint32_t VulkanBase::GetImageIdx() const
+{
+	return m_ImageIdx;
+}
+
 void VulkanBase::InitWindow()
 {
 	glfwInit();
@@ -86,6 +96,7 @@ void VulkanBase::InitVulkan()
 	CreateLogicalDevice();
 	m_CommandPool.Initialize();
 	m_SwapChain.Initialize();
+	m_Camera = Camera{ static_cast<float>(m_SwapChain.GetWidth()), static_cast<float>(m_SwapChain.GetHeight()), 80.f };
 }
 
 void VulkanBase::InitScenes()
@@ -151,11 +162,11 @@ void VulkanBase::Cleanup()
 void VulkanBase::DrawFrame()
 {
 	m_SwapChain.Wait();
-	const uint32_t imageIdx{ m_SwapChain.GetImageIdx() };
+	m_ImageIdx = m_SwapChain.GetImageIdx();
 	if (m_FrameBufferResized)
 		UpdateWindow();
-	SceneManager::GetInstance().Draw(imageIdx);
-	m_SwapChain.Present(imageIdx);
+	SceneManager::GetInstance().Draw();
+	m_SwapChain.Present(m_ImageIdx);
 	m_SwapChain.NextFrame();
 }
 

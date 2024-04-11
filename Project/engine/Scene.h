@@ -25,7 +25,7 @@ namespace mk
 		Scene& operator=(const Scene& other)		= delete;
 		Scene& operator=(Scene&& other) noexcept	= delete;
 
-		void Draw(uint32_t imageIdx) const;
+		void Draw() const;
 
 		Mesh2D* AddMesh2D(const std::string& shader);
 		Mesh3D* AddMesh3D(const std::string& shader);

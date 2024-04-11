@@ -7,15 +7,19 @@
 
 using namespace mk;
 
-void Scene::Draw(uint32_t imageIdx) const
+void Scene::Draw() const
 {
 	std::vector<Mesh3D*> meshes3D{};
 	for (const auto& meshSet : m_Mesh3DSets)
 	{
 		for (const auto& mesh : meshSet.second)
+		{
+			mesh->Update();
 			meshes3D.push_back(mesh.get());
+		}
+			
 
-		meshSet.first->Draw(imageIdx, meshes3D);
+		meshSet.first->Draw(meshes3D);
 		meshes3D.clear();
 	}
 
@@ -25,7 +29,7 @@ void Scene::Draw(uint32_t imageIdx) const
 		for (const auto& mesh : meshSet.second)
 			meshes2D.push_back(mesh.get());
 
-		meshSet.first->Draw(imageIdx, meshes2D);
+		meshSet.first->Draw(meshes2D);
 		meshes2D.clear();
 	}
 }

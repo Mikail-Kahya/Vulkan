@@ -24,7 +24,7 @@ namespace mk
 		void Destroy();
 		void Update();
 
-		void Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const;
+		void Draw(const std::vector<Mesh*>& meshes) const;
 
 	private:
 		void CreatePipelineLayout();

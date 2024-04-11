@@ -21,12 +21,10 @@ namespace mk
 		void Draw(VkCommandBuffer commandBuffer) const;
 		void SetVertices(const Vertices& vertices);
 		void SetIndices(const Indices& indices);
-		void Destroy();
 
 	private:
 		void CreateVertexBuffer(const Vertices& vertices);
 		void CreateIndexBuffer(const Indices& indices);
-		static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 		void DestroyVertices();
 		void DestroyIndices();

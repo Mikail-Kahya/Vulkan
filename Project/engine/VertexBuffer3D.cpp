@@ -9,7 +9,8 @@ using namespace mk;
 
 VertexBuffer3D::~VertexBuffer3D()
 {
-	Destroy();
+	DestroyIndices();
+	DestroyVertices();
 }
 
 void VertexBuffer3D::Draw(VkCommandBuffer commandBuffer) const
@@ -45,22 +46,17 @@ void VertexBuffer3D::SetIndices(const Indices& indices)
 		
 }
 
-void VertexBuffer3D::Destroy()
-{
-	DestroyIndices();
-	DestroyVertices();
-}
-
 void VertexBuffer3D::CreateVertexBuffer(const Vertices& vertices)
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	VkDevice device{ vulkanBase.GetDevice() };
+	VkPhysicalDevice physicalDevice{ vulkanBase.GetPhysicalDevice() };
 
 	const VkDeviceSize bufferSize{ sizeof(vertices[0]) * vertices.size() };
 
 	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
 	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
-	CreateBuffer(	bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	CreateBuffer(	device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					stagingBuffer, stagingBufferMemory);
 
@@ -70,7 +66,7 @@ void VertexBuffer3D::CreateVertexBuffer(const Vertices& vertices)
 	memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
 	vkUnmapMemory(device, stagingBufferMemory);
 
-	CreateBuffer(	bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+	CreateBuffer(	device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 					VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_VertexBuffer, m_VertexBufferMemory);
 
 	vulkanBase.GetCommandPool().CopyBuffer(stagingBuffer, m_VertexBuffer, bufferSize);
@@ -83,12 +79,13 @@ void VertexBuffer3D::CreateIndexBuffer(const Indices& indices)
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	VkDevice device{ vulkanBase.GetDevice() };
+	VkPhysicalDevice physicalDevice{ vulkanBase.GetPhysicalDevice() };
 
 	const VkDeviceSize bufferSize{ sizeof(indices[0]) * indices.size() };
 
 	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
 	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
-	CreateBuffer(	bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+	CreateBuffer(	device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	void* data{ nullptr };
@@ -96,44 +93,13 @@ void VertexBuffer3D::CreateIndexBuffer(const Indices& indices)
 	memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
 	vkUnmapMemory(device, stagingBufferMemory);
 
-	CreateBuffer(	bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 
+	CreateBuffer(	device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 					VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_IndexBuffer, m_IndexBufferMemory);
 
 	vulkanBase.GetCommandPool().CopyBuffer(stagingBuffer, m_IndexBuffer, bufferSize);
 
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void VertexBuffer3D::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                                VkBuffer& buffer, VkDeviceMemory& bufferMemory)
-{
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	VkDevice device{ vulkanBase.GetDevice() };
-
-	VertexBuffer3D vertexBuffer{};
-
-	VkBufferCreateInfo bufferInfo{};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = usage;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-	if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
-		throw std::runtime_error("Failed to create buffer");
-
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
-
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = FindMemoryType(vulkanBase.GetPhysicalDevice(), memRequirements.memoryTypeBits, properties);
-
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
-		throw std::runtime_error("Failed to allocate buffer memory");
-
-	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
 void VertexBuffer3D::DestroyVertices()

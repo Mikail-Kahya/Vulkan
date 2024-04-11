@@ -21,7 +21,6 @@ namespace mk
 		void Draw(VkCommandBuffer commandBuffer) const;
 		void SetVertices(const Vertices& vertices);
 		void SetIndices(const Indices& indices);
-		void Destroy();
 
 	private:
 		void CreateVertexBuffer(const Vertices& vertices);

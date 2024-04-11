@@ -2,9 +2,9 @@
 
 using namespace mk;
 
-void SceneManager::Draw(uint32_t imageIdx) const
+void SceneManager::Draw() const
 {
-	m_CurrentScenePtr->Draw(imageIdx);
+	m_CurrentScenePtr->Draw();
 }
 
 void SceneManager::Cleanup()

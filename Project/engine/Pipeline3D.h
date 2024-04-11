@@ -24,9 +24,10 @@ namespace mk
 		void Destroy();
 		void Update();
 
-		void Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const;
+		void Draw(const std::vector<Mesh*>& meshes) const;
 
 	private:
+		void CreateDescriptorLayout();
 		void CreatePipelineLayout();
 		void CreateRenderPass();
 		void CreatePipeline();
@@ -46,6 +47,7 @@ namespace mk
 
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
+		VkDescriptorSetLayout m_DescriptorSetLayout{ VK_NULL_HANDLE };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};

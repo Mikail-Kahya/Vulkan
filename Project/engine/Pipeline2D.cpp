@@ -95,9 +95,10 @@ void Pipeline2D::Update()
 	CreateBuffers();
 }
 
-void Pipeline2D::Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const
+void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 {
-	const SwapChain& swapChain{ VulkanBase::GetInstance().GetSwapChain() };
+	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
 	const auto scissor{ swapChain.GetScissor() };
 	const auto viewport{ swapChain.GetViewport() };
 	const VkCommandBuffer commandBuffer{ m_CommandBuffers[swapChain.GetCurrentFrame()] };
@@ -117,7 +118,7 @@ void Pipeline2D::Draw(uint32_t imageIdx, const std::vector<Mesh*>& meshes) const
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = m_RenderPass;
-	renderPassInfo.framebuffer = m_SwapChainFramebuffers[imageIdx];
+	renderPassInfo.framebuffer = m_SwapChainFramebuffers[vulkanBase.GetImageIdx()];
 	renderPassInfo.renderArea = scissor;
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &m_ClearColor;

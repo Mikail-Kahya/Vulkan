@@ -9,7 +9,8 @@ using namespace mk;
 
 VertexBuffer2D::~VertexBuffer2D()
 {
-	Destroy();
+	DestroyIndices();
+	DestroyVertices();
 }
 
 void VertexBuffer2D::Draw(VkCommandBuffer commandBuffer) const
@@ -43,12 +44,6 @@ void VertexBuffer2D::SetIndices(const Indices& indices)
 		CreateIndexBuffer(indices);
 	}
 		
-}
-
-void VertexBuffer2D::Destroy()
-{
-	DestroyIndices();
-	DestroyVertices();
 }
 
 void VertexBuffer2D::CreateVertexBuffer(const Vertices& vertices)
@@ -110,8 +105,6 @@ void VertexBuffer2D::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, V
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	VkDevice device{ vulkanBase.GetDevice() };
-
-	VertexBuffer2D vertexBuffer{};
 
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

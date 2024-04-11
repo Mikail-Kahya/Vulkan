@@ -26,6 +26,8 @@ namespace mk
 		void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
 
 	private:
+		VkCommandBuffer BeginSingleTimeCommands() const;
+		void EndSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 		void CreateCommandPool();
 
 		VkCommandPool m_CommandPool{ VK_NULL_HANDLE };

@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "VulkanStructs.h"
+#include "engine/Camera.h"
 #include "interfaces/Singleton.h"
 
 #include "engine/CommandPool.h"
@@ -27,6 +28,8 @@ namespace mk
 		VkQueue GetPresentQueue() const;
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
+		const Camera& GetCamera() const;
+		uint32_t GetImageIdx() const;
 
 		static constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
 
@@ -63,6 +66,9 @@ namespace mk
 
 		SwapChain m_SwapChain{};
 		CommandPool m_CommandPool{};
+		Camera m_Camera{};
+
+		uint32_t m_ImageIdx{};
 
 		bool m_FrameBufferResized{ false };
 	};
