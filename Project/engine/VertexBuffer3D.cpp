@@ -43,7 +43,6 @@ void VertexBuffer3D::SetIndices(const Indices& indices)
 		m_NrIndices = static_cast<uint32_t>(indices.size());
 		CreateIndexBuffer(indices);
 	}
-		
 }
 
 void VertexBuffer3D::CreateVertexBuffer(const Vertices& vertices)

@@ -1,5 +1,8 @@
 #include "UniformBuffer.h"
 
+#include <stdexcept>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "vulkanbase/VulkanBase.h"
 #include "vulkanbase/VulkanStructs.h"
 #include "vulkanbase/VulkanUtils.h"
@@ -9,6 +12,7 @@ using namespace mk;
 UniformBuffer::UniformBuffer()
 {
 	CreateUniformBuffers();
+	CreateDescriptorSets();
 }
 
 UniformBuffer::~UniformBuffer()
@@ -26,13 +30,19 @@ UniformBuffer::~UniformBuffer()
 
 void UniformBuffer::Update(const glm::mat4& worldTransform)
 {
-	m_BufferInfo.model = worldTransform;
 	const Camera& camera{ VulkanBase::GetInstance().GetCamera() };
+	m_BufferInfo.model = worldTransform;
 	m_BufferInfo.proj = camera.GetProjectionMatrix();
 	m_BufferInfo.view = camera.GetViewMatrix();
-
-	auto image{ VulkanBase::GetInstance().GetImageIdx() };
 	memcpy(m_UniformBuffersMapped[VulkanBase::GetInstance().GetSwapChain().GetCurrentFrame()], &m_BufferInfo, sizeof(m_BufferInfo));
+}
+
+void UniformBuffer::SetActive(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const
+{
+	vkCmdBindDescriptorSets(
+		commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 
+		1, &m_DescriptorSets[VulkanBase::GetInstance().GetSwapChain().GetCurrentFrame()], 
+		0, nullptr);
 }
 
 void UniformBuffer::CreateUniformBuffers()
@@ -56,4 +66,36 @@ void UniformBuffer::CreateUniformBuffers()
 
 		vkMapMemory(device, m_UniformBuffersMemory[idx], 0, bufferSize, 0, &m_UniformBuffersMapped[idx]);
 	}
+}
+
+void UniformBuffer::CreateDescriptorSets()
+{
+	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	const VkDevice device{ vulkanBase.GetDevice() };
+	const auto allocInfo{ vulkanBase.GetDescriptorPool().GetAllocationInfo() };
+
+	m_DescriptorSets.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(VulkanBase::GetInstance().GetDevice(), &allocInfo, m_DescriptorSets.data()) != VK_SUCCESS)
+		throw std::runtime_error("Failed to allocate descriptor sets");
+
+	for (size_t idx{}; idx < VulkanBase::MAX_FRAMES_IN_FLIGHT; ++idx)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_UniformBuffers[idx];
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(UniformBufferObject);
+
+		VkWriteDescriptorSet descriptorWrite{};
+		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrite.dstSet = m_DescriptorSets[idx];
+		descriptorWrite.dstBinding = 0;
+		descriptorWrite.dstArrayElement = 0;
+		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrite.descriptorCount = 1;
+		descriptorWrite.pBufferInfo = &bufferInfo;
+		descriptorWrite.pImageInfo = nullptr; // Optional
+		descriptorWrite.pTexelBufferView = nullptr; // Optional
+		vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+	}
+
 }

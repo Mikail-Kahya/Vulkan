@@ -17,21 +17,20 @@ void Scene::Draw() const
 			mesh->Update();
 			meshes3D.push_back(mesh.get());
 		}
-			
 
 		meshSet.first->Draw(meshes3D);
 		meshes3D.clear();
 	}
 
-	std::vector<Mesh2D*> meshes2D{};
-	for (const auto& meshSet : m_Mesh2DSets)
-	{
-		for (const auto& mesh : meshSet.second)
-			meshes2D.push_back(mesh.get());
-
-		meshSet.first->Draw(meshes2D);
-		meshes2D.clear();
-	}
+	//std::vector<Mesh2D*> meshes2D{};
+	//for (const auto& meshSet : m_Mesh2DSets)
+	//{
+	//	for (const auto& mesh : meshSet.second)
+	//		meshes2D.push_back(mesh.get());
+	//
+	//	meshSet.first->Draw(meshes2D);
+	//	meshes2D.clear();
+	//}
 }
 
 Mesh2D* Scene::AddMesh2D(const std::string& shader)

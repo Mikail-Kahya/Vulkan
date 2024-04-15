@@ -18,14 +18,17 @@ namespace mk
 		UniformBuffer& operator=(UniformBuffer&& other) noexcept	= delete;
 
 		void Update(const glm::mat4& worldTransform);
+		void SetActive(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const;
 
 	private:
 		void CreateUniformBuffers();
+		void CreateDescriptorSets();
 
 		UniformBufferObject m_BufferInfo{};
 
 		std::vector<VkBuffer> m_UniformBuffers{};
 		std::vector<VkDeviceMemory> m_UniformBuffersMemory{};
 		std::vector<void*> m_UniformBuffersMapped{};
+		std::vector<VkDescriptorSet> m_DescriptorSets{};
 	};
 }

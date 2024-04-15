@@ -45,7 +45,7 @@ void Camera::SetViewport(float width, float height)
 void Camera::SetFOV(float fovDeg)
 {
 	FlagProjection();
-	m_FOV = tanf(glm::radians(fovDeg));
+	m_FOV = glm::radians(fovDeg);
 }
 
 void Camera::CalculateProjectionMatrix()
@@ -58,7 +58,8 @@ void Camera::CalculateProjectionMatrix()
 void Camera::CalculateViewMatrix()
 {
 	m_FlagView = false;
-	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+	//m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+	m_ViewMatrix = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void Camera::FlagView()

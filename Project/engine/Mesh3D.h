@@ -20,7 +20,7 @@ namespace mk
 		Mesh3D& operator=(const Mesh3D& other)		= delete;
 		Mesh3D& operator=(Mesh3D&& other) noexcept	= delete;
 
-		void Draw(VkCommandBuffer commandBuffer) const;
+		void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const;
 		void Update();
 		void Load(const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
 
@@ -43,8 +43,8 @@ namespace mk
 		glm::mat4 m_WorldTransform{};
 		glm::vec3 m_Position{};
 		glm::vec3 m_Rotation{};
-		glm::vec3 m_Scale{};
+		glm::vec3 m_Scale{1, 1, 1};
 
-		bool m_FlagTransform{ false };
+		bool m_FlagTransform{ true };
 	};
 }

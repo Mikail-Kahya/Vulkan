@@ -1,16 +1,28 @@
 #include "Mesh3D.h"
 
+// temp includes
+#include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace mk;
 
-void Mesh3D::Draw(VkCommandBuffer commandBuffer) const
+void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const
 {
+	if (!m_VertexBuffer.IsValid())
+		return;
+	m_UniformBuffer.SetActive(commandBuffer, pipelineLayout);
 	m_VertexBuffer.Draw(commandBuffer);
 }
 
 void Mesh3D::Update()
 {
+	// Temp hardcoded rotation
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	SetRotation({ 0.f, 0.f, time * 90.0f});
+
 	if (m_FlagTransform)
 		SetTransform();
 
@@ -81,18 +93,15 @@ float Mesh3D::ClampAxis(float angle) const
 void Mesh3D::SetTransform()
 {
 	m_FlagTransform = false;
-	glm::mat4 identity{ 1.f };
+	constexpr glm::mat4 identity{ 1.f };
 
 	constexpr glm::vec3 x{ 1, 0, 0 };
 	constexpr glm::vec3 y{ 0, 1, 0 };
 	constexpr glm::vec3 z{ 0, 0, 1 };
 
-
-	glm::mat4 rotation{ glm::rotate(identity, glm::radians(m_Rotation.z), z) };
-	rotation *= glm::rotate(identity, glm::radians(m_Rotation.y), y);
-	rotation *= glm::rotate(identity, glm::radians(m_Rotation.x), x);
-
-	m_WorldTransform = glm::translate(identity, m_Position) * rotation * glm::scale(identity, m_Scale);
+	m_WorldTransform = glm::translate(identity, m_Position);
+	m_WorldTransform *= glm::rotate(m_WorldTransform, glm::radians(m_Rotation.z), z);
+	m_WorldTransform *= glm::scale(m_WorldTransform, m_Scale);
 }
 
 void Mesh3D::FlagTransform()

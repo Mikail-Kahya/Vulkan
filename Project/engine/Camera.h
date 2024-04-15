@@ -39,7 +39,7 @@ namespace mk
 
 		glm::mat4 m_ViewMatrix{};
 		glm::mat4 m_ProjectionMatrix{};
-		glm::vec3 m_Position{2, 2, 2};
+		glm::vec3 m_Position{};
 
 		glm::vec3 m_Forward{ 0, 0, 1 };
 		glm::vec3 m_Up{ 0, 1, 0 };
@@ -48,7 +48,7 @@ namespace mk
 		float m_FOV{};
 
 		float m_ZFar{ 1000.f };
-		float m_ZNear{ .1f };
+		float m_ZNear{ 0.1f };
 
 		//float m_TotalPitch{};
 		//float m_TotalYaw{};

@@ -39,6 +39,7 @@ set(SOURCES
     "engine/structs.cpp"
     "engine/SwapChain.cpp" 
     "engine/CommandPool.cpp" 
+    "engine/DescriptorPool.cpp" 
 
     "engine/Pipeline2D.cpp" 
     "engine/VertexBuffer2D.cpp" 

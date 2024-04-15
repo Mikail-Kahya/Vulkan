@@ -8,8 +8,6 @@
 #include "VulkanUtils.h"
 #include "engine/ResourceManager.h"
 #include "engine/SceneManager.h"
-#include "engine/Mesh2D.h"
-#include "engine/Pipeline2D.h"
 
 using namespace mk;
 
@@ -72,6 +70,11 @@ const Camera& VulkanBase::GetCamera() const
 	return m_Camera;
 }
 
+const DescriptorPool& VulkanBase::GetDescriptorPool() const
+{
+	return m_DescriptorPool;
+}
+
 uint32_t VulkanBase::GetImageIdx() const
 {
 	return m_ImageIdx;
@@ -95,29 +98,31 @@ void VulkanBase::InitVulkan()
 	m_PhysicalDevice = PickPhysicalDevice(m_Instance, m_Surface);
 	CreateLogicalDevice();
 	m_CommandPool.Initialize();
+	m_DescriptorPool.Initialize();
 	m_SwapChain.Initialize();
-	m_Camera = Camera{ static_cast<float>(m_SwapChain.GetWidth()), static_cast<float>(m_SwapChain.GetHeight()), 80.f };
+	m_Camera = Camera{ static_cast<float>(m_SwapChain.GetWidth()), static_cast<float>(m_SwapChain.GetHeight()), 45.f };
 }
 
 void VulkanBase::InitScenes()
 {
 	const std::string shaderName{ "shader2D" };
 	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-	Mesh3D* mesh3DPtr = scenePtr->AddMesh3D("shader3D");
-	//Mesh2D* meshPtr = scenePtr->AddMesh2D(shaderName);
+	Mesh3D* plane = scenePtr->AddMesh3D("shader3D");
+	Mesh3D* plane2 = scenePtr->AddMesh3D("shader3D");
+	Mesh2D* plane2D = scenePtr->AddMesh2D(shaderName);
 
 	const std::vector<Vertex2D> vertices = {
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	{{-0.8f, 0.7f}, {1.0f, 0.0f, 0.0f}},
+	{{-0.7f, 0.7f}, {0.0f, 1.0f, 0.0f}},
+	{{-0.7f, 0.8f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.8f, 0.8f}, {1.0f, 1.0f, 1.0f}}
 	};
 
 	const std::vector<Vertex3D> vertices3D = {
 	{{-0.5f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f, 2.f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f, 1.f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f, 1.f}, {1.0f, 1.0f, 1.0f}}
+	{{0.5f, -0.5f, 0.f}, {0.0f, 1.0f, 0.0f}},
+	{{0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f, 0.f}, {1.0f, 1.0f, 1.0f}}
 	};
 
 
@@ -125,8 +130,11 @@ void VulkanBase::InitScenes()
 		0, 1, 2, 2, 3, 0
 	};
 
-	mesh3DPtr->Load(vertices3D, indices);
-	//meshPtr->Load(vertices, indices);
+	plane->Load(vertices3D, indices);
+	plane->SetPosition({ -1, 0, 0 });
+	plane2->Load(vertices3D, indices);
+	plane2->SetPosition({ 1, 0, 0 });
+	plane2D->Load(vertices, indices);
 
 }
 
@@ -135,6 +143,7 @@ void VulkanBase::MainLoop()
 	while (!glfwWindowShouldClose(m_WindowPtr))
 	{
 		glfwPollEvents();
+		m_Camera.Update();
 		DrawFrame();
 	}
 
@@ -146,6 +155,7 @@ void VulkanBase::Cleanup()
 	SceneManager::GetInstance().Cleanup();
 	ResourceManager::GetInstance().Cleanup();
 	m_SwapChain.Destroy();
+	m_DescriptorPool.Destroy();
 	m_CommandPool.Destroy();
 	
 	vkDestroyDevice(m_Device, nullptr);

@@ -36,7 +36,7 @@ namespace mk
 
 		std::vector<VkSemaphore> GetWaitSemaphores() const;
 		std::vector<VkSemaphore> GetSignalSemaphores() const;
-		const VkFence& GetWaitingFence() const;
+		VkFence GetWaitingFence() const;
 
 	private:
 		void CreateSwapChain();

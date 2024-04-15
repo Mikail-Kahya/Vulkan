@@ -47,7 +47,6 @@ void Pipeline3D::Initialize(const std::string& shaderName)
 {
 	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
-	CreateDescriptorLayout();
 	CreatePipelineLayout();
 	CreateRenderPass();
 	CreatePipeline();
@@ -73,12 +72,6 @@ void Pipeline3D::Destroy()
 	}
 		
 	if (m_PipelineLayout != VK_NULL_HANDLE)
-	{
-		vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
-		m_PipelineLayout = VK_NULL_HANDLE;
-	}
-
-	if (m_DescriptorSetLayout != VK_NULL_HANDLE)
 	{
 		vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
 		m_PipelineLayout = VK_NULL_HANDLE;
@@ -134,7 +127,7 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 	for (Mesh* mesh : meshes)
-		mesh->Draw(commandBuffer);
+		mesh->Draw(commandBuffer, m_PipelineLayout);
 
 	vkCmdEndRenderPass(commandBuffer);
 
@@ -144,30 +137,14 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	SubmitCommandBuffer();
 }
 
-void Pipeline3D::CreateDescriptorLayout()
-{
-	VkDescriptorSetLayoutBinding uboLayoutBinding{};
-	uboLayoutBinding.binding = 0;
-	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	uboLayoutBinding.descriptorCount = 1;
-	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-
-	VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 1;
-	layoutInfo.pBindings = &uboLayoutBinding;
-
-	if (vkCreateDescriptorSetLayout(VulkanBase::GetInstance().GetDevice(), &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS)
-		throw std::runtime_error("Failed to create descriptor set layout");
-}
-
 void Pipeline3D::CreatePipelineLayout()
 {
+	const auto setLayout{ VulkanBase::GetInstance().GetDescriptorPool().GetLayout() };
+
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &m_DescriptorSetLayout;
+	pipelineLayoutInfo.pSetLayouts = &setLayout;
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
@@ -303,6 +280,9 @@ void Pipeline3D::SubmitCommandBuffer() const
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &m_CommandBuffers[swapChain.GetCurrentFrame()];
 
+	VkFence fences[]{ swapChain.GetWaitingFence() };
+	vkWaitForFences(vulkanBase.GetDevice(), 1, fences, true, 1000);
+
 	if (vkQueueSubmit(vulkanBase.GetGraphicsQueue(), 1, &submitInfo, swapChain.GetWaitingFence()))
 		throw std::runtime_error("Failed to submit draw command buffer");
 }
@@ -356,7 +336,7 @@ VkPipelineRasterizationStateCreateInfo Pipeline3D::CreateRasterizer()
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0; // Optional
 	rasterizer.depthBiasClamp = 0; // Optional

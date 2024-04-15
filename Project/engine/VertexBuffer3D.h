@@ -21,6 +21,7 @@ namespace mk
 		void Draw(VkCommandBuffer commandBuffer) const;
 		void SetVertices(const Vertices& vertices);
 		void SetIndices(const Indices& indices);
+		bool IsValid() const;
 
 	private:
 		void CreateVertexBuffer(const Vertices& vertices);
@@ -28,7 +29,7 @@ namespace mk
 
 		void DestroyVertices();
 		void DestroyIndices();
-		bool IsValid() const;
+		
 
 		VkBuffer m_VertexBuffer{ VK_NULL_HANDLE };
 		VkDeviceMemory m_VertexBufferMemory{ VK_NULL_HANDLE };

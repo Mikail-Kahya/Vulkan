@@ -191,7 +191,7 @@ std::vector<VkSemaphore> SwapChain::GetSignalSemaphores() const
 	return { m_RenderFinishedSemaphores[m_CurrentFrame] };
 }
 
-const VkFence& SwapChain::GetWaitingFence() const
+VkFence SwapChain::GetWaitingFence() const
 {
 	return m_InFlightFences[m_CurrentFrame];
 }
