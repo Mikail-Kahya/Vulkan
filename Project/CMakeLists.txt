@@ -48,7 +48,9 @@ set(SOURCES
     "engine/Pipeline3D.cpp" 
     "engine/VertexBuffer3D.cpp" 
     "engine/Mesh3D.cpp"
-     "engine/UniformBuffer.cpp" "engine/Camera.cpp")
+     "engine/UniformBuffer.cpp" 
+     "engine/Camera.cpp" 
+     "engine/Utils.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})
@@ -57,3 +59,7 @@ add_dependencies(${PROJECT_NAME} Shaders)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARIES} glfw)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARIES} glm)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"
+)

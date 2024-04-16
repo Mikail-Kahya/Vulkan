@@ -4,6 +4,8 @@
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Utils.h"
+
 using namespace mk;
 
 void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const
@@ -33,6 +35,14 @@ void Mesh3D::Load(const std::vector<Vertex>& vertices, const std::vector<uint16_
 {
 	m_VertexBuffer.SetVertices(vertices);
 	m_VertexBuffer.SetIndices(indices);
+}
+
+void Mesh3D::Load(const std::string& objFile)
+{
+	std::vector<Vertex> vertices{};
+	std::vector<uint16_t> indices{};
+	if (ParseOBJ<Vertex3D>(objFile, vertices, indices))
+		Load(vertices, indices);
 }
 
 void Mesh3D::SetPosition(const glm::vec3& position)

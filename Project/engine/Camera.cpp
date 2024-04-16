@@ -59,7 +59,8 @@ void Camera::CalculateViewMatrix()
 {
 	m_FlagView = false;
 	//m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
-	m_ViewMatrix = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	m_Position = { 0, -25, 2 };
+	m_ViewMatrix = glm::lookAt(m_Position, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void Camera::FlagView()

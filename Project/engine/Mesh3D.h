@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <vector>
 
 #include "Structs.h"
@@ -23,6 +24,7 @@ namespace mk
 		void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const;
 		void Update();
 		void Load(const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
+		void Load(const std::string& objFile);
 
 		void SetPosition(const glm::vec3& position);
 		void SetRotation(const glm::vec3& rotation);

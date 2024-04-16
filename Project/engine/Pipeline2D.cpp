@@ -138,6 +138,8 @@ void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 		throw std::runtime_error("Failed to record command buffer");
 
 	SubmitCommandBuffer();
+	swapChain.GetWaitingFence(),
+	vkWaitForFences(vulkanBase.GetDevice(), 1, & true, 1000000);
 }
 
 void Pipeline2D::CreatePipelineLayout()

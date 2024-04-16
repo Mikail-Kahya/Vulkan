@@ -109,6 +109,7 @@ void VulkanBase::InitScenes()
 	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
 	Mesh3D* plane = scenePtr->AddMesh3D("shader3D");
 	Mesh3D* plane2 = scenePtr->AddMesh3D("shader3D");
+	Mesh3D* tuktuk = scenePtr->AddMesh3D("shader3D");
 	Mesh2D* plane2D = scenePtr->AddMesh2D(shaderName);
 
 	const std::vector<Vertex2D> vertices = {
@@ -135,7 +136,7 @@ void VulkanBase::InitScenes()
 	plane2->Load(vertices3D, indices);
 	plane2->SetPosition({ 1, 0, 0 });
 	plane2D->Load(vertices, indices);
-
+	tuktuk->Load("tuktuk.obj");
 }
 
 void VulkanBase::MainLoop()
