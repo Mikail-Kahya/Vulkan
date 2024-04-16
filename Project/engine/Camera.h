@@ -1,4 +1,5 @@
 #pragma once
+#include "Mouse.h"
 #include "glm/glm.hpp"
 
 namespace mk
@@ -15,7 +16,7 @@ namespace mk
 		Camera& operator=(const Camera& other)		= default;
 		Camera& operator=(Camera&& other) noexcept	= default;
 
-		void Update();
+		void Update(const Mouse& mouse);
 
 		const glm::mat4& GetViewMatrix() const;
 		const glm::mat4& GetProjectionMatrix() const;
@@ -29,7 +30,7 @@ namespace mk
 		
 		// Controls
 		//void Move(const uint8_t* keyboardStatePtr, float deltaTime);
-		//void Rotate(int mouseX, int mouseY);
+		void Rotate(const glm::vec2& mouseDir);
 		//void MouseMove(int mouseY, float deltaTime, float moveSpeed = 10.f);
 		//void VerticalMove(int direction, float deltaTime, float moveSpeed = 10.f);
 		
@@ -43,18 +44,17 @@ namespace mk
 
 		glm::vec3 m_Forward{ 0, 0, 1 };
 		glm::vec3 m_Up{ 0, 1, 0 };
-
 		float m_AspectRatio{ 1.6f };
 		float m_FOV{};
 
 		float m_ZFar{ 1000.f };
 		float m_ZNear{ 0.1f };
 
-		//float m_TotalPitch{};
-		//float m_TotalYaw{};
-		//
-		//float m_RotateSpeed{ 1.5f };
-		//float m_MoveSpeed{ 0.f };
+		float m_TotalPitch{};
+		float m_TotalYaw{};
+		
+		float m_RotateSpeed{ 0.01f };
+		float m_MoveSpeed{ 0.f };
 
 		bool m_FlagProjection{ true };
 		bool m_FlagView{ true };

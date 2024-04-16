@@ -10,6 +10,7 @@
 
 #include "engine/CommandPool.h"
 #include "engine/DescriptorPool.h"
+#include "engine/Mouse.h"
 #include "engine/SwapChain.h"
 
 namespace mk
@@ -71,6 +72,7 @@ namespace mk
 		CommandPool m_CommandPool{};
 		DescriptorPool m_DescriptorPool{};
 		Camera m_Camera{};
+		Mouse m_Mouse{ nullptr };
 
 		uint32_t m_ImageIdx{};
 

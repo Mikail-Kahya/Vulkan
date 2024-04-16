@@ -93,6 +93,7 @@ void VulkanBase::InitWindow()
 	m_WindowPtr = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Vulkan", nullptr, nullptr);
 	glfwSetWindowUserPointer(m_WindowPtr, this);
 	glfwSetFramebufferSizeCallback(m_WindowPtr, &FrameBufferResizeCallback);
+	m_Mouse = Mouse{ m_WindowPtr };
 }
 
 void VulkanBase::InitVulkan()
@@ -153,7 +154,8 @@ void VulkanBase::MainLoop()
 	while (!glfwWindowShouldClose(m_WindowPtr))
 	{
 		glfwPollEvents();
-		m_Camera.Update();
+		m_Mouse.Update();
+		m_Camera.Update(m_Mouse);
 		DrawFrame();
 	}
 
