@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "Time.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
@@ -19,16 +20,18 @@ Camera::Camera(float width, float height, float fovDeg)
 	SetFOV(fovDeg);
 }
 
-void Camera::Update(const Mouse& mouse)
+void Camera::Update(const Mouse& mouse, const Keyboard& keyboard)
 {
+	if (mouse.RightClick())
+		Rotate(mouse.GetDirection());
+
+	Move(keyboard);
+
 	if (m_FlagProjection)
 		CalculateProjectionMatrix();
 
 	if (m_FlagView)
 		CalculateViewMatrix();
-
-	if (mouse.RightClick())
-		Rotate(mouse.GetDirection());
 }
 
 const glm::mat4& Camera::GetViewMatrix() const
@@ -63,36 +66,76 @@ void Camera::CalculateProjectionMatrix()
 void Camera::CalculateViewMatrix()
 {
 	m_FlagView = false;
-	m_Position = { 0, -25, 2 };
-	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+	// Right handed
+	m_Right = glm::normalize(glm::cross(m_Forward, { 0,1,0 }));
+	m_Up = glm::normalize(glm::cross(m_Right, m_Forward));
 	
-	//m_ViewMatrix = glm::lookAt(m_Position, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+}
+
+void Camera::Move(const Keyboard& keyboard)
+{
+	bool hasMoved{ false };
+	glm::vec2 moveDir{};
+	if (keyboard.ButtonPress(GLFW_KEY_W))
+	{
+		moveDir.y += 1;
+		hasMoved = true;
+	}
+		
+	if (keyboard.ButtonPress(GLFW_KEY_S))
+	{
+		moveDir.y -= 1;
+		hasMoved = true;
+	}
+		
+	if (keyboard.ButtonPress(GLFW_KEY_D))
+	{
+		moveDir.x += 1;
+		hasMoved = true;
+	}
+		
+	if (keyboard.ButtonPress(GLFW_KEY_A))
+	{
+		moveDir.x -= 1;
+		hasMoved = true;
+	}
+
+	if (!hasMoved)
+		return;
+
+	moveDir *= m_MoveSpeed * Time::DeltaTime();
+	m_Position += m_Forward * moveDir.y;
+	m_Position += m_Right * moveDir.x;
+	FlagView();
 }
 
 void Camera::Rotate(const glm::vec2& mouseDir)
 {
+	const float deltaTime{ Time::DeltaTime() };
 	bool mouseMoved{ false };
+	
 	if (abs(mouseDir.x) > FLT_EPSILON)
 	{
-		m_TotalYaw += mouseDir.x * m_RotateSpeed;
+		m_TotalYaw -= mouseDir.x * m_RotateSpeed * deltaTime;
 		m_TotalYaw = std::fmod(m_TotalYaw, 360.f);
 		mouseMoved = true;
 	}
 	if (abs(mouseDir.y) > FLT_EPSILON)
 	{
 		// Flor allowed this :)
-		m_TotalPitch -= mouseDir.y * m_RotateSpeed;
+		m_TotalPitch -= mouseDir.y * m_RotateSpeed * deltaTime;
 		m_TotalPitch = std::clamp(m_TotalPitch, -90.f, 90.f);
 		mouseMoved = true;
 	}
 
-	if (mouseMoved)
-	{
-		FlagView();
-		glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalPitch), glm::vec3{ 0, 0, 1 });
-		rotation = glm::rotate(rotation, glm::radians(m_TotalYaw), { 0, 1, 0 });
-		m_Forward = rotation * glm::vec4{ m_Forward, 1 };
-	}
+	if (!mouseMoved)
+		return;
+	FlagView();
+	glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
+	rotation = glm::rotate(rotation, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
+
+	m_Forward = glm::normalize(rotation * glm::vec4{ 0, 0, 1, 1 });
 }
 
 void Camera::FlagView()

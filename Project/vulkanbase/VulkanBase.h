@@ -2,6 +2,7 @@
 
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
+#include <functional>
 #include <GLFW/glfw3.h>
 
 #include "VulkanStructs.h"
@@ -19,7 +20,7 @@ namespace mk
 	{
 	public:
 		VulkanBase() = default;
-		void Run();
+		void Run(const std::function<void()>& load);
 		void WindowChanged();
 
 		GLFWwindow* GetWindow() const;
@@ -40,7 +41,6 @@ namespace mk
 	private:
 		void InitWindow();
 		void InitVulkan();
-		void InitScenes();
 		void MainLoop();
 		void Cleanup();
 		void DrawFrame();
@@ -73,6 +73,7 @@ namespace mk
 		DescriptorPool m_DescriptorPool{};
 		Camera m_Camera{};
 		Mouse m_Mouse{ nullptr };
+		Keyboard m_Keyboard{ nullptr };
 
 		uint32_t m_ImageIdx{};
 

@@ -50,7 +50,7 @@ set(SOURCES
     "engine/Mesh3D.cpp"
      "engine/UniformBuffer.cpp" 
      "engine/Camera.cpp" 
-     "engine/Utils.cpp" "engine/Mouse.cpp")
+     "engine/Utils.cpp" "engine/Mouse.cpp" "engine/Keyboard.cpp" "engine/Time.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})

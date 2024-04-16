@@ -23,7 +23,7 @@ void Mesh3D::Update()
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	SetRotation({ 0.f, 0.f, time * 90.0f});
+	SetRotation({ 0.f, time * 90.0f, 0});
 
 	if (m_FlagTransform)
 		SetTransform();
@@ -105,13 +105,15 @@ void Mesh3D::SetTransform()
 	m_FlagTransform = false;
 	constexpr glm::mat4 identity{ 1.f };
 
-	constexpr glm::vec3 x{ 1, 0, 0 };
-	constexpr glm::vec3 y{ 0, 1, 0 };
-	constexpr glm::vec3 z{ 0, 0, 1 };
+	constexpr glm::vec3 x{ 1, 0, 0 }; // roll
+	constexpr glm::vec3 y{ 0, 1, 0 }; // yaw
+	constexpr glm::vec3 z{ 0, 0, 1 }; // pitch
 
 	m_WorldTransform = glm::translate(identity, m_Position);
-	m_WorldTransform *= glm::rotate(m_WorldTransform, glm::radians(m_Rotation.z), z);
-	m_WorldTransform *= glm::scale(m_WorldTransform, m_Scale);
+	m_WorldTransform = glm::rotate(m_WorldTransform, glm::radians(m_Rotation.x), x);
+	m_WorldTransform = glm::rotate(m_WorldTransform, glm::radians(m_Rotation.z), z);
+	m_WorldTransform = glm::rotate(m_WorldTransform, glm::radians(m_Rotation.y), y);
+	m_WorldTransform = glm::scale(m_WorldTransform, m_Scale);
 }
 
 void Mesh3D::FlagTransform()

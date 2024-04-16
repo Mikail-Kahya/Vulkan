@@ -11,10 +11,10 @@ namespace mk
 		Mouse(GLFWwindow* windowPtr);
 		~Mouse() = default;
 
-		Mouse(const Mouse& other) = default;
-		Mouse(Mouse&& other) noexcept = default;
-		Mouse& operator=(const Mouse& other) = default;
-		Mouse& operator=(Mouse&& other) noexcept = default;
+		Mouse(const Mouse& other)					= default;
+		Mouse(Mouse&& other) noexcept				= default;
+		Mouse& operator=(const Mouse& other)		= default;
+		Mouse& operator=(Mouse&& other) noexcept	= default;
 
 		void Update();
 

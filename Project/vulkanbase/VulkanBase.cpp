@@ -8,14 +8,16 @@
 #include "VulkanUtils.h"
 #include "engine/ResourceManager.h"
 #include "engine/SceneManager.h"
+#include "engine/Time.h"
 
 using namespace mk;
 
-void VulkanBase::Run()
+void VulkanBase::Run(const std::function<void()>& load)
 {
 	InitWindow();
 	InitVulkan();
-	InitScenes();
+	Time::Update();
+	load();
 	MainLoop();
 	Cleanup();
 }
@@ -94,6 +96,7 @@ void VulkanBase::InitWindow()
 	glfwSetWindowUserPointer(m_WindowPtr, this);
 	glfwSetFramebufferSizeCallback(m_WindowPtr, &FrameBufferResizeCallback);
 	m_Mouse = Mouse{ m_WindowPtr };
+	m_Keyboard = Keyboard{ m_WindowPtr };
 }
 
 void VulkanBase::InitVulkan()
@@ -109,42 +112,6 @@ void VulkanBase::InitVulkan()
 	m_Camera = Camera{ static_cast<float>(m_SwapChain.GetWidth()), static_cast<float>(m_SwapChain.GetHeight()), 45.f };
 }
 
-void VulkanBase::InitScenes()
-{
-	const std::string shaderName{ "shader2D" };
-	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-	Mesh3D* plane = scenePtr->AddMesh3D("shader3D");
-	Mesh3D* plane2 = scenePtr->AddMesh3D("shader3D");
-	Mesh3D* tuktuk = scenePtr->AddMesh3D("shader3D");
-	Mesh2D* plane2D = scenePtr->AddMesh2D(shaderName);
-
-	const std::vector<Vertex2D> vertices = {
-	{{-0.8f, 0.7f}, {1.0f, 0.0f, 0.0f}},
-	{{-0.7f, 0.7f}, {0.0f, 1.0f, 0.0f}},
-	{{-0.7f, 0.8f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.8f, 0.8f}, {1.0f, 1.0f, 1.0f}}
-	};
-
-	const std::vector<Vertex3D> vertices3D = {
-	{{-0.5f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f, 0.f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f, 0.f}, {1.0f, 1.0f, 1.0f}}
-	};
-
-
-	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0
-	};
-
-	plane->Load(vertices3D, indices);
-	plane->SetPosition({ -1, 0, 0 });
-	plane2->Load(vertices3D, indices);
-	plane2->SetPosition({ 1, 0, 0 });
-	plane2D->Load(vertices, indices);
-	tuktuk->Load("tuktuk.obj");
-}
-
 void VulkanBase::MainLoop()
 {
 	//glfwPollEvents();
@@ -153,9 +120,10 @@ void VulkanBase::MainLoop()
 	//return;
 	while (!glfwWindowShouldClose(m_WindowPtr))
 	{
+		Time::Update();
 		glfwPollEvents();
 		m_Mouse.Update();
-		m_Camera.Update(m_Mouse);
+		m_Camera.Update(m_Mouse, m_Keyboard);
 		DrawFrame();
 	}
 
