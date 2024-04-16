@@ -19,7 +19,7 @@ namespace mk
 #ifdef NDEBUG
 	inline constexpr bool ENABLE_VALIDATION_LAYERS{ false };
 #else
-	inline constexpr bool ENABLE_VALIDATION_LAYERS{ false };
+	inline constexpr bool ENABLE_VALIDATION_LAYERS{ true };
 #endif
 
 

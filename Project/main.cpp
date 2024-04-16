@@ -46,6 +46,20 @@ void Load()
 
 	mk::Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName);
 	tuktuk->Load("tuktuk.obj");
+
+
+	std::cout << "Controls:\n\n"
+		<< "=========\n\n"
+		<< "Rotation:\n"
+		<< "---------\n"
+		<< "Hold right click to rotate camera:\n\n"
+		<< "=========\n\n"
+		<< "Move:\n"
+		<< "-----\n"
+		<< "W => Move forward\n"
+		<< "S => Move backwards \n"
+		<< "D => Move right \n"
+		<< "A => Move left \n";
 }
 
 int main() {
