@@ -55,6 +55,11 @@ VkQueue VulkanBase::GetPresentQueue() const
 	return m_PresentQueue;
 }
 
+void VulkanBase::WaitDrawPipeline()
+{
+	m_SwapChain.Wait();
+}
+
 const SwapChain& VulkanBase::GetSwapChain() const
 {
 	return m_SwapChain;
@@ -141,6 +146,10 @@ void VulkanBase::InitScenes()
 
 void VulkanBase::MainLoop()
 {
+	//glfwPollEvents();
+	//m_Camera.Update();
+	//DrawFrame();
+	//return;
 	while (!glfwWindowShouldClose(m_WindowPtr))
 	{
 		glfwPollEvents();
@@ -179,6 +188,7 @@ void VulkanBase::DrawFrame()
 	SceneManager::GetInstance().Draw();
 	m_SwapChain.Present(m_ImageIdx);
 	m_SwapChain.NextFrame();
+	
 }
 
 void VulkanBase::UpdateWindow()

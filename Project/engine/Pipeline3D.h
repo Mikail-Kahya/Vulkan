@@ -13,6 +13,7 @@ namespace mk
 		using Mesh = Mesh3D;
 	public:
 		Pipeline3D() = default;
+		Pipeline3D(bool canClear);
 		~Pipeline3D();
 
 		Pipeline3D(const Pipeline3D& other)					= delete;
@@ -28,7 +29,7 @@ namespace mk
 
 	private:
 		void CreatePipelineLayout();
-		void CreateRenderPass();
+		void CreateRenderPass(bool canClear);
 		void CreatePipeline();
 		void CreateBuffers();
 
@@ -44,13 +45,14 @@ namespace mk
 		static VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
 		static VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
 
+		inline static const VkClearValue CLEAR_COLOR{ {{0.0f, 0.0f, 0.5f, 1.0f} } };
+
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
-
 		std::vector<VkCommandBuffer> m_CommandBuffers{};
-		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
+		bool m_CanClear{ false };
 	};
 }

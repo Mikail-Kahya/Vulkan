@@ -27,6 +27,7 @@ namespace mk
 		VkSurfaceKHR GetSurface() const;
 		VkQueue GetGraphicsQueue() const;
 		VkQueue GetPresentQueue() const;
+		void WaitDrawPipeline();
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
 		const Camera& GetCamera() const;

@@ -19,8 +19,8 @@ namespace mk
 		ResourceManager& operator=(const ResourceManager& other)		= delete;
 		ResourceManager& operator=(ResourceManager&& other) noexcept	= delete;
 
-		Pipeline2D* LoadShader2D(const std::string& shader);
-		Pipeline3D* LoadShader3D(const std::string& shader);
+		Pipeline2D* LoadShader2D(const std::string& shader, bool canClear = false);
+		Pipeline3D* LoadShader3D(const std::string& shader, bool canClear = false);
 		void Update();
 		void Cleanup();
 

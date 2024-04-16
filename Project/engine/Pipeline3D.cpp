@@ -7,6 +7,11 @@
 
 using namespace mk;
 
+Pipeline3D::Pipeline3D(bool canClear)
+	: m_CanClear{ canClear }
+{
+}
+
 Pipeline3D::~Pipeline3D()
 {
 	Destroy();
@@ -19,7 +24,7 @@ Pipeline3D::Pipeline3D(Pipeline3D&& other) noexcept
 	, m_GraphicsPipeline{ other.m_GraphicsPipeline }
 	, m_SwapChainFramebuffers{ std::move(other.m_SwapChainFramebuffers) }
 	, m_CommandBuffers{ std::move(other.m_CommandBuffers) }
-	, m_ClearColor{ other.m_ClearColor }
+	, m_CanClear{ other.m_CanClear }
 {
 	other.m_PipelineLayout = nullptr;
 	other.m_RenderPass = nullptr;
@@ -34,7 +39,7 @@ Pipeline3D& Pipeline3D::operator=(Pipeline3D&& other) noexcept
 	m_GraphicsPipeline = other.m_GraphicsPipeline;
 	m_SwapChainFramebuffers = std::move(other.m_SwapChainFramebuffers);
 	m_CommandBuffers = std::move(other.m_CommandBuffers);
-	m_ClearColor = other.m_ClearColor;
+	m_CanClear = other.m_CanClear;
 
 	other.m_PipelineLayout = nullptr;
 	other.m_RenderPass = nullptr;
@@ -48,7 +53,7 @@ void Pipeline3D::Initialize(const std::string& shaderName)
 	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
 	CreatePipelineLayout();
-	CreateRenderPass();
+	CreateRenderPass(m_CanClear);
 	CreatePipeline();
 	m_CommandBuffers = VulkanBase::GetInstance().GetCommandPool().CreateCommandBuffer(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 	CreateBuffers();
@@ -94,7 +99,7 @@ void Pipeline3D::Update()
 
 void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 {
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
 	const auto scissor{ swapChain.GetScissor() };
 	const auto viewport{ swapChain.GetViewport() };
@@ -117,8 +122,14 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	renderPassInfo.renderPass = m_RenderPass;
 	renderPassInfo.framebuffer = m_SwapChainFramebuffers[vulkanBase.GetImageIdx()];
 	renderPassInfo.renderArea = scissor;
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &m_ClearColor;
+	renderPassInfo.clearValueCount = 0;
+	renderPassInfo.pClearValues = nullptr;
+
+	if (m_CanClear)
+	{
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &CLEAR_COLOR;
+	}
 
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -152,12 +163,12 @@ void Pipeline3D::CreatePipelineLayout()
 		throw std::runtime_error("failed to create pipeline layout!");
 }
 
-void Pipeline3D::CreateRenderPass()
+void Pipeline3D::CreateRenderPass(bool canClear)
 {
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = VulkanBase::GetInstance().GetSwapChain().GetSwapChainImageFormat();
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.loadOp = canClear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;

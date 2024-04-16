@@ -13,11 +13,12 @@ namespace mk
 		using Mesh = Mesh2D;
 	public:
 		Pipeline2D() = default;
+		Pipeline2D(bool canClear);
 		~Pipeline2D();
 
-		Pipeline2D(const Pipeline2D& other)					= delete;
+		Pipeline2D(const Pipeline2D& other) = delete;
 		Pipeline2D(Pipeline2D&& other) noexcept;
-		Pipeline2D& operator=(const Pipeline2D& other)		= delete;
+		Pipeline2D& operator=(const Pipeline2D& other) = delete;
 		Pipeline2D& operator=(Pipeline2D&& other) noexcept;
 
 		void Initialize(const std::string& shaderName);
@@ -28,7 +29,7 @@ namespace mk
 
 	private:
 		void CreatePipelineLayout();
-		void CreateRenderPass();
+		void CreateRenderPass(bool canClear);
 		void CreatePipeline();
 		void CreateBuffers();
 
@@ -44,13 +45,14 @@ namespace mk
 		static VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
 		static VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
 
+		inline static const VkClearValue CLEAR_COLOR{ {{0.5f, 0.0f, 0.0f, 1.0f} } };
+
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
-
 		std::vector<VkCommandBuffer> m_CommandBuffers{};
-		VkClearValue m_ClearColor{ {{0.0f, 0.0f, 0.0f, 1.0f}} };
+		bool m_CanClear{ false };
 	};
 }

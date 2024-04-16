@@ -7,6 +7,11 @@
 
 using namespace mk;
 
+Pipeline2D::Pipeline2D(bool canClear)
+	: m_CanClear{ canClear }
+{
+}
+
 Pipeline2D::~Pipeline2D()
 {
 	Destroy();
@@ -19,7 +24,6 @@ Pipeline2D::Pipeline2D(Pipeline2D&& other) noexcept
 	, m_GraphicsPipeline{ other.m_GraphicsPipeline }
 	, m_SwapChainFramebuffers{ std::move(other.m_SwapChainFramebuffers) }
 	, m_CommandBuffers{ std::move(other.m_CommandBuffers) }
-	, m_ClearColor{ other.m_ClearColor }
 {
 	other.m_PipelineLayout = nullptr;
 	other.m_RenderPass = nullptr;
@@ -34,7 +38,6 @@ Pipeline2D& Pipeline2D::operator=(Pipeline2D&& other) noexcept
 	m_GraphicsPipeline = other.m_GraphicsPipeline;
 	m_SwapChainFramebuffers = std::move(other.m_SwapChainFramebuffers);
 	m_CommandBuffers = std::move(other.m_CommandBuffers);
-	m_ClearColor = other.m_ClearColor;
 
 	other.m_PipelineLayout = nullptr;
 	other.m_RenderPass = nullptr;
@@ -48,7 +51,7 @@ void Pipeline2D::Initialize(const std::string& shaderName)
 	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
 	CreatePipelineLayout();
-	CreateRenderPass();
+	CreateRenderPass(m_CanClear);
 	CreatePipeline();
 	m_CommandBuffers = VulkanBase::GetInstance().GetCommandPool().CreateCommandBuffer(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 	CreateBuffers();
@@ -97,7 +100,7 @@ void Pipeline2D::Update()
 
 void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 {
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
 	const auto scissor{ swapChain.GetScissor() };
 	const auto viewport{ swapChain.GetViewport() };
@@ -120,8 +123,13 @@ void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 	renderPassInfo.renderPass = m_RenderPass;
 	renderPassInfo.framebuffer = m_SwapChainFramebuffers[vulkanBase.GetImageIdx()];
 	renderPassInfo.renderArea = scissor;
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &m_ClearColor;
+	renderPassInfo.clearValueCount = 0;
+	renderPassInfo.pClearValues = nullptr;
+	if (m_CanClear)
+	{
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &CLEAR_COLOR;
+	}
 
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -138,8 +146,6 @@ void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 		throw std::runtime_error("Failed to record command buffer");
 
 	SubmitCommandBuffer();
-	swapChain.GetWaitingFence(),
-	vkWaitForFences(vulkanBase.GetDevice(), 1, & true, 1000000);
 }
 
 void Pipeline2D::CreatePipelineLayout()
@@ -155,12 +161,12 @@ void Pipeline2D::CreatePipelineLayout()
 		throw std::runtime_error("failed to create pipeline layout!");
 }
 
-void Pipeline2D::CreateRenderPass()
+void Pipeline2D::CreateRenderPass(bool canClear)
 {
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = VulkanBase::GetInstance().GetSwapChain().GetSwapChainImageFormat();
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.loadOp = (canClear) ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -361,21 +367,13 @@ VkPipelineColorBlendAttachmentState Pipeline2D::CreateColorBlendAttachment()
 {
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	colorBlendAttachment.blendEnable = VK_FALSE;
-	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
-
-	//colorBlendAttachment.blendEnable = VK_TRUE;
-	//colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	//colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	//colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-	//colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-	//colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-	//colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+	colorBlendAttachment.blendEnable = VK_TRUE;
+	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 	return colorBlendAttachment;
 }
 

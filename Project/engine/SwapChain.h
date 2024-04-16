@@ -43,7 +43,7 @@ namespace mk
 		void CreateImageViews();
 		void CreateSyncObjects();
 
-		void Update(); // perform when external variables such as the surface change
+		void UpdateInternal(); // perform when external variables such as the surface change
 
 		VkSwapchainKHR m_SwapChain{ VK_NULL_HANDLE };
 		VkExtent2D m_SwapChainExtent{};

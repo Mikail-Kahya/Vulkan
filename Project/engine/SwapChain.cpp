@@ -56,12 +56,12 @@ void SwapChain::Destroy()
 
 void SwapChain::Wait()
 {
-	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
+	const VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	const VkResult result = vkWaitForFences(device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
-		Update();
+		UpdateInternal();
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
 		throw std::runtime_error("Failed to acquire swap chain image");
 
@@ -85,7 +85,7 @@ void SwapChain::Present(uint32_t imageIdx)
 
 	const VkResult result = vkQueuePresentKHR(VulkanBase::GetInstance().GetPresentQueue(), &presentInfo);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-		Update();
+		UpdateInternal();
 	else if (result != VK_SUCCESS)
 		throw std::runtime_error("Failed to present swap chain image");
 }
@@ -95,7 +95,7 @@ void SwapChain::NextFrame()
 	m_CurrentFrame = (m_CurrentFrame + 1) % VulkanBase::MAX_FRAMES_IN_FLIGHT;
 }
 
-void SwapChain::Update()
+void SwapChain::UpdateInternal()
 {
 	VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	int width, height{};
@@ -169,7 +169,7 @@ uint32_t SwapChain::GetImageIdx()
 	uint32_t imageIdx{};
 	const VkResult result = vkAcquireNextImageKHR(VulkanBase::GetInstance().GetDevice(), m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIdx);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
-		Update();
+		UpdateInternal();
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
 		throw std::runtime_error("Failed to acquire swap chain image");
 

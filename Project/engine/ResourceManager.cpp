@@ -2,11 +2,11 @@
 
 using namespace mk;
 
-Pipeline2D* ResourceManager::LoadShader2D(const std::string& shader)
+Pipeline2D* ResourceManager::LoadShader2D(const std::string& shader, bool canClear)
 {
 	if (!m_Pipelines2D.contains(shader))
 	{
-		Pipeline2D pipeline{};
+		Pipeline2D pipeline{ canClear };
 		pipeline.Initialize(shader);
 
 		m_Pipelines2D[shader] = std::move(pipeline);
@@ -15,11 +15,11 @@ Pipeline2D* ResourceManager::LoadShader2D(const std::string& shader)
 	return &m_Pipelines2D[shader];
 }
 
-Pipeline3D* ResourceManager::LoadShader3D(const std::string& shader)
+Pipeline3D* ResourceManager::LoadShader3D(const std::string& shader, bool canClear)
 {
 	if (!m_Pipelines3D.contains(shader))
 	{
-		Pipeline3D pipeline{};
+		Pipeline3D pipeline{ canClear };
 		pipeline.Initialize(shader);
 
 		m_Pipelines3D[shader] = std::move(pipeline);
