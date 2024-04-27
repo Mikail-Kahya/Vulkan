@@ -43,10 +43,11 @@ void SecondaryCommandBuffer::Start(const RenderPass& renderPass) const
 		throw std::runtime_error("Failed to begin recording command buffer");
 }
 
-void SecondaryCommandBuffer::End() const
+void SecondaryCommandBuffer::End(const RenderPass& renderPass) const
 {
 	if (vkEndCommandBuffer(GetBuffer()) != VK_SUCCESS)
 		throw std::runtime_error("Failed to record command buffer");
+	vkCmdExecuteCommands(renderPass.GetPrimaryBuffer(), 1, &GetBuffer());
 }
 
 const VkCommandBuffer& SecondaryCommandBuffer::GetBuffer() const

@@ -25,7 +25,7 @@ namespace mk
 		friend class Singleton<VulkanBase>;
 
 	public:
-		virtual ~VulkanBase() override;
+		virtual ~VulkanBase() override = default;
 
 		void Run(const std::function<void()>& load);
 		void WindowChanged();
@@ -57,15 +57,15 @@ namespace mk
 		void UpdateWindow();
 
 		// Members
-		Window m_Window{ 800, 600, "Vulkan" };
-		Device m_Device{ m_Window.GetWindow() };
+		std::unique_ptr<Window> m_Window{};
+		std::unique_ptr<Device> m_Device{};
 		std::unique_ptr<DescriptorPool> m_DescriptorPool{};
 		std::unique_ptr<CommandPool> m_CommandPool{};
 		std::unique_ptr<SwapChain> m_SwapChain{};
 		std::unique_ptr<RenderPass> m_RenderPass{};
 		Camera m_Camera{};
-		Mouse m_Mouse{ m_Window.GetWindow() };
-		Keyboard m_Keyboard{ m_Window.GetWindow() };
+		Mouse m_Mouse{ nullptr };
+		Keyboard m_Keyboard{ nullptr };
 
 		uint32_t m_ImageIdx{};
 

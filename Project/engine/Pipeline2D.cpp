@@ -79,7 +79,6 @@ void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 	const auto viewport{ swapChain.GetViewport() };
 
 	m_CommandBuffer->Start(renderPass);
-	vkCmdExecuteCommands(renderPass.GetPrimaryBuffer(), 1, &m_CommandBuffer->GetBuffer());
 	const VkCommandBuffer commandBuffer{ m_CommandBuffer->GetBuffer() };
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
@@ -88,9 +87,7 @@ void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 	for (Mesh* mesh : meshes)
 		mesh->Draw(m_CommandBuffer->GetBuffer());
 
-	m_CommandBuffer->End();
-
-	SubmitCommandBuffer();
+	m_CommandBuffer->End(renderPass);
 }
 
 void Pipeline2D::CreatePipelineLayout()
@@ -146,11 +143,6 @@ void Pipeline2D::CreatePipeline()
 
 	if (vkCreateGraphicsPipelines(VulkanBase::GetInstance().GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create graphics pipeline");
-}
-
-void Pipeline2D::SubmitCommandBuffer() const
-{
-	
 }
 
 VkPipelineDynamicStateCreateInfo Pipeline2D::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)

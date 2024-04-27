@@ -32,8 +32,6 @@ namespace mk
 		void CreatePipelineLayout();
 		void CreatePipeline();
 
-		void SubmitCommandBuffer() const;
-
 		// Fixed functions
 		static VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
 		static VkPipelineVertexInputStateCreateInfo CreateVertexInfo();

@@ -34,9 +34,6 @@ void ResourceManager::Update()
 
 void ResourceManager::Cleanup()
 {
-	for (auto& pipeline : m_Pipelines2D)
-		pipeline.second.Destroy();
-
-	for (auto& pipeline : m_Pipelines3D)
-		pipeline.second.Destroy();
+	m_Pipelines2D.clear();
+	m_Pipelines3D.clear();
 }

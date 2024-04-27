@@ -79,7 +79,6 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	const auto viewport{ swapChain.GetViewport() };
 
 	m_CommandBuffer->Start(renderPass);
-	vkCmdExecuteCommands(renderPass.GetPrimaryBuffer(), 1, &m_CommandBuffer->GetBuffer());
 	const VkCommandBuffer commandBuffer{ m_CommandBuffer->GetBuffer() };
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
@@ -89,7 +88,7 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	for (Mesh* mesh : meshes)
 		mesh->Draw(commandBuffer, m_PipelineLayout);
 
-	m_CommandBuffer->End();
+	m_CommandBuffer->End(renderPass);
 }
 
 void Pipeline3D::CreatePipelineLayout()

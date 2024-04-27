@@ -18,7 +18,7 @@ namespace mk
 		SecondaryCommandBuffer& operator=(SecondaryCommandBuffer&& other) noexcept;
 
 		void Start(const RenderPass& renderPass) const;
-		void End() const;
+		void End(const RenderPass& renderPass) const;
 
 		const VkCommandBuffer& GetBuffer() const;
 
