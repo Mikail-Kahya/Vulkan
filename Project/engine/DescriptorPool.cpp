@@ -7,22 +7,17 @@
 
 using namespace mk;
 
-DescriptorPool::~DescriptorPool()
-{
-	Destroy();
-}
-
-void DescriptorPool::Initialize()
+DescriptorPool::DescriptorPool()
 {
 	CreateDescriptorLayout();
 	CreateDescriptorPool();
 	CreateAllocationInfo();
 }
 
-void DescriptorPool::Destroy()
+DescriptorPool::~DescriptorPool()
 {
-	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
-	
+	const VkDevice device{ VulkanBase::GetInstance().GetDevice() };
+
 	if (m_DescriptorPool != VK_NULL_HANDLE)
 	{
 		vkDestroyDescriptorPool(device, m_DescriptorPool, nullptr);
@@ -34,7 +29,6 @@ void DescriptorPool::Destroy()
 		vkDestroyDescriptorSetLayout(device, m_DescriptorSetLayout, nullptr);
 		m_DescriptorSetLayout = VK_NULL_HANDLE;
 	}
-
 }
 
 VkDescriptorSetLayout DescriptorPool::GetLayout() const

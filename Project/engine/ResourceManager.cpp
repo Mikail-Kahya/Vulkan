@@ -6,7 +6,7 @@ Pipeline2D* ResourceManager::LoadShader2D(const std::string& shader, bool canCle
 {
 	if (!m_Pipelines2D.contains(shader))
 	{
-		Pipeline2D pipeline{ canClear };
+		Pipeline2D pipeline{ };
 		pipeline.Initialize(shader);
 
 		m_Pipelines2D[shader] = std::move(pipeline);
@@ -19,7 +19,7 @@ Pipeline3D* ResourceManager::LoadShader3D(const std::string& shader, bool canCle
 {
 	if (!m_Pipelines3D.contains(shader))
 	{
-		Pipeline3D pipeline{ canClear };
+		Pipeline3D pipeline{ };
 		pipeline.Initialize(shader);
 
 		m_Pipelines3D[shader] = std::move(pipeline);
@@ -30,11 +30,6 @@ Pipeline3D* ResourceManager::LoadShader3D(const std::string& shader, bool canCle
 
 void ResourceManager::Update()
 {
-	for (auto& pipeline : m_Pipelines2D)
-		pipeline.second.Update();
-
-	for (auto& pipeline : m_Pipelines3D)
-		pipeline.second.Update();
 }
 
 void ResourceManager::Cleanup()

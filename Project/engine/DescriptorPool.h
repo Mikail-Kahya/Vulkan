@@ -9,16 +9,13 @@ namespace mk
 	class DescriptorPool final
 	{
 	public:
-		DescriptorPool() = default;
+		DescriptorPool();
 		~DescriptorPool();
 
 		DescriptorPool(const DescriptorPool& other)					= delete;
 		DescriptorPool(DescriptorPool&& other) noexcept				= delete;
 		DescriptorPool& operator=(const DescriptorPool& other)		= delete;
 		DescriptorPool& operator=(DescriptorPool&& other) noexcept	= delete;
-
-		void Initialize();
-		void Destroy();
 
 		VkDescriptorSetLayout GetLayout() const;
 		VkDescriptorSetAllocateInfo GetAllocationInfo() const;

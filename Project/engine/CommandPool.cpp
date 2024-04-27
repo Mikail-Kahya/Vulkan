@@ -1,43 +1,45 @@
 #include "CommandPool.h"
-#include "CommandPool.h"
 
 #include <stdexcept>
 
+#include "CommandBuffer.h"
+#include "SecondaryCommandBuffer.h"
 #include "vulkanbase/VulkanBase.h"
 #include "vulkanbase/VulkanStructs.h"
 #include "vulkanbase/VulkanUtils.h"
 
 using namespace mk;
 
+CommandPool::CommandPool()
+{
+	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	QueueFamilyIndices queueFamilyIndices{ FindQueueFamilies(vulkanBase.GetPhysicalDevice(), vulkanBase.GetSurface()) };
+
+	VkCommandPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+
+	if (vkCreateCommandPool(vulkanBase.GetDevice(), &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create command pool");
+}
+
 CommandPool::~CommandPool()
-{
-	Destroy();
-}
-
-void CommandPool::Initialize()
-{
-	CreateCommandPool();
-}
-
-void CommandPool::Destroy()
 {
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
-	if (m_CommandPool != VK_NULL_HANDLE)
-	{
-		vkDestroyCommandPool(device, m_CommandPool, nullptr);
-		m_CommandPool = VK_NULL_HANDLE;
-	}
+	vkDestroyCommandPool(device, m_CommandPool, nullptr);
+	m_CommandPool = VK_NULL_HANDLE;
 }
 
-std::vector<VkCommandBuffer> CommandPool::CreateCommandBuffer(int nrBuffers) const
+std::vector<VkCommandBuffer> CommandPool::CreateCommandBuffer(int nrBuffers, VkCommandBufferLevel bufferType) const
 {
 	std::vector<VkCommandBuffer> commandBuffers(nrBuffers);
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = m_CommandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.level = bufferType;
 	allocInfo.commandBufferCount = nrBuffers;
 
 	if (vkAllocateCommandBuffers(VulkanBase::GetInstance().GetDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
@@ -57,6 +59,16 @@ void CommandPool::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
 	EndSingleTimeCommands(commandBuffer);
+}
+
+CommandBuffer CommandPool::CreatePrimaryBuffer() const
+{
+	return CommandBuffer{ CreateCommandBuffer(VulkanBase::MAX_FRAMES_IN_FLIGHT, VK_COMMAND_BUFFER_LEVEL_PRIMARY) };
+}
+
+SecondaryCommandBuffer CommandPool::CreateSecondaryBuffer() const
+{
+	return SecondaryCommandBuffer{ CreateCommandBuffer(VulkanBase::MAX_FRAMES_IN_FLIGHT, VK_COMMAND_BUFFER_LEVEL_SECONDARY) };
 }
 
 VkCommandBuffer CommandPool::BeginSingleTimeCommands() const
@@ -93,18 +105,4 @@ void CommandPool::EndSingleTimeCommands(VkCommandBuffer commandBuffer) const
 	vkQueueWaitIdle(graphicsQueue);
 
 	vkFreeCommandBuffers(VulkanBase::GetInstance().GetDevice(), m_CommandPool, 1, &commandBuffer);
-}
-
-void CommandPool::CreateCommandPool()
-{
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	QueueFamilyIndices queueFamilyIndices{ FindQueueFamilies(vulkanBase.GetPhysicalDevice(), vulkanBase.GetSurface()) };
-
-	VkCommandPoolCreateInfo poolInfo{};
-	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-
-	if (vkCreateCommandPool(vulkanBase.GetDevice(), &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
-		throw std::runtime_error("Failed to create command pool");
 }

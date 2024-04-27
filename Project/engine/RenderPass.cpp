@@ -2,14 +2,17 @@
 
 #include <stdexcept>
 
+#include "CommandBuffer.h"
 #include "vulkanbase/VulkanBase.h"
 
 using namespace mk;
 
 RenderPass::RenderPass()
+	: m_CommandBuffer{}
 {
 	CreateRenderPass();
 	CreateBuffers();
+	m_CommandBuffer = std::make_unique<CommandBuffer>(VulkanBase::GetInstance().GetCommandPool().CreatePrimaryBuffer());
 }
 
 RenderPass::~RenderPass()
@@ -17,14 +20,26 @@ RenderPass::~RenderPass()
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
 	DestroyBuffers();
-	vkDestroyRenderPass(device, m_RenderPass, nullptr);
+	if (m_RenderPass != VK_NULL_HANDLE)
+		vkDestroyRenderPass(device, m_RenderPass, nullptr);
+}
+
+RenderPass::RenderPass(RenderPass&& other) noexcept
+	: m_RenderPass{ other.m_RenderPass }
+	, m_SwapChainFramebuffers{ std::move(other.m_SwapChainFramebuffers) }
+	, m_CommandBuffer{ std::move(other.m_CommandBuffer) }
+{
+	other.m_RenderPass = VK_NULL_HANDLE;
 }
 
 RenderPass& RenderPass::operator=(RenderPass&& other) noexcept
 {
 	m_RenderPass = other.m_RenderPass;
-	m_CommandBuffer = other.m_CommandBuffer;
 	m_SwapChainFramebuffers = std::move(other.m_SwapChainFramebuffers);
+	m_CommandBuffer = std::move(other.m_CommandBuffer);
+
+	other.m_RenderPass = VK_NULL_HANDLE;
+
 	return *this;
 }
 
@@ -34,27 +49,42 @@ void RenderPass::Update()
 	CreateBuffers();
 }
 
-void RenderPass::StartRecording(VkCommandBuffer commandBuffer) const
+void RenderPass::StartRecording(uint32_t imageIdx) const
 {
 	const VulkanBase& app{ VulkanBase::GetInstance() };
+	m_CommandBuffer->Start();
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = m_RenderPass;
-	renderPassInfo.framebuffer = m_SwapChainFramebuffers[app.GetImageIdx()];
+	renderPassInfo.framebuffer = m_SwapChainFramebuffers[imageIdx];
 	renderPassInfo.renderArea = app.GetSwapChain().GetScissor();
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &CLEAR_COLOR;
 
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(m_CommandBuffer->GetBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void RenderPass::StopRecording()
+void RenderPass::StopRecording() const
 {
-	if (m_CommandBuffer == VK_NULL_HANDLE)
-		return;
-	vkCmdEndRenderPass(m_CommandBuffer);
-	m_CommandBuffer = VK_NULL_HANDLE;
+	vkCmdEndRenderPass(m_CommandBuffer->GetBuffer());
+	m_CommandBuffer->End();
+	Submit();
+}
+
+VkRenderPass RenderPass::GetVkRenderPass() const
+{
+	return m_RenderPass;
+}
+
+VkCommandBuffer RenderPass::GetPrimaryBuffer() const
+{
+	return m_CommandBuffer->GetBuffer();
+}
+
+VkFramebuffer RenderPass::GetFrameBuffer() const
+{
+	return m_SwapChainFramebuffers[VulkanBase::GetInstance().GetImageIdx()];
 }
 
 void RenderPass::CreateRenderPass()
@@ -101,8 +131,8 @@ void RenderPass::CreateRenderPass()
 
 void RenderPass::CreateBuffers()
 {
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
+	const auto& app{ VulkanBase::GetInstance() };
+	const SwapChain& swapChain{ app.GetSwapChain() };
 	m_SwapChainFramebuffers.resize(swapChain.GetNrImagesViews());
 
 	for (int idx{}; idx < swapChain.GetNrImagesViews(); ++idx)
@@ -118,7 +148,7 @@ void RenderPass::CreateBuffers()
 		framebufferInfo.height = swapChain.GetHeight();
 		framebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(vulkanBase.GetDevice(), &framebufferInfo, nullptr, &m_SwapChainFramebuffers[idx]) != VK_SUCCESS)
+		if (vkCreateFramebuffer(app.GetDevice(), &framebufferInfo, nullptr, &m_SwapChainFramebuffers[idx]) != VK_SUCCESS)
 			throw std::runtime_error("Failed to create framebuffer");
 	}
 }
@@ -127,5 +157,32 @@ void RenderPass::DestroyBuffers() const
 {
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 	for (auto framebuffer : m_SwapChainFramebuffers)
-		vkDestroyFramebuffer(device, framebuffer, nullptr);
+	{
+		if (framebuffer != VK_NULL_HANDLE)
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+	}
+}
+
+void RenderPass::Submit() const
+{
+	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
+	const auto waitSemaphores{ swapChain.GetWaitSemaphores() };
+	const auto signalSemaphores{ swapChain.GetSignalSemaphores() };
+	constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+	submitInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
+	submitInfo.pWaitSemaphores = waitSemaphores.data();
+	submitInfo.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
+	submitInfo.pSignalSemaphores = signalSemaphores.data();
+	submitInfo.pWaitDstStageMask = waitStages;
+
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &m_CommandBuffer->GetBuffer();
+
+	if (vkQueueSubmit(vulkanBase.GetGraphicsQueue(), 1, &submitInfo, swapChain.GetWaitingFence()))
+		throw std::runtime_error("Failed to submit draw command buffer");
 }

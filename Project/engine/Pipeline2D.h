@@ -5,15 +5,17 @@
 #include "Mesh2D.h"
 #include "Shader.h"
 
+
 namespace mk
 {
+	class SecondaryCommandBuffer;
+
 	class Pipeline2D final
 	{
 		using Vertex = Vertex2D;
 		using Mesh = Mesh2D;
 	public:
-		Pipeline2D() = default;
-		Pipeline2D(bool canClear);
+		Pipeline2D();
 		~Pipeline2D();
 
 		Pipeline2D(const Pipeline2D& other) = delete;
@@ -23,15 +25,12 @@ namespace mk
 
 		void Initialize(const std::string& shaderName);
 		void Destroy();
-		void Update();
 
 		void Draw(const std::vector<Mesh*>& meshes) const;
 
 	private:
 		void CreatePipelineLayout();
-		void CreateRenderPass(bool canClear);
 		void CreatePipeline();
-		void CreateBuffers();
 
 		void SubmitCommandBuffer() const;
 
@@ -45,14 +44,9 @@ namespace mk
 		static VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
 		static VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
 
-		inline static const VkClearValue CLEAR_COLOR{ {{0.5f, 0.0f, 0.0f, 1.0f} } };
-
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
-		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
-		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
-		std::vector<VkCommandBuffer> m_CommandBuffers{};
-		bool m_CanClear{ false };
+		std::unique_ptr<SecondaryCommandBuffer> m_CommandBuffer;
 	};
 }

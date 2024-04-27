@@ -9,6 +9,11 @@
 
 using namespace mk;
 
+SwapChain::SwapChain()
+{
+	Initialize();
+}
+
 SwapChain::~SwapChain()
 {
 	Destroy();

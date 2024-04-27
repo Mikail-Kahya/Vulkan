@@ -3,6 +3,7 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
 #include <functional>
+#include <memory>
 #include <GLFW/glfw3.h>
 
 #include "VulkanStructs.h"
@@ -13,22 +14,30 @@
 #include "engine/DescriptorPool.h"
 #include "engine/Mouse.h"
 #include "engine/SwapChain.h"
+#include "engine/Device.h"
+#include "engine/RenderPass.h"
+#include "engine/Window.h"
 
 namespace mk
 {
 	class VulkanBase final : public Singleton<VulkanBase>
 	{
+		friend class Singleton<VulkanBase>;
+
 	public:
-		VulkanBase() = default;
+		virtual ~VulkanBase() override;
+
 		void Run(const std::function<void()>& load);
 		void WindowChanged();
 
 		GLFWwindow* GetWindow() const;
+		const Device& GetDeviceAbstraction() const;
 		VkDevice GetDevice() const;
 		VkPhysicalDevice GetPhysicalDevice() const;
 		VkSurfaceKHR GetSurface() const;
 		VkQueue GetGraphicsQueue() const;
 		VkQueue GetPresentQueue() const;
+		const RenderPass& GetRenderPass() const;;
 		void WaitDrawPipeline();
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
@@ -39,41 +48,24 @@ namespace mk
 		static constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
 
 	private:
-		void InitWindow();
+		VulkanBase() = default;
+
 		void InitVulkan();
 		void MainLoop();
 		void Cleanup();
 		void DrawFrame();
 		void UpdateWindow();
 
-		// Vulkan initialization
-		void CreateInstance(); // Links device to library
-		void SetupDebugMessenger();
-		void CreateLogicalDevice(); // Interacts between physical device and queue
-		void CreateSurface();
-
-		// STATICS
-		static constexpr uint32_t SCREEN_WIDTH{ 800 };
-		static constexpr uint32_t SCREEN_HEIGHT{ 600 };
-
 		// Members
-		GLFWwindow* m_WindowPtr{ nullptr };
-
-		VkInstance m_Instance{ VK_NULL_HANDLE }; // interface with device
-		VkSurfaceKHR m_Surface{ VK_NULL_HANDLE }; // interface with glfw window
-		VkDebugUtilsMessengerEXT m_DebugMessenger{ VK_NULL_HANDLE }; // debugging
-		VkPhysicalDevice m_PhysicalDevice{ VK_NULL_HANDLE }; // Graphics card used
-
-		VkDevice m_Device{ VK_NULL_HANDLE }; // Logical device interaction between physical and queues
-		VkQueue m_GraphicsQueue{ VK_NULL_HANDLE };
-		VkQueue m_PresentQueue{ VK_NULL_HANDLE };
-
-		SwapChain m_SwapChain{};
-		CommandPool m_CommandPool{};
-		DescriptorPool m_DescriptorPool{};
+		Window m_Window{ 800, 600, "Vulkan" };
+		Device m_Device{ m_Window.GetWindow() };
+		std::unique_ptr<DescriptorPool> m_DescriptorPool{};
+		std::unique_ptr<CommandPool> m_CommandPool{};
+		std::unique_ptr<SwapChain> m_SwapChain{};
+		std::unique_ptr<RenderPass> m_RenderPass{};
 		Camera m_Camera{};
-		Mouse m_Mouse{ nullptr };
-		Keyboard m_Keyboard{ nullptr };
+		Mouse m_Mouse{ m_Window.GetWindow() };
+		Keyboard m_Keyboard{ m_Window.GetWindow() };
 
 		uint32_t m_ImageIdx{};
 

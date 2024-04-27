@@ -7,16 +7,13 @@ namespace mk
 	class SwapChain final
 	{
 	public:
-		SwapChain() = default;
+		SwapChain();
 		~SwapChain();
 
 		SwapChain(const SwapChain& other) = delete;
 		SwapChain(SwapChain&& other) noexcept = delete;
 		SwapChain& operator=(const SwapChain& other) = delete;
 		SwapChain& operator=(SwapChain&& other) noexcept = delete;
-
-		void Initialize();
-		void Destroy();
 
 		void Wait();
 		void Present(uint32_t imageIdx);
@@ -39,6 +36,9 @@ namespace mk
 		VkFence GetWaitingFence() const;
 
 	private:
+		void Initialize();
+		void Destroy();
+
 		void CreateSwapChain();
 		void CreateImageViews();
 		void CreateSyncObjects();

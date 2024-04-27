@@ -3,12 +3,13 @@
 #include <stdexcept>
 #include <vector>
 
+#include "SecondaryCommandBuffer.h"
 #include "vulkanbase/VulkanBase.h"
 
 using namespace mk;
 
-Pipeline2D::Pipeline2D(bool canClear)
-	: m_CanClear{ canClear }
+Pipeline2D::Pipeline2D()
+	: m_CommandBuffer{}
 {
 }
 
@@ -20,13 +21,10 @@ Pipeline2D::~Pipeline2D()
 Pipeline2D::Pipeline2D(Pipeline2D&& other) noexcept
 	: m_Shader{ std::move(other.m_Shader) }
 	, m_PipelineLayout{ other.m_PipelineLayout }
-	, m_RenderPass{ other.m_RenderPass }
 	, m_GraphicsPipeline{ other.m_GraphicsPipeline }
-	, m_SwapChainFramebuffers{ std::move(other.m_SwapChainFramebuffers) }
-	, m_CommandBuffers{ std::move(other.m_CommandBuffers) }
+	, m_CommandBuffer{ std::move(other.m_CommandBuffer) }
 {
 	other.m_PipelineLayout = nullptr;
-	other.m_RenderPass = nullptr;
 	other.m_GraphicsPipeline = nullptr;
 }
 
@@ -34,13 +32,10 @@ Pipeline2D& Pipeline2D::operator=(Pipeline2D&& other) noexcept
 {
 	m_Shader = std::move(other.m_Shader);
 	m_PipelineLayout = other.m_PipelineLayout;
-	m_RenderPass = other.m_RenderPass;
 	m_GraphicsPipeline = other.m_GraphicsPipeline;
-	m_SwapChainFramebuffers = std::move(other.m_SwapChainFramebuffers);
-	m_CommandBuffers = std::move(other.m_CommandBuffers);
+	m_CommandBuffer = std::move(other.m_CommandBuffer);
 
 	other.m_PipelineLayout = nullptr;
-	other.m_RenderPass = nullptr;
 	other.m_GraphicsPipeline = nullptr;
 
 	return *this;
@@ -51,22 +46,13 @@ void Pipeline2D::Initialize(const std::string& shaderName)
 	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
 	CreatePipelineLayout();
-	CreateRenderPass(m_CanClear);
 	CreatePipeline();
-	m_CommandBuffers = VulkanBase::GetInstance().GetCommandPool().CreateCommandBuffer(VulkanBase::MAX_FRAMES_IN_FLIGHT);
-	CreateBuffers();
+	m_CommandBuffer = std::make_unique<SecondaryCommandBuffer>(VulkanBase::GetInstance().GetCommandPool().CreateSecondaryBuffer());
 }
 
 void Pipeline2D::Destroy()
 {
 	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
-
-	for (auto framebuffer : m_SwapChainFramebuffers)
-	{
-		if (framebuffer != VK_NULL_HANDLE)
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-	}
-	m_SwapChainFramebuffers.clear();
 
 	if (m_Shader)
 		m_Shader->DestroyModules(device);
@@ -82,68 +68,27 @@ void Pipeline2D::Destroy()
 		vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
 		m_PipelineLayout = VK_NULL_HANDLE;
 	}
-
-	if (m_RenderPass != VK_NULL_HANDLE)
-	{
-		vkDestroyRenderPass(device, m_RenderPass, nullptr);
-		m_RenderPass = VK_NULL_HANDLE;
-	}
-}
-
-void Pipeline2D::Update()
-{
-	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
-	for (auto framebuffer : m_SwapChainFramebuffers)
-		vkDestroyFramebuffer(device, framebuffer, nullptr);
-	CreateBuffers();
 }
 
 void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 {
-	VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
+	const VulkanBase& app{ VulkanBase::GetInstance() };
+	const SwapChain& swapChain{ app.GetSwapChain() };
+	const RenderPass& renderPass{ app.GetRenderPass() };
 	const auto scissor{ swapChain.GetScissor() };
 	const auto viewport{ swapChain.GetViewport() };
-	const VkCommandBuffer commandBuffer{ m_CommandBuffers[swapChain.GetCurrentFrame()] };
 
-	// reset command buffer before filling up
-	vkResetCommandBuffer(commandBuffer, 0);
-
-	// Start command buffer
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = 0; // Optional
-	beginInfo.pInheritanceInfo = nullptr; // Optional
-
-	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
-		throw std::runtime_error("Failed to begin recording command buffer");
-
-	VkRenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = m_RenderPass;
-	renderPassInfo.framebuffer = m_SwapChainFramebuffers[vulkanBase.GetImageIdx()];
-	renderPassInfo.renderArea = scissor;
-	renderPassInfo.clearValueCount = 0;
-	renderPassInfo.pClearValues = nullptr;
-	if (m_CanClear)
-	{
-		renderPassInfo.clearValueCount = 1;
-		renderPassInfo.pClearValues = &CLEAR_COLOR;
-	}
-
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
+	m_CommandBuffer->Start(renderPass);
+	vkCmdExecuteCommands(renderPass.GetPrimaryBuffer(), 1, &m_CommandBuffer->GetBuffer());
+	const VkCommandBuffer commandBuffer{ m_CommandBuffer->GetBuffer() };
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 	for (Mesh* mesh : meshes)
-		mesh->Draw(commandBuffer);
+		mesh->Draw(m_CommandBuffer->GetBuffer());
 
-	vkCmdEndRenderPass(commandBuffer);
-
-	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
-		throw std::runtime_error("Failed to record command buffer");
+	m_CommandBuffer->End();
 
 	SubmitCommandBuffer();
 }
@@ -159,48 +104,6 @@ void Pipeline2D::CreatePipelineLayout()
 
 	if (vkCreatePipelineLayout(VulkanBase::GetInstance().GetDevice(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
 		throw std::runtime_error("failed to create pipeline layout!");
-}
-
-void Pipeline2D::CreateRenderPass(bool canClear)
-{
-	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = VulkanBase::GetInstance().GetSwapChain().GetSwapChainImageFormat();
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = (canClear) ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDependency dependency{};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-	VkSubpassDescription subpass{};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-
-	VkRenderPassCreateInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
-
-	if (vkCreateRenderPass(VulkanBase::GetInstance().GetDevice(), &renderPassInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
-		throw std::runtime_error("Failed to create render pass");
 }
 
 void Pipeline2D::CreatePipeline()
@@ -234,7 +137,7 @@ void Pipeline2D::CreatePipeline()
 	pipelineInfo.pDynamicState = &dynamicState;
 
 	pipelineInfo.layout = m_PipelineLayout;
-	pipelineInfo.renderPass = m_RenderPass;
+	pipelineInfo.renderPass = VulkanBase::GetInstance().GetRenderPass().GetVkRenderPass();
 	pipelineInfo.subpass = 0;
 
 	// for derived pipelines
@@ -245,52 +148,9 @@ void Pipeline2D::CreatePipeline()
 		throw std::runtime_error("Failed to create graphics pipeline");
 }
 
-void Pipeline2D::CreateBuffers()
-{
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
-	m_SwapChainFramebuffers.resize(swapChain.GetNrImagesViews());
-
-	for (int idx{}; idx < swapChain.GetNrImagesViews(); ++idx)
-	{
-		VkImageView attachments[]{ swapChain.GetImageView(idx) };
-
-		VkFramebufferCreateInfo framebufferInfo{};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = m_RenderPass;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
-		framebufferInfo.width = swapChain.GetWidth();
-		framebufferInfo.height = swapChain.GetHeight();
-		framebufferInfo.layers = 1;
-
-		if (vkCreateFramebuffer(vulkanBase.GetDevice(), &framebufferInfo, nullptr, &m_SwapChainFramebuffers[idx]) != VK_SUCCESS)
-			throw std::runtime_error("Failed to create framebuffer");
-	}
-}
-
 void Pipeline2D::SubmitCommandBuffer() const
 {
-	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
-	const SwapChain& swapChain{ vulkanBase.GetSwapChain() };
-	const auto waitSemaphores{ swapChain.GetWaitSemaphores() };
-	const auto signalSemaphores{ swapChain.GetSignalSemaphores() };
-	constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-	submitInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
-	submitInfo.pWaitSemaphores = waitSemaphores.data();
-	submitInfo.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
-	submitInfo.pSignalSemaphores = signalSemaphores.data();
-	submitInfo.pWaitDstStageMask = waitStages;
-
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &m_CommandBuffers[swapChain.GetCurrentFrame()];
-
-	if (vkQueueSubmit(vulkanBase.GetGraphicsQueue(), 1, &submitInfo, swapChain.GetWaitingFence()))
-		throw std::runtime_error("Failed to submit draw command buffer");
+	
 }
 
 VkPipelineDynamicStateCreateInfo Pipeline2D::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)

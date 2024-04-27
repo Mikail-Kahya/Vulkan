@@ -48,9 +48,14 @@ set(SOURCES
     "engine/Pipeline3D.cpp" 
     "engine/VertexBuffer3D.cpp" 
     "engine/Mesh3D.cpp"
-     "engine/UniformBuffer.cpp" 
-     "engine/Camera.cpp" 
-     "engine/Utils.cpp" "engine/Mouse.cpp" "engine/Keyboard.cpp" "engine/Time.cpp" "engine/RenderPass.cpp")
+    "engine/UniformBuffer.cpp" 
+    "engine/Camera.cpp" 
+    "engine/Utils.cpp" 
+    "engine/Mouse.cpp" 
+    "engine/Keyboard.cpp" 
+    "engine/Time.cpp" 
+    "engine/RenderPass.cpp" 
+    "engine/Device.cpp" "engine/CommandBuffer.cpp" "engine/Window.cpp" "engine/SecondaryCommandBuffer.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})

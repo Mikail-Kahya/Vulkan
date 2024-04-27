@@ -1,7 +1,5 @@
 #include "VertexBuffer3D.h"
 
-#include <stdexcept>
-
 #include "vulkanbase/VulkanBase.h"
 #include "vulkanbase/VulkanUtils.h"
 
