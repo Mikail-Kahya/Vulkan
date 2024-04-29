@@ -4,13 +4,13 @@
 
 #include "Structs.h"
 #include "abstraction/UniformBuffer.h"
-#include "abstraction/VertexBuffer3D.h"
+#include "abstraction/VertexBuffer.h"
 
 namespace mk
 {
 	class Mesh3D final
 	{
-		using VertexBuffer = VertexBuffer3D;
+		using VertexBuffer = VertexBuffer;
 		using Vertex = Vertex3D;
 	public:
 		Mesh3D()	= default;

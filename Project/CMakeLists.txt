@@ -49,9 +49,9 @@ set(SOURCES
     "abstraction/DescriptorPool.cpp" 
     "abstraction/UniformBuffer.cpp" 
     "abstraction/Pipeline2D.cpp" 
-    "abstraction/VertexBuffer2D.cpp" 
+     
     "abstraction/Pipeline3D.cpp" 
-    "abstraction/VertexBuffer3D.cpp" 
+    "abstraction/VertexBuffer.cpp" 
     "abstraction/RenderPass.cpp" 
     "abstraction/Device.cpp" 
     "abstraction/CommandBuffer.cpp" 

@@ -2,11 +2,10 @@
 #include <vector>
 
 #include "Structs.h"
-#include "abstraction/VertexBuffer2D.h"
+#include "abstraction/VertexBuffer.h"
 
 namespace mk
 {
-	using VertexBuffer = VertexBuffer2D;
 	using Vertex = Vertex2D;
 	class Mesh2D final
 	{
