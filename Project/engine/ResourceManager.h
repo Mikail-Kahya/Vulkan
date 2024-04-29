@@ -3,8 +3,8 @@
 #include <string>
 
 #include "interfaces/Singleton.h"
-#include "Pipeline2D.h"
-#include "Pipeline3D.h"
+#include "abstraction/Pipeline2D.h"
+#include "abstraction/Pipeline3D.h"
 
 namespace mk
 {

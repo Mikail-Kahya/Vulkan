@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "Structs.h"
-#include "UniformBuffer.h"
-#include "VertexBuffer3D.h"
+#include "abstraction/UniformBuffer.h"
+#include "abstraction/VertexBuffer3D.h"
 
 namespace mk
 {

@@ -1,9 +1,6 @@
 #include "Shader.h"
-
-#include <numeric>
 #include <stdexcept>
-
-#include "vulkanbase/VulkanUtils.h"
+#include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 

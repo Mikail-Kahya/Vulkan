@@ -3,9 +3,9 @@
 #include <stdexcept>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "vulkanbase/VulkanBase.h"
-#include "vulkanbase/VulkanStructs.h"
-#include "vulkanbase/VulkanUtils.h"
+#include "vulkan/VulkanBase.h"
+#include "vulkan/VulkanStructs.h"
+#include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 

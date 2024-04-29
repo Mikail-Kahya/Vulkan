@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include "CommandBuffer.h"
-#include "vulkanbase/VulkanBase.h"
+#include "vulkan/VulkanBase.h"
 
 using namespace mk;
 

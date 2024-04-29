@@ -27,35 +27,36 @@ add_custom_target(
 set(SOURCES
     "main.cpp"
     # Add other source files here    
-    "vulkanbase/VulkanStructs.cpp"
-    "vulkanbase/VulkanUtils.cpp" 
-    "vulkanbase/VulkanBase.cpp"
+    "vulkan/VulkanStructs.cpp"
+    "vulkan/VulkanUtils.cpp" 
+    "vulkan/VulkanBase.cpp"
 
     "engine/ResourceManager.cpp" 
     "engine/SceneManager.cpp" 
     "engine/Scene.cpp" 
-
-    "engine/Shader.cpp"
-    "engine/structs.cpp"
-    "engine/SwapChain.cpp" 
-    "engine/CommandPool.cpp" 
-    "engine/DescriptorPool.cpp" 
-
-    "engine/Pipeline2D.cpp" 
-    "engine/VertexBuffer2D.cpp" 
-    "engine/Mesh2D.cpp"
-
-    "engine/Pipeline3D.cpp" 
-    "engine/VertexBuffer3D.cpp" 
     "engine/Mesh3D.cpp"
-    "engine/UniformBuffer.cpp" 
+    "engine/Mesh2D.cpp"
     "engine/Camera.cpp" 
     "engine/Utils.cpp" 
     "engine/Mouse.cpp" 
     "engine/Keyboard.cpp" 
     "engine/Time.cpp" 
-    "engine/RenderPass.cpp" 
-    "engine/Device.cpp" "engine/CommandBuffer.cpp" "engine/Window.cpp" "engine/SecondaryCommandBuffer.cpp")
+    "engine/structs.cpp"
+
+    "abstraction/Shader.cpp"
+    "abstraction/SwapChain.cpp" 
+    "abstraction/CommandPool.cpp" 
+    "abstraction/DescriptorPool.cpp" 
+    "abstraction/UniformBuffer.cpp" 
+    "abstraction/Pipeline2D.cpp" 
+    "abstraction/VertexBuffer2D.cpp" 
+    "abstraction/Pipeline3D.cpp" 
+    "abstraction/VertexBuffer3D.cpp" 
+    "abstraction/RenderPass.cpp" 
+    "abstraction/Device.cpp" 
+    "abstraction/CommandBuffer.cpp" 
+    "abstraction/Window.cpp" 
+    "abstraction/SecondaryCommandBuffer.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})

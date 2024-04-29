@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "SecondaryCommandBuffer.h"
-#include "vulkanbase/VulkanBase.h"
+#include "vulkan/VulkanBase.h"
 
 using namespace mk;
 

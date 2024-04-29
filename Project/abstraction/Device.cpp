@@ -3,7 +3,7 @@
 #include <set>
 #include <stdexcept>
 
-#include "vulkanbase/VulkanUtils.h"
+#include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 

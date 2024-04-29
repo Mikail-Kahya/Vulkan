@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "Structs.h"
-#include "VertexBuffer2D.h"
+#include "abstraction/VertexBuffer2D.h"
 
 namespace mk
 {

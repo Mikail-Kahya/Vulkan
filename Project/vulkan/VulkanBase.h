@@ -10,13 +10,13 @@
 #include "engine/Camera.h"
 #include "interfaces/Singleton.h"
 
-#include "engine/CommandPool.h"
-#include "engine/DescriptorPool.h"
+#include "abstraction/CommandPool.h"
+#include "abstraction/DescriptorPool.h"
 #include "engine/Mouse.h"
-#include "engine/SwapChain.h"
-#include "engine/Device.h"
-#include "engine/RenderPass.h"
-#include "engine/Window.h"
+#include "abstraction/SwapChain.h"
+#include "abstraction/Device.h"
+#include "abstraction/RenderPass.h"
+#include "abstraction/Window.h"
 
 namespace mk
 {

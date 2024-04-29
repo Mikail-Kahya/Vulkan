@@ -1,6 +1,6 @@
 #include "Window.h"
 
-#include "vulkanbase/VulkanUtils.h"
+#include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 
@@ -8,7 +8,6 @@ Window::Window(int width, int height, std::string name)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	//glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	m_WindowPtr = glfwCreateWindow(width, height, std::move(name).c_str(), nullptr, nullptr);
 	glfwSetWindowUserPointer(m_WindowPtr, this);
 	glfwSetFramebufferSizeCallback(m_WindowPtr, &FrameBufferResizeCallback);

@@ -4,9 +4,9 @@
 
 #include "CommandBuffer.h"
 #include "SecondaryCommandBuffer.h"
-#include "vulkanbase/VulkanBase.h"
-#include "vulkanbase/VulkanStructs.h"
-#include "vulkanbase/VulkanUtils.h"
+#include "vulkan/VulkanBase.h"
+#include "vulkan/VulkanStructs.h"
+#include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 

@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vulkan/vulkan_core.h>
 
-#include "vulkanbase/VulkanBase.h"
-#include "vulkanbase/VulkanUtils.h"
+#include "vulkan/VulkanBase.h"
+#include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "Structs.h"
+#include "engine/Structs.h"
 
 namespace mk
 {

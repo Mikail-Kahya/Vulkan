@@ -1,10 +1,5 @@
 #include "VulkanBase.h"
 
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <set>
-#include <stdexcept>
-#include <vector>
-
 #include "VulkanUtils.h"
 #include "engine/ResourceManager.h"
 #include "engine/SceneManager.h"
@@ -112,11 +107,14 @@ void VulkanBase::InitVulkan()
 
 void VulkanBase::MainLoop()
 {
-	glfwPollEvents();
-	m_Mouse.Update();
-	m_Camera.Update(m_Mouse, m_Keyboard);
-	DrawFrame();
-	return;
+	if (false)
+	{
+		glfwPollEvents();
+		m_Mouse.Update();
+		m_Camera.Update(m_Mouse, m_Keyboard);
+		DrawFrame();
+		return;
+	}
 	while (!m_Window->ShouldClose())
 	{
 		Time::Update();
@@ -134,12 +132,12 @@ void VulkanBase::Cleanup()
 	SceneManager::GetInstance().Cleanup();
 	ResourceManager::GetInstance().Cleanup();
 
-	m_RenderPass.reset(nullptr);
-	m_SwapChain.reset(nullptr);
-	m_CommandPool.reset(nullptr);
-	m_DescriptorPool.reset(nullptr);
-	m_Device.reset();
-	m_Window.reset(nullptr);
+	//m_RenderPass.reset(nullptr);
+	//m_SwapChain.reset(nullptr);
+	//m_CommandPool.reset(nullptr);
+	//m_DescriptorPool.reset(nullptr);
+	//m_Device.reset();
+	//m_Window.reset(nullptr);
 }
 
 void VulkanBase::DrawFrame()

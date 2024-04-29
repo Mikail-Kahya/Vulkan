@@ -2,9 +2,6 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
-
-#include "Structs.h"
-
 namespace mk
 {
 	class Shader final

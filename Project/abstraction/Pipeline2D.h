@@ -2,25 +2,26 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
-#include "Mesh3D.h"
+#include "engine/Mesh2D.h"
 #include "Shader.h"
+
 
 namespace mk
 {
 	class SecondaryCommandBuffer;
 
-	class Pipeline3D final
+	class Pipeline2D final
 	{
-		using Vertex = Vertex3D;
-		using Mesh = Mesh3D;
+		using Vertex = Vertex2D;
+		using Mesh = Mesh2D;
 	public:
-		Pipeline3D();
-		~Pipeline3D();
+		Pipeline2D();
+		~Pipeline2D();
 
-		Pipeline3D(const Pipeline3D& other) = delete;
-		Pipeline3D(Pipeline3D&& other) noexcept;
-		Pipeline3D& operator=(const Pipeline3D& other) = delete;
-		Pipeline3D& operator=(Pipeline3D&& other) noexcept;
+		Pipeline2D(const Pipeline2D& other) = delete;
+		Pipeline2D(Pipeline2D&& other) noexcept;
+		Pipeline2D& operator=(const Pipeline2D& other) = delete;
+		Pipeline2D& operator=(Pipeline2D&& other) noexcept;
 
 		void Initialize(const std::string& shaderName);
 		void Destroy();
@@ -40,8 +41,6 @@ namespace mk
 		static VkPipelineMultisampleStateCreateInfo CreateMultisampling();
 		static VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
 		static VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
-
-		inline static const VkClearValue CLEAR_COLOR{ {{0.0f, 0.0f, 0.5f, 1.0f} } };
 
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };

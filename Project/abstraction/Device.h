@@ -5,7 +5,7 @@
 #include <functional>
 #include <GLFW/glfw3.h>
 
-#include "vulkanbase/VulkanStructs.h"
+#include "vulkan/VulkanStructs.h"
 
 namespace mk
 {

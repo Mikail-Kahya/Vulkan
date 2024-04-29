@@ -2,7 +2,7 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "vulkanbase/VulkanStructs.h"
+#include "vulkan/VulkanStructs.h"
 
 namespace mk
 {
