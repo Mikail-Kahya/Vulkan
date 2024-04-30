@@ -61,11 +61,6 @@ const RenderPass& VulkanBase::GetRenderPass() const
 	return *m_RenderPass;
 }
 
-void VulkanBase::WaitDrawPipeline()
-{
-	m_SwapChain->Wait();
-}
-
 const SwapChain& VulkanBase::GetSwapChain() const
 {
 	return *m_SwapChain;

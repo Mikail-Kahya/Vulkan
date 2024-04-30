@@ -38,7 +38,6 @@ namespace mk
 		VkQueue GetGraphicsQueue() const;
 		VkQueue GetPresentQueue() const;
 		const RenderPass& GetRenderPass() const;;
-		void WaitDrawPipeline();
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
 		const Camera& GetCamera() const;

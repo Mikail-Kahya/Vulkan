@@ -4,6 +4,7 @@
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Time.h"
 #include "Utils.h"
 
 using namespace mk;
@@ -19,12 +20,8 @@ void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout
 void Mesh3D::Update()
 {
 	// Temp hardcoded rotation
-	static auto startTime = std::chrono::high_resolution_clock::now();
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	SetRotation({ 0.f, time * 90.0f, 0});
-
+	AddRotation({ 0.f, Time::DeltaTime() * 90.0f, 0 });
+	
 	if (m_FlagTransform)
 		SetTransform();
 

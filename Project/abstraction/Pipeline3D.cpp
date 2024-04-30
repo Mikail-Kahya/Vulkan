@@ -78,8 +78,9 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	const auto scissor{ swapChain.GetScissor() };
 	const auto viewport{ swapChain.GetViewport() };
 
-	m_CommandBuffer->Start(renderPass);
-	const VkCommandBuffer commandBuffer{ m_CommandBuffer->GetBuffer() };
+	//m_CommandBuffer->Start(renderPass);
+	//const VkCommandBuffer commandBuffer{ m_CommandBuffer->GetBuffer() };
+	const VkCommandBuffer commandBuffer{ renderPass.GetPrimaryBuffer() };
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
@@ -88,7 +89,7 @@ void Pipeline3D::Draw(const std::vector<Mesh*>& meshes) const
 	for (Mesh* mesh : meshes)
 		mesh->Draw(commandBuffer, m_PipelineLayout);
 
-	m_CommandBuffer->End(renderPass);
+	//m_CommandBuffer->End(renderPass);
 }
 
 void Pipeline3D::CreatePipelineLayout()

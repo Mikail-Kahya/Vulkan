@@ -62,6 +62,7 @@ void RenderPass::StartRecording(uint32_t imageIdx) const
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &CLEAR_COLOR;
 
+	//vkCmdBeginRenderPass(m_CommandBuffer->GetBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE_AND_SECONDARY_COMMAND_BUFFERS_EXT);
 	vkCmdBeginRenderPass(m_CommandBuffer->GetBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
