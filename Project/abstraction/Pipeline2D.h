@@ -32,16 +32,6 @@ namespace mk
 		void CreatePipelineLayout();
 		void CreatePipeline();
 
-		// Fixed functions
-		static VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
-		static VkPipelineVertexInputStateCreateInfo CreateVertexInfo();
-		static VkPipelineInputAssemblyStateCreateInfo CreateInputAssembly();
-		static VkPipelineViewportStateCreateInfo CreateViewportState();
-		static VkPipelineRasterizationStateCreateInfo CreateRasterizer();
-		static VkPipelineMultisampleStateCreateInfo CreateMultisampling();
-		static VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
-		static VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
-
 		std::unique_ptr<Shader> m_Shader;
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };

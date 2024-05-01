@@ -22,6 +22,12 @@ namespace mk
 	inline constexpr bool ENABLE_VALIDATION_LAYERS{ true };
 #endif
 
+	template <typename Vertex>
+	concept IsVertex = requires()
+	{
+		{ Vertex::GetAttributeDescriptions() } -> std::same_as<std::vector<VkVertexInputAttributeDescription>*>;
+		{ Vertex::GetBindingDescription() } -> std::same_as <VkVertexInputBindingDescription*>;
+	};
 
 
 	// Functions
@@ -61,4 +67,27 @@ namespace mk
 
 	void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
 		VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+	// Pipeline creation
+	VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
+	
+	template <IsVertex Vertex>
+	VkPipelineVertexInputStateCreateInfo CreateVertexInfo()
+	{
+		const auto attributeDescriptions = Vertex::GetAttributeDescriptions();
+		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputInfo.vertexBindingDescriptionCount = 1;
+		vertexInputInfo.pVertexBindingDescriptions = Vertex::GetBindingDescription();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions->size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions->data();
+		return vertexInputInfo;
+	}
+
+	VkPipelineInputAssemblyStateCreateInfo CreateInputAssembly();
+	VkPipelineViewportStateCreateInfo CreateViewportState();
+	VkPipelineRasterizationStateCreateInfo CreateRasterizer();
+	VkPipelineMultisampleStateCreateInfo CreateMultisampling();
+	VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
+	VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
 }
