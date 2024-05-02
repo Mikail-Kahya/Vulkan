@@ -18,13 +18,18 @@ namespace mk
 		Texture& operator=(Texture&& other) noexcept = delete;
 
 	private:
-		void CreateImage(VkDevice device);
-		void CreateMemory(VkDevice device, VkPhysicalDevice physicalDevice);
+		void CreateImage(const std::string& path);
+		void CreateImageView();
+		void CreateTextureSampler();
+		void CreateVkImage(VkDevice device);
+		void CreateVkMemory(VkDevice device, VkPhysicalDevice physicalDevice);
 
 		uint32_t m_Width{};
 		uint32_t m_Height{};
 
-		VkImage m_TextureImage{};
-		VkDeviceMemory M_TextureImageMemory{};
+		VkImage m_Image{};
+		VkDeviceMemory m_ImageMemory{};
+		VkImageView m_ImageView{};
+		VkSampler m_TextureSampler{};
 	};
 }

@@ -68,6 +68,8 @@ namespace mk
 	void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
 		VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
+	VkImageView CreateVkImageView(VkImage image, VkFormat format);
+
 	// Pipeline creation
 	VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
 	

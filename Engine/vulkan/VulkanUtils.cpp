@@ -145,6 +145,9 @@ bool mk::IsDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
     VkPhysicalDeviceFeatures deviceFeatures{};
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
+    if (!deviceFeatures.samplerAnisotropy)
+        return false;
+
     if (!deviceFeatures.geometryShader)
         return false;
 
@@ -343,6 +346,27 @@ void mk::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDevice
         throw std::runtime_error("Failed to allocate buffer memory");
 
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
+}
+
+VkImageView mk::CreateVkImageView(VkImage image, VkFormat format)
+{
+    VkImageView imageView{ VK_NULL_HANDLE };
+
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    if (vkCreateImageView(VulkanBase::GetInstance().GetDevice(), &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+        throw std::runtime_error("Failed to create texture image view");
+
+    return imageView;
 }
 
 VkPipelineDynamicStateCreateInfo mk::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)
