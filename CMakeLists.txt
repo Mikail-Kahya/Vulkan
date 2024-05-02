@@ -32,7 +32,7 @@ find_package(Vulkan REQUIRED)
 # Include Directories
 include_directories(${Vulkan_INCLUDE_DIRS})
 
-add_subdirectory(Project)
+add_subdirectory(Engine)
 
 # If using validation layers, copy the required JSON files (optional)
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

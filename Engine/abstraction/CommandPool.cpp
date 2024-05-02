@@ -50,13 +50,43 @@ std::vector<VkCommandBuffer> CommandPool::CreateCommandBuffer(int nrBuffers, VkC
 
 void CommandPool::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const
 {
-	VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
+	const VkCommandBuffer commandBuffer{ BeginSingleTimeCommands() };
 
 	VkBufferCopy copyRegion{};
 	copyRegion.srcOffset = 0; // Optional
 	copyRegion.dstOffset = 0; // Optional
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+	EndSingleTimeCommands(commandBuffer);
+}
+
+void CommandPool::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
+{
+	const VkCommandBuffer commandBuffer{ BeginSingleTimeCommands() };
+
+	VkImageMemoryBarrier barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+	barrier.srcAccessMask = 0; // TODO
+	barrier.dstAccessMask = 0; // TODO
+
+	vkCmdPipelineBarrier(
+		commandBuffer,
+		0 /* TODO */, 0 /* TODO */,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &barrier);
 
 	EndSingleTimeCommands(commandBuffer);
 }
