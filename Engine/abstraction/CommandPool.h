@@ -19,7 +19,8 @@ namespace mk
 		CommandPool& operator=(CommandPool&& other) noexcept	= delete;
 
 		void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
-		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+		void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const;
+		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) const;
 		CommandBuffer CreatePrimaryBuffer() const;
 		SecondaryCommandBuffer CreateSecondaryBuffer() const;
 

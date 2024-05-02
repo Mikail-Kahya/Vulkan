@@ -12,8 +12,14 @@ using namespace mk;
 Texture::Texture(const std::string& path)
 {
     int32_t channels{};
-    stbi_uc* pixels = stbi_load(path.c_str(), &m_Width, &m_Height, &channels, STBI_rgb_alpha);
-    VkDeviceSize imageSize = static_cast<VkDeviceSize>(m_Width * m_Height * 4);
+    int32_t width{};
+    int32_t height{};
+    stbi_uc* pixels = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+
+    m_Width = static_cast<uint32_t>(width);
+    m_Height = static_cast<uint32_t>(height);
+
+    const VkDeviceSize imageSize{ m_Width * m_Height * 4 };
 
     if (pixels == nullptr)
         throw std::runtime_error("Failed to load texture image: " + path);
@@ -37,6 +43,23 @@ Texture::Texture(const std::string& path)
     CreateImage(device);
     CreateMemory(device, physicalDevice);
     vkBindImageMemory(device, m_TextureImage, M_TextureImageMemory, 0);
+
+    const CommandPool& pool{ app.GetCommandPool() };
+    pool.TransitionImageLayout(m_TextureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    pool.CopyBufferToImage(stagingBuffer, m_TextureImage, m_Width, m_Height);
+    pool.TransitionImageLayout(m_TextureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+
+    // cleanup
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+
+Texture::~Texture()
+{
+    const VkDevice device{ VulkanBase::GetInstance().GetDevice() };
+    vkDestroyImage(device, m_TextureImage, nullptr);
+    vkFreeMemory(device, M_TextureImageMemory, nullptr);
 }
 
 void Texture::CreateImage(VkDevice device)
@@ -73,8 +96,4 @@ void Texture::CreateMemory(VkDevice device, VkPhysicalDevice physicalDevice)
 
     if (vkAllocateMemory(device, &allocInfo, nullptr, &M_TextureImageMemory) != VK_SUCCESS)
         throw std::runtime_error("failed to allocate image memory!");
-}
-
-void Texture::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
-{
 }

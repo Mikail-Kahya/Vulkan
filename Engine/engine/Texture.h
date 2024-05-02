@@ -10,7 +10,7 @@ namespace mk
 	{
 	public:
 		Texture(const std::string& path);
-		~Texture() = default;
+		~Texture();
 
 		Texture(const Texture& other) = delete;
 		Texture(Texture&& other) noexcept = delete;
@@ -20,10 +20,9 @@ namespace mk
 	private:
 		void CreateImage(VkDevice device);
 		void CreateMemory(VkDevice device, VkPhysicalDevice physicalDevice);
-		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
-		int32_t m_Width{};
-		int32_t m_Height{};
+		uint32_t m_Width{};
+		uint32_t m_Height{};
 
 		VkImage m_TextureImage{};
 		VkDeviceMemory M_TextureImageMemory{};
