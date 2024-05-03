@@ -7,7 +7,7 @@ namespace mk
 	class Shader final
 	{
 	public:
-		Shader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile);
+		Shader(std::string vertexShaderFile, std::string fragmentShaderFile);
 		~Shader() = default;
 
 		Shader(const Shader& other)					= delete;
@@ -25,7 +25,6 @@ namespace mk
 		VkPipelineShaderStageCreateInfo CreateFragmentShaderInfo(VkDevice device, const std::string& fileName) const;
 		VkShaderModule CreateShaderModule(VkDevice device, const std::vector<char>& code) const;
 
-		inline static const std::string SHADER_FOLDER{ "shaders/" };
 		inline static const std::string EXTENSION{ ".spv" };
 
 		const std::string m_VertexShaderFile{};

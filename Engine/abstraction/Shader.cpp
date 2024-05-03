@@ -4,9 +4,9 @@
 
 using namespace mk;
 
-Shader::Shader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
-	: m_VertexShaderFile{ vertexShaderFile }
-	, m_FragmentShaderFile{ fragmentShaderFile }
+Shader::Shader(std::string vertexShaderFile, std::string fragmentShaderFile)
+	: m_VertexShaderFile{ std::move(vertexShaderFile) }
+	, m_FragmentShaderFile{ std::move(fragmentShaderFile) }
 {
 }
 
@@ -30,7 +30,7 @@ void Shader::DestroyModules(VkDevice vkDevice)
 
 VkPipelineShaderStageCreateInfo Shader::CreateShaderStageInfo(VkDevice device, const std::string& fileName, VkShaderStageFlagBits stage) const
 {
-	const std::string path{ SHADER_FOLDER + fileName + EXTENSION };
+	const std::string path{ fileName + EXTENSION };
 	std::vector<char> shaderCode = ReadFile(path);
 	VkShaderModule shaderModule = CreateShaderModule(device, shaderCode);
 

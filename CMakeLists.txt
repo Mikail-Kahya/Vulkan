@@ -33,6 +33,7 @@ find_package(Vulkan REQUIRED)
 include_directories(${Vulkan_INCLUDE_DIRS})
 
 add_subdirectory(Engine)
+add_subdirectory(RatchetAndClank)
 
 # If using validation layers, copy the required JSON files (optional)
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
