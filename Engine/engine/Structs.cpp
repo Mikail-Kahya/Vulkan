@@ -22,7 +22,7 @@ std::vector<VkVertexInputAttributeDescription>* Vertex2D::GetAttributeDescriptio
 
 	if (attributeDescriptions.empty())
 	{
-		attributeDescriptions.resize(3);
+		attributeDescriptions.resize(2);
 
 		// Pos
 		attributeDescriptions[0].binding = 0;
@@ -37,10 +37,10 @@ std::vector<VkVertexInputAttributeDescription>* Vertex2D::GetAttributeDescriptio
 		attributeDescriptions[1].offset = offsetof(Vertex2D, color);
 
 		// texCoord
-		attributeDescriptions[2].binding = 0;
-		attributeDescriptions[2].location = 2;
-		attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-		attributeDescriptions[2].offset = offsetof(Vertex2D, texCoord);
+		//attributeDescriptions[2].binding = 0;
+		//attributeDescriptions[2].location = 2;
+		//attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+		//attributeDescriptions[2].offset = offsetof(Vertex2D, texCoord);
 	}
 
 	return &attributeDescriptions;

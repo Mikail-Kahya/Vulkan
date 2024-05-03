@@ -100,7 +100,7 @@ namespace mk
 						{
 							// Optional texture coordinate
 							file >> iTexCoord;
-							//vertex.uv = UVs[iTexCoord - 1];
+							vertex.texCoord = UVs[iTexCoord - 1];
 						}
 						
 						if ('/' == file.peek())

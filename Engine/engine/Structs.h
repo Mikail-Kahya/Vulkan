@@ -10,7 +10,7 @@ namespace mk
 	{
 		glm::vec2 pos;
 		glm::vec3 color;
-		glm::vec2 texCoord;
+		//glm::vec2 texCoord;
 		//glm::vec3 normal;
 		//glm::vec3 tangent;
 		

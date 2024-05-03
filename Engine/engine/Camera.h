@@ -54,7 +54,7 @@ namespace mk
 		float m_TotalPitch{};
 		float m_TotalYaw{ 180 };
 		
-		float m_RotateSpeed{ 10.f };
+		float m_RotateSpeed{ 100.f };
 		float m_MoveSpeed{ 10.f };
 
 		bool m_FlagProjection{ true };
