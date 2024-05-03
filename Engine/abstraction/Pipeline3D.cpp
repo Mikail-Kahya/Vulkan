@@ -122,6 +122,7 @@ void Pipeline3D::CreatePipeline()
 	VkPipelineMultisampleStateCreateInfo multisampling{ CreateMultisampling() };
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{ CreateColorBlendAttachment() };
 	VkPipelineColorBlendStateCreateInfo colorBlending{ CreateColorBlend(&colorBlendAttachment) };
+	VkPipelineDepthStencilStateCreateInfo depthStencil{ CreateDepthStencilInfo() };
 
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -133,7 +134,7 @@ void Pipeline3D::CreatePipeline()
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = &rasterizer;
 	pipelineInfo.pMultisampleState = &multisampling;
-	pipelineInfo.pDepthStencilState = nullptr; // Optional
+	pipelineInfo.pDepthStencilState = &depthStencil;
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicState;
 

@@ -81,6 +81,11 @@ const DescriptorPool& VulkanBase::GetDescriptorPool() const
 	return *m_DescriptorPool;
 }
 
+const DepthBuffer& VulkanBase::GetDepthBuffer() const
+{
+	return *m_DepthBuffer;
+}
+
 uint32_t VulkanBase::GetImageIdx() const
 {
 	return m_ImageIdx;
@@ -93,6 +98,7 @@ void VulkanBase::InitVulkan()
 	m_DescriptorPool = std::make_unique<DescriptorPool>();
 	m_CommandPool = std::make_unique<CommandPool>();
 	m_SwapChain = std::make_unique<SwapChain>();
+	m_DepthBuffer = std::make_unique<DepthBuffer>();
 	m_RenderPass = std::make_unique<RenderPass>();
 
 	m_Camera = Camera{ static_cast<float>(m_SwapChain->GetWidth()), static_cast<float>(m_SwapChain->GetHeight()), 45.f };
@@ -154,6 +160,7 @@ void VulkanBase::UpdateWindow()
 {
 	m_Device->Wait();
 	m_FrameBufferResized = false;
+	m_DepthBuffer = std::make_unique<DepthBuffer>();
 	m_RenderPass->Update();
 	ResourceManager::GetInstance().Update();
 }

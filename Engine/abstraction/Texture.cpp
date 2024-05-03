@@ -103,9 +103,10 @@ void Texture::CreateImage(const std::string& path)
 
     stbi_image_free(pixels);
 
-    CreateVkImage(device);
-    CreateVkMemory(device, physicalDevice);
-    vkBindImageMemory(device, m_Image, m_ImageMemory, 0);
+    mk::CreateImage(device, physicalDevice, m_Width, m_Height, 
+					VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, 
+					VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+					m_Image, m_ImageMemory);
 
     const CommandPool& pool{ app.GetCommandPool() };
     pool.TransitionImageLayout(m_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -120,7 +121,7 @@ void Texture::CreateImage(const std::string& path)
 
 void Texture::CreateImageView()
 {
-    m_ImageView = CreateVkImageView(m_Image, VK_FORMAT_R8G8B8A8_SRGB);
+    m_ImageView = CreateVkImageView(m_Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void Texture::CreateTextureSampler()
@@ -159,44 +160,4 @@ void Texture::CreateTextureSampler()
 
     if (vkCreateSampler(VulkanBase::GetInstance().GetDevice(), &samplerInfo, nullptr, &m_TextureSampler) != VK_SUCCESS)
         throw std::runtime_error("Failed to create texture sampler");
-}
-
-void Texture::CreateVkImage(VkDevice device)
-{
-    VkImageCreateInfo imageInfo{};
-    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = m_Width;
-    imageInfo.extent.height = m_Height;
-    imageInfo.extent.depth = 1;
-
-    imageInfo.mipLevels = 1;
-    imageInfo.arrayLayers = 1;
-
-	imageInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-    imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-
-	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageInfo.flags = 0; // Optional
-
-    if (vkCreateImage(device, &imageInfo, nullptr, &m_Image) != VK_SUCCESS)
-        throw std::runtime_error("Failed to create image");
-}
-
-void Texture::CreateVkMemory(VkDevice device, VkPhysicalDevice physicalDevice)
-{
-    VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(device, m_Image, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = FindMemoryType(physicalDevice, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    if (vkAllocateMemory(device, &allocInfo, nullptr, &m_ImageMemory) != VK_SUCCESS)
-        throw std::runtime_error("failed to allocate image memory!");
 }

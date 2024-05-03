@@ -280,6 +280,36 @@ VkExtent2D mk::ChooseSwapExtent2D(const VkSurfaceCapabilitiesKHR& capabilities, 
     return actualExtent;
 }
 
+VkFormat mk::FindSupportedFormat(VkPhysicalDevice physicalDevice, const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+{
+
+    for (const VkFormat format : candidates) 
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+            return format;
+        if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+            return format;
+    }
+
+    throw std::runtime_error("Failed to find supported format");
+}
+
+VkFormat mk::FindDepthFormat(VkPhysicalDevice physicalDevice)
+{
+    return FindSupportedFormat( physicalDevice,
+								{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+								VK_IMAGE_TILING_OPTIMAL,
+								VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
+bool mk::HasStencilComponent(VkFormat format)
+{
+    return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+}
+
 std::vector<char> mk::ReadFile(const std::string& fileName)
 {
     // ate =  AT End
@@ -348,7 +378,7 @@ void mk::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDevice
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-VkImageView mk::CreateVkImageView(VkImage image, VkFormat format)
+VkImageView mk::CreateVkImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlag)
 {
     VkImageView imageView{ VK_NULL_HANDLE };
 
@@ -357,7 +387,7 @@ VkImageView mk::CreateVkImageView(VkImage image, VkFormat format)
     viewInfo.image = image;
     viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
     viewInfo.format = format;
-    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.aspectMask = aspectFlag;
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.levelCount = 1;
     viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -367,6 +397,54 @@ VkImageView mk::CreateVkImageView(VkImage image, VkFormat format)
         throw std::runtime_error("Failed to create texture image view");
 
     return imageView;
+}
+
+void mk::CreateImage(VkDevice device, VkPhysicalDevice physicalDevice, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+    VkMemoryPropertyFlags properties, VkImage& image_out, VkDeviceMemory& imageMemory_out)
+{
+    CreateVkImage(device, width, height, format, tiling, usage, image_out);
+    CreateVkMemory(device, physicalDevice, properties, image_out, imageMemory_out);
+    vkBindImageMemory(device, image_out, imageMemory_out, 0);
+}
+
+void mk::CreateVkImage(VkDevice device, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkImage& image_out)
+{
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth = 1;
+
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+
+    imageInfo.format = format;
+    imageInfo.tiling = tiling;
+
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.flags = 0; // Optional
+
+    if (vkCreateImage(device, &imageInfo, nullptr, &image_out) != VK_SUCCESS)
+        throw std::runtime_error("Failed to create image");
+}
+
+void mk::CreateVkMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkMemoryPropertyFlags properties, VkImage image, VkDeviceMemory& imageMemory_out)
+{
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(device, image, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = FindMemoryType(physicalDevice, memRequirements.memoryTypeBits, properties);
+
+    if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory_out) != VK_SUCCESS)
+        throw std::runtime_error("failed to allocate image memory!");
 }
 
 VkPipelineDynamicStateCreateInfo mk::CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates)
@@ -454,4 +532,24 @@ VkPipelineColorBlendStateCreateInfo mk::CreateColorBlend(VkPipelineColorBlendAtt
     colorBlending.blendConstants[3] = 0.0f; // Optional
 
     return colorBlending;
+}
+
+VkPipelineDepthStencilStateCreateInfo mk::CreateDepthStencilInfo()
+{
+    VkPipelineDepthStencilStateCreateInfo depthStencil{};
+    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil.depthTestEnable = VK_TRUE;
+    depthStencil.depthWriteEnable = VK_TRUE;
+
+    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+
+    depthStencil.depthBoundsTestEnable = VK_FALSE;
+    depthStencil.minDepthBounds = 0.0f; // Optional
+    depthStencil.maxDepthBounds = 1.0f; // Optional
+
+    depthStencil.stencilTestEnable = VK_FALSE;
+    depthStencil.front = {}; // Optional
+    depthStencil.back = {}; // Optional
+
+    return depthStencil;
 }

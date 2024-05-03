@@ -11,12 +11,18 @@
 #include "interfaces/Singleton.h"
 
 #include "abstraction/CommandPool.h"
+#include "abstraction/DepthBuffer.h"
 #include "abstraction/DescriptorPool.h"
 #include "engine/Mouse.h"
 #include "abstraction/SwapChain.h"
 #include "abstraction/Device.h"
 #include "abstraction/RenderPass.h"
 #include "abstraction/Window.h"
+
+namespace mk
+{
+	class DepthBuffer;
+}
 
 namespace mk
 {
@@ -42,6 +48,7 @@ namespace mk
 		const CommandPool& GetCommandPool() const;
 		const Camera& GetCamera() const;
 		const DescriptorPool& GetDescriptorPool() const;
+		const DepthBuffer& GetDepthBuffer() const;
 		uint32_t GetImageIdx() const;
 
 		static constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
@@ -61,6 +68,7 @@ namespace mk
 		std::unique_ptr<DescriptorPool> m_DescriptorPool{};
 		std::unique_ptr<CommandPool> m_CommandPool{};
 		std::unique_ptr<SwapChain> m_SwapChain{};
+		std::unique_ptr<DepthBuffer> m_DepthBuffer{};
 		std::unique_ptr<RenderPass> m_RenderPass{};
 		Camera m_Camera{};
 		Mouse m_Mouse{ nullptr };

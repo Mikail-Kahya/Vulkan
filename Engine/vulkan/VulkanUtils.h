@@ -59,6 +59,9 @@ namespace mk
 	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	VkExtent2D ChooseSwapExtent2D(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* windowPtr);
+	VkFormat FindSupportedFormat(VkPhysicalDevice physicalDevice, const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	VkFormat FindDepthFormat(VkPhysicalDevice physicalDevice);
+	bool HasStencilComponent(VkFormat format);
 
 	std::vector<char> ReadFile(const std::string& fileName);
 	void FrameBufferResizeCallback(GLFWwindow* windowPtr, int width, int height);
@@ -68,7 +71,11 @@ namespace mk
 	void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
 		VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
-	VkImageView CreateVkImageView(VkImage image, VkFormat format);
+	VkImageView CreateVkImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlag);
+	void CreateImage(VkDevice device, VkPhysicalDevice physicalDevice, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+		VkMemoryPropertyFlags properties, VkImage& image_out, VkDeviceMemory& imageMemory_out);
+	void CreateVkImage(VkDevice device, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkImage& image_out);
+	void CreateVkMemory(VkDevice device, VkPhysicalDevice physicalDevice, VkMemoryPropertyFlags properties, VkImage image, VkDeviceMemory& imageMemory_out);
 
 	// Pipeline creation
 	VkPipelineDynamicStateCreateInfo CreateDynamicState(const std::vector<VkDynamicState>& dynamicStates);
@@ -92,4 +99,5 @@ namespace mk
 	VkPipelineMultisampleStateCreateInfo CreateMultisampling();
 	VkPipelineColorBlendAttachmentState CreateColorBlendAttachment();
 	VkPipelineColorBlendStateCreateInfo CreateColorBlend(VkPipelineColorBlendAttachmentState* colorBlendAttachment);
+	VkPipelineDepthStencilStateCreateInfo CreateDepthStencilInfo();
 }

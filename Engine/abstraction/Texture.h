@@ -24,8 +24,6 @@ namespace mk
 		void CreateImage(const std::string& path);
 		void CreateImageView();
 		void CreateTextureSampler();
-		void CreateVkImage(VkDevice device);
-		void CreateVkMemory(VkDevice device, VkPhysicalDevice physicalDevice);
 
 		uint32_t m_Width{};
 		uint32_t m_Height{};

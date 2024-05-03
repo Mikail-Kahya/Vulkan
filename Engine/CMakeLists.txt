@@ -58,7 +58,7 @@ set(SOURCES
     "abstraction/CommandBuffer.cpp" 
     "abstraction/Window.cpp" 
     "abstraction/SecondaryCommandBuffer.cpp" 
-    "abstraction/Texture.cpp")
+    "abstraction/Texture.cpp" "abstraction/DepthBuffer.cpp")
 
 # Create the executable
 add_library(${ENGINE_NAME} STATIC ${SOURCES})

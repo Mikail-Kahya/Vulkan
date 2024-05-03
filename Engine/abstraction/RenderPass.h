@@ -33,7 +33,6 @@ namespace mk
 
 		void Submit() const;
 
-		inline static const VkClearValue CLEAR_COLOR{ {{0.0f, 0.0f, 0.5f, 1.0f} } };
 		VkRenderPass m_RenderPass{ VK_NULL_HANDLE };
 		std::vector<VkFramebuffer> m_SwapChainFramebuffers{};
 		std::unique_ptr<CommandBuffer> m_CommandBuffer;

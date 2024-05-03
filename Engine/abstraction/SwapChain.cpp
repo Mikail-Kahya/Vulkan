@@ -267,7 +267,7 @@ void SwapChain::CreateImageViews()
 	m_SwapChainImageViews.resize(m_SwapChainImages.size());
 
 	for (size_t idx{}; idx < m_SwapChainImages.size(); ++idx)
-		m_SwapChainImageViews[idx] = CreateVkImageView(m_SwapChainImages[idx], m_SwapChainImageFormat);
+		m_SwapChainImageViews[idx] = CreateVkImageView(m_SwapChainImages[idx], m_SwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void SwapChain::CreateSyncObjects()
