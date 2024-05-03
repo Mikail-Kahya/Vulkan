@@ -18,9 +18,9 @@ namespace mk
 		Pipeline2D();
 		~Pipeline2D();
 
-		Pipeline2D(const Pipeline2D& other) = delete;
+		Pipeline2D(const Pipeline2D& other)					= delete;
 		Pipeline2D(Pipeline2D&& other) noexcept;
-		Pipeline2D& operator=(const Pipeline2D& other) = delete;
+		Pipeline2D& operator=(const Pipeline2D& other)		= delete;
 		Pipeline2D& operator=(Pipeline2D&& other) noexcept;
 
 		void Initialize(const std::string& shaderName);

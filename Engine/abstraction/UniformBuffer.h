@@ -6,10 +6,12 @@
 
 namespace mk
 {
+	class Texture;
+
 	class UniformBuffer final
 	{
 	public:
-		UniformBuffer();
+		UniformBuffer(const Texture* texture);
 		~UniformBuffer();
 
 		UniformBuffer(const UniformBuffer& other)					= delete;
@@ -22,7 +24,7 @@ namespace mk
 
 	private:
 		void CreateUniformBuffers();
-		void CreateDescriptorSets();
+		void CreateDescriptorSets(const Texture* texture);
 
 		UniformBufferObject m_BufferInfo{};
 

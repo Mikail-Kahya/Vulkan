@@ -13,7 +13,7 @@ namespace mk
 		using VertexBuffer = VertexBuffer;
 		using Vertex = Vertex3D;
 	public:
-		Mesh3D()	= default;
+		Mesh3D(const Texture* texture);
 		~Mesh3D()	= default;
 
 		Mesh3D(const Mesh3D& other)					= delete;
@@ -40,7 +40,7 @@ namespace mk
 		void SetTransform();
 		void FlagTransform();
 
-		UniformBuffer m_UniformBuffer{};
+		UniformBuffer m_UniformBuffer;
 		VertexBuffer m_VertexBuffer{};
 		glm::mat4 m_WorldTransform{};
 		glm::vec3 m_Position{};

@@ -12,15 +12,64 @@ using namespace mk;
 Texture::Texture(const std::string& path)
 {
     CreateImage(path);
+    CreateImageView();
+    CreateTextureSampler();
 }
 
 Texture::~Texture()
 {
     const VkDevice device{ VulkanBase::GetInstance().GetDevice() };
-    vkDestroySampler(device, m_TextureSampler, nullptr);
-    vkDestroyImageView(device, m_ImageView, nullptr);
-    vkDestroyImage(device, m_Image, nullptr);
-    vkFreeMemory(device, m_ImageMemory, nullptr);
+    if (m_TextureSampler != VK_NULL_HANDLE)
+		vkDestroySampler(device, m_TextureSampler, nullptr);
+
+    if (m_ImageView != VK_NULL_HANDLE)
+		vkDestroyImageView(device, m_ImageView, nullptr);
+
+    if (m_Image != VK_NULL_HANDLE)
+		vkDestroyImage(device, m_Image, nullptr);
+
+    if (m_ImageMemory != VK_NULL_HANDLE)
+		vkFreeMemory(device, m_ImageMemory, nullptr);
+}
+
+Texture::Texture(Texture&& other) noexcept
+    : m_Width{ other.m_Width }
+    , m_Height{ other.m_Height }
+    , m_Image{ other.m_Image }
+    , m_ImageMemory{ other.m_ImageMemory }
+    , m_ImageView{ other.m_ImageView }
+    , m_TextureSampler{ other.m_TextureSampler }
+{
+    other.m_Image = VK_NULL_HANDLE;
+    other.m_ImageMemory = VK_NULL_HANDLE;
+    other.m_ImageView = VK_NULL_HANDLE;
+    other.m_TextureSampler = VK_NULL_HANDLE;
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept
+{
+    m_Width = other.m_Width;
+    m_Height = other.m_Height;
+    m_Image = other.m_Image;
+    m_ImageMemory = other.m_ImageMemory;
+    m_ImageView = other.m_ImageView;
+    m_TextureSampler = other.m_TextureSampler;
+
+    other.m_Image = VK_NULL_HANDLE;
+    other.m_ImageMemory = VK_NULL_HANDLE;
+    other.m_ImageView = VK_NULL_HANDLE;
+    other.m_TextureSampler = VK_NULL_HANDLE;
+
+    return *this;
+}
+
+VkDescriptorImageInfo Texture::GetImageInfo() const
+{
+    VkDescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageView = m_ImageView;
+    imageInfo.sampler = m_TextureSampler;
+    return imageInfo;
 }
 
 void Texture::CreateImage(const std::string& path)
@@ -117,8 +166,8 @@ void Texture::CreateVkImage(VkDevice device)
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = static_cast<uint32_t>(m_Width);
-    imageInfo.extent.height = static_cast<uint32_t>(m_Height);
+    imageInfo.extent.width = m_Width;
+    imageInfo.extent.height = m_Height;
     imageInfo.extent.depth = 1;
 
     imageInfo.mipLevels = 1;

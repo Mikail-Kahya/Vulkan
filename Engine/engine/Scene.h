@@ -28,7 +28,7 @@ namespace mk
 		void Draw() const;
 
 		Mesh2D* AddMesh2D(const std::string& shader);
-		Mesh3D* AddMesh3D(const std::string& shader);
+		Mesh3D* AddMesh3D(const std::string& shader, const std::string& texture);
 		void RemoveMesh(Mesh2D* meshPtr);
 		void RemoveMesh(Mesh3D* meshPtr);
 

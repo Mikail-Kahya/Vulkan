@@ -9,6 +9,11 @@
 
 using namespace mk;
 
+Mesh3D::Mesh3D(const Texture* texture)
+	: m_UniformBuffer{ texture }
+{
+}
+
 void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const
 {
 	if (!m_VertexBuffer.IsValid())

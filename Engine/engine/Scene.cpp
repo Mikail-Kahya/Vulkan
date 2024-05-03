@@ -43,11 +43,12 @@ Mesh2D* Scene::AddMesh2D(const std::string& shader)
 	return m_Mesh2DSets[pipeline].back().get();
 }
 
-Mesh3D* Scene::AddMesh3D(const std::string& shader)
+Mesh3D* Scene::AddMesh3D(const std::string& shader, const std::string& texture)
 {
-	bool canClear{ m_Mesh3DSets.empty() };
-	Pipeline3D* pipeline = ResourceManager::GetInstance().LoadShader3D(shader, canClear);
-	m_Mesh3DSets[pipeline].emplace_back(std::make_unique<Mesh3D>());
+	ResourceManager& resources{ ResourceManager::GetInstance() };
+	const bool canClear{ m_Mesh3DSets.empty() };
+	Pipeline3D* pipeline = resources.LoadShader3D(shader);
+	m_Mesh3DSets[pipeline].emplace_back(std::make_unique<Mesh3D>(resources.LoadTexture(texture)));
 
 	return m_Mesh3DSets[pipeline].back().get();
 }

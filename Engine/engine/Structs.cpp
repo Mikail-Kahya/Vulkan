@@ -22,7 +22,7 @@ std::vector<VkVertexInputAttributeDescription>* Vertex2D::GetAttributeDescriptio
 
 	if (attributeDescriptions.empty())
 	{
-		attributeDescriptions.resize(2);
+		attributeDescriptions.resize(3);
 
 		// Pos
 		attributeDescriptions[0].binding = 0;
@@ -35,6 +35,12 @@ std::vector<VkVertexInputAttributeDescription>* Vertex2D::GetAttributeDescriptio
 		attributeDescriptions[1].location = 1;
 		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[1].offset = offsetof(Vertex2D, color);
+
+		// texCoord
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[2].offset = offsetof(Vertex2D, texCoord);
 	}
 
 	return &attributeDescriptions;
@@ -60,7 +66,7 @@ std::vector<VkVertexInputAttributeDescription>* Vertex3D::GetAttributeDescriptio
 
 	if (attributeDescriptions.empty())
 	{
-		attributeDescriptions.resize(2);
+		attributeDescriptions.resize(3);
 
 		// Pos
 		attributeDescriptions[0].binding = 0;
@@ -73,6 +79,12 @@ std::vector<VkVertexInputAttributeDescription>* Vertex3D::GetAttributeDescriptio
 		attributeDescriptions[1].location = 1;
 		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[1].offset = offsetof(Vertex3D, color);
+
+		// texCoord
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[2].offset = offsetof(Vertex3D, texCoord);
 	}
 
 	return &attributeDescriptions;

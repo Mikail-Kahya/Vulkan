@@ -9,13 +9,16 @@ namespace mk
 	class Texture final
 	{
 	public:
+		Texture() = default;
 		Texture(const std::string& path);
 		~Texture();
 
-		Texture(const Texture& other) = delete;
-		Texture(Texture&& other) noexcept = delete;
-		Texture& operator=(const Texture& other) = delete;
-		Texture& operator=(Texture&& other) noexcept = delete;
+		Texture(const Texture& other)					= delete;
+		Texture(Texture&& other) noexcept;
+		Texture& operator=(const Texture& other)		= delete;
+		Texture& operator=(Texture&& other) noexcept;
+
+		VkDescriptorImageInfo GetImageInfo() const;
 
 	private:
 		void CreateImage(const std::string& path);

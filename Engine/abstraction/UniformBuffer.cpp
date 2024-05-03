@@ -1,18 +1,20 @@
 #include "UniformBuffer.h"
 
+#include <array>
 #include <stdexcept>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Texture.h"
 #include "vulkan/VulkanBase.h"
 #include "vulkan/VulkanStructs.h"
 #include "vulkan/VulkanUtils.h"
 
 using namespace mk;
 
-UniformBuffer::UniformBuffer()
+UniformBuffer::UniformBuffer(const Texture* texture)
 {
 	CreateUniformBuffers();
-	CreateDescriptorSets();
+	CreateDescriptorSets(texture);
 }
 
 UniformBuffer::~UniformBuffer()
@@ -68,12 +70,13 @@ void UniformBuffer::CreateUniformBuffers()
 	}
 }
 
-void UniformBuffer::CreateDescriptorSets()
+void UniformBuffer::CreateDescriptorSets(const Texture* texture)
 {
 	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
 	const VkDevice device{ vulkanBase.GetDevice() };
 	const auto allocInfo{ vulkanBase.GetDescriptorPool().GetAllocationInfo() };
 
+	const auto imageInfo{ texture->GetImageInfo() };
 	m_DescriptorSets.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
 	if (vkAllocateDescriptorSets(VulkanBase::GetInstance().GetDevice(), &allocInfo, m_DescriptorSets.data()) != VK_SUCCESS)
 		throw std::runtime_error("Failed to allocate descriptor sets");
@@ -85,17 +88,27 @@ void UniformBuffer::CreateDescriptorSets()
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(UniformBufferObject);
 
-		VkWriteDescriptorSet descriptorWrite{};
-		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrite.dstSet = m_DescriptorSets[idx];
-		descriptorWrite.dstBinding = 0;
-		descriptorWrite.dstArrayElement = 0;
-		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptorWrite.descriptorCount = 1;
-		descriptorWrite.pBufferInfo = &bufferInfo;
-		descriptorWrite.pImageInfo = nullptr; // Optional
-		descriptorWrite.pTexelBufferView = nullptr; // Optional
-		vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = m_DescriptorSets[idx];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].dstArrayElement = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+		descriptorWrites[0].pImageInfo = nullptr; // Optional
+		descriptorWrites[0].pTexelBufferView = nullptr; // Optional
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = m_DescriptorSets[idx];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].dstArrayElement = 0;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pImageInfo = &imageInfo;
+		descriptorWrites[1].pTexelBufferView = nullptr; // Optional
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 
 }
