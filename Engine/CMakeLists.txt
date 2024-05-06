@@ -65,10 +65,22 @@ add_library(${ENGINE_NAME} STATIC ${SOURCES})
 # 
 # Link libraries
 
+include(FetchContent)
+
+FetchContent_Declare(tinyobjloader
+  GIT_REPOSITORY https://github.com/tinyobjloader/tinyobjloader.git
+  GIT_TAG v2.0.0rc13
+  GIT_SHALLOW TRUE
+  GIT_PROGRESS TRUE
+)
+
+FetchContent_MakeAvailable(tinyobjloader)
+
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb)
 target_link_libraries(${ENGINE_NAME} PUBLIC ${Vulkan_LIBRARIES} glfw)
 target_link_libraries(${ENGINE_NAME} PUBLIC ${Vulkan_LIBRARIES} glm)
+target_link_libraries(${ENGINE_NAME} PUBLIC ${Vulkan_LIBRARIES} tinyobjloader)
 
 #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 #    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"

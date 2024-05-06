@@ -19,7 +19,7 @@ void VertexBuffer::Draw(VkCommandBuffer commandBuffer) const
 	const VkBuffer vertexBuffers[] = { m_VertexBuffer };
 	constexpr VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
 	vkCmdDrawIndexed(commandBuffer, m_NrIndices, 1, 0, 0, 0);
 }

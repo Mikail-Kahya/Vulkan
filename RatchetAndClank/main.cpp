@@ -23,7 +23,7 @@ void Load()
 	{{-0.5f, 0.5f, 0.f}, {1.0f, 1.0f, 1.0f}, {0, 1}}
 	};
 
-	const std::vector<uint16_t> indices = {
+	const std::vector<uint32_t> indices = {
 		0, 1, 2, 2, 3, 0
 	};
 

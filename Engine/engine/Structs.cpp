@@ -2,6 +2,12 @@
 
 using namespace mk;
 
+bool Vertex2D::operator==(const Vertex2D& other) const
+{
+	return	pos == other.pos && 
+			color == other.color;
+}
+
 VkVertexInputBindingDescription* Vertex2D::GetBindingDescription()
 {
 	static VkVertexInputBindingDescription bindingDescription{};
@@ -46,6 +52,14 @@ std::vector<VkVertexInputAttributeDescription>* Vertex2D::GetAttributeDescriptio
 	return &attributeDescriptions;
 }
 
+bool Vertex3D::operator==(const Vertex3D& other) const
+{
+	return	pos == other.pos && 
+			color == other.color &&
+			texCoord == other.texCoord &&
+			normal == other.normal;
+}
+
 VkVertexInputBindingDescription* Vertex3D::GetBindingDescription()
 {
 	static VkVertexInputBindingDescription bindingDescription{};
@@ -66,7 +80,7 @@ std::vector<VkVertexInputAttributeDescription>* Vertex3D::GetAttributeDescriptio
 
 	if (attributeDescriptions.empty())
 	{
-		attributeDescriptions.resize(3);
+		attributeDescriptions.resize(5);
 
 		// Pos
 		attributeDescriptions[0].binding = 0;
@@ -85,6 +99,18 @@ std::vector<VkVertexInputAttributeDescription>* Vertex3D::GetAttributeDescriptio
 		attributeDescriptions[2].location = 2;
 		attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
 		attributeDescriptions[2].offset = offsetof(Vertex3D, texCoord);
+
+		// normal
+		attributeDescriptions[3].binding = 0;
+		attributeDescriptions[3].location = 3;
+		attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[3].offset = offsetof(Vertex3D, normal);
+
+		// tangent
+		attributeDescriptions[4].binding = 0;
+		attributeDescriptions[4].location = 4;
+		attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[4].offset = offsetof(Vertex3D, tangent);
 	}
 
 	return &attributeDescriptions;

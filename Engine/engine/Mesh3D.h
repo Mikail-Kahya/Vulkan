@@ -10,7 +10,6 @@ namespace mk
 {
 	class Mesh3D final
 	{
-		using VertexBuffer = VertexBuffer;
 		using Vertex = Vertex3D;
 	public:
 		Mesh3D(const Texture* texture);
@@ -23,7 +22,7 @@ namespace mk
 
 		void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const;
 		void Update();
-		void Load(const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
+		void Load(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 		void Load(const std::string& objFile);
 
 		void SetPosition(const glm::vec3& position);

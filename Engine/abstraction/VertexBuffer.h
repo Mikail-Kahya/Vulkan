@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 
-#include "engine/Structs.h"
 #include "vulkan/VulkanBase.h"
 #include "vulkan/VulkanUtils.h"
 
@@ -9,8 +8,7 @@ namespace mk
 {
 	class VertexBuffer final
 	{
-		using Vertices = std::vector<Vertex3D>;
-		using Indices = std::vector<uint16_t>;
+		using Indices = std::vector<uint32_t>;
 	public:
 		VertexBuffer()	= default;
 		~VertexBuffer();
