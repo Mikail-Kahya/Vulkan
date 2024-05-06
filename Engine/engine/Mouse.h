@@ -18,7 +18,7 @@ namespace mk
 
 		void Update();
 
-		glm::vec2 GetDirection() const;
+		const glm::vec2& GetDirection() const;
 		const glm::vec2& GetDisplacement() const;
 		glm::vec2 GeScreenPos() const;
 		bool LeftClick() const;

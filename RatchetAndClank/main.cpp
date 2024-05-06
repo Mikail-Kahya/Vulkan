@@ -48,7 +48,7 @@ void Load()
 		vertex.pos *= -1;
 	plane2D2->Load(vertices, indices);
 
-	Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName, texture);
+	Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName, "tuktuk.png");
 	tuktuk->Load("tuktuk.obj");
 
 

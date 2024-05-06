@@ -45,25 +45,28 @@ namespace mk
 				VertexType vertex{};
 		
 				vertex.color = { 1.0f, 1.0f, 1.0f };
+				constexpr int idx0{ 0 };
+				constexpr int idx1{ 1 };
+				constexpr int idx2{ 2 };
 		
 				if constexpr (std::same_as<VertexType, Vertex2D>)
 				{
-					vertex.pos = {	attrib.vertices[3 * index.vertex_index + 0],
-									attrib.vertices[3 * index.vertex_index + 1] };
+					vertex.pos = {	attrib.vertices[3 * index.vertex_index + idx0],
+									attrib.vertices[3 * index.vertex_index + idx1] };
 					
 				}
 				else
 				{
-					vertex.pos = {	attrib.vertices[3 * index.vertex_index + 0],
-									attrib.vertices[3 * index.vertex_index + 1],
-									attrib.vertices[3 * index.vertex_index + 2] };
+					vertex.pos = {	attrib.vertices[3 * index.vertex_index + idx0],
+									attrib.vertices[3 * index.vertex_index + idx1],
+									attrib.vertices[3 * index.vertex_index + idx2] };
 		
-					vertex.texCoord = {	attrib.texcoords[2 * index.texcoord_index + 0],
-										1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
-		
-					vertex.normal = {	attrib.normals[3 * index.vertex_index + 0],
-										attrib.normals[3 * index.vertex_index + 1],
-										attrib.normals[3 * index.vertex_index + 2] };
+					vertex.texCoord = {	attrib.texcoords[2 * index.texcoord_index + idx0],
+										1.0f - attrib.texcoords[2 * index.texcoord_index + idx1] };
+
+					vertex.normal = {	attrib.normals[3 * index.normal_index + idx0],
+										attrib.normals[3 * index.normal_index + idx1],
+										attrib.normals[3 * index.normal_index + idx2] };
 				}
 		
 				if (uniqueVertices.count(vertex) == 0) 
@@ -76,6 +79,15 @@ namespace mk
 			}
 		}
 
+		if (flipAxisAndWinding)
+		{
+			for (int idx{}; idx < indices.size(); idx += 3)
+			{
+				uint32_t temp{ indices[idx + 1] };
+				indices[idx + 1] = indices[idx + 2];
+				indices[idx + 2] = temp;
+			}
+		}
 
 		//Cheap Tangent Calculations
 		//if constexpr (std::same_as<VertexType, Vertex3D>)

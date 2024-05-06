@@ -21,14 +21,14 @@ void Mouse::Update()
 	m_Position = newPos;
 }
 
-glm::vec2 Mouse::GetDirection() const
+const glm::vec2& Mouse::GetDirection() const
 {
-	return m_Displacement;
+	return m_Direction;
 }
 
 const glm::vec2& Mouse::GetDisplacement() const
 {
-	return m_Direction;
+	return m_Displacement;
 }
 
 glm::vec2 Mouse::GeScreenPos() const

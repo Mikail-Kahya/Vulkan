@@ -29,11 +29,7 @@ vec3 phong(const vec3 color, float ks, float exp, const vec3 l, const vec3 v, co
 }
 
 void main() {
-    //outColor = vec4(fragColor, 1.0);
-    const float observedArea = observed_area();
-    outColor = texture(texSampler, fragTexCoord);
-    outColor.w=1;
-    //outColor.x *= observedArea;
-    //outColor.y *= observedArea;
-    //outColor.z *= observedArea;
+    outColor = texture(texSampler, fragTexCoord) * observed_area();
+    //outColor = vec4(fragColor, 1.0) * observed_area();
+    outColor.w = 1;
 }

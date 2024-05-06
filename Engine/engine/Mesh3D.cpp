@@ -25,7 +25,7 @@ void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout
 void Mesh3D::Update()
 {
 	// Temp hardcoded rotation
-	AddRotation({ 0.f, Time::DeltaTime() * 90.0f, 0 });
+	//AddRotation({ 0.f, Time::DeltaTime() * 90.0f, 0 });
 	
 	if (m_FlagTransform)
 		SetTransform();

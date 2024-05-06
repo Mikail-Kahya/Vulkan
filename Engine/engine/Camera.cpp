@@ -23,7 +23,7 @@ Camera::Camera(float width, float height, float fovDeg)
 void Camera::Update(const Mouse& mouse, const Keyboard& keyboard)
 {
 	if (mouse.RightClick())
-		Rotate(mouse.GetDirection());
+		Rotate(mouse.GetDisplacement());
 
 	Move(keyboard);
 
@@ -132,8 +132,11 @@ void Camera::Rotate(const glm::vec2& mouseDir)
 	if (!mouseMoved)
 		return;
 	FlagView();
-	glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
-	rotation = glm::rotate(rotation, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
+	//glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
+	//rotation = glm::rotate(rotation, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
+
+	glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
+	rotation = glm::rotate(rotation, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
 
 	m_Forward = glm::normalize(rotation * glm::vec4{ 0, 0, 1, 1 });
 }
