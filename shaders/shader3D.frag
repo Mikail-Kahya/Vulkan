@@ -10,26 +10,24 @@ layout(location = 3) in vec3 fragTangent;
 layout(location = 0) out vec4 outColor;
 
 vec3 g_LightDirection = vec3(0.89, 0.45, 0.02);
+const float g_LightIntensity = 7;
 const float PI = 3.1415926535897932384626433832795;
+const float g_MinObservedArea = 0.05;
 
 float observed_area() 
 {
-    return max(0, dot(-g_LightDirection, fragNormal));
+    return max(g_MinObservedArea, dot(-g_LightDirection, fragNormal));
 }
 
-vec3 lambert(vec3 kd, vec3 color)
+vec4 lambert(float kd, vec4 color)
 {
     return color * kd / PI;
 }
 
-vec3 phong(const vec3 color, float ks, float exp, const vec3 l, const vec3 v, const vec3 n)
-{
-	const float cosAngle = dot(reflect(l, n), -v);
-	return ks * pow(max(0, cosAngle), exp) * color;
-}
-
 void main() {
-    outColor = texture(texSampler, fragTexCoord) * observed_area();
-    //outColor = vec4(fragColor, 1.0) * observed_area();
-    outColor.w = 1;
+    outColor = texture(texSampler, fragTexCoord);
+    float alpha = outColor.w;
+
+    outColor = lambert(g_LightIntensity, outColor) * observed_area();
+    outColor.w = alpha;
 }
