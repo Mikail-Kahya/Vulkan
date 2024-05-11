@@ -48,8 +48,17 @@ void Load()
 		vertex.pos *= -1;
 	plane2D2->Load(vertices, indices);
 
-	Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName, "tuktuk.png");
-	tuktuk->Load("tuktuk.obj");
+	//Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName, "tuktuk.png");
+	//tuktuk->Load("tuktuk.obj");
+
+	Mesh3D* ratchet = scenePtr->AddMesh3D(shader3DName, "Ratchet/Ratchet.png");
+	ratchet->Load("Ratchet/Ratchet.obj");
+	ratchet->SetScale({ 2.5f, 2.5f, 2.5f });
+
+	Mesh3D* clank = scenePtr->AddMesh3D(shader3DName, "Clank/ClankBackpack.png");
+	clank->Load("Clank/ClankBackpack.obj");
+	clank->SetPosition({ 0, 1, -1 });
+	clank->SetScale({ 0.1f, 0.1f, 0.1f });
 
 
 	std::cout << "Controls:\n\n"
