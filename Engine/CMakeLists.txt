@@ -78,9 +78,14 @@ set(SOURCES
 # -----------------------------------------------------------------
 # --------------------------INPUT----------------------------------
 # -----------------------------------------------------------------
-    "input/Input.h"
+    "input/CommandInput.h"
+    "input/InputKeys.h"
     "input/InputMapping.h"
-    "input/InputManager.cpp"
+    "input/Action.cpp"
+    "input/ControllerInput.cpp"
+    "input/KeyboardInput.cpp"
+    "input/Controller.cpp"
+    "input/GLFWInput.cpp"
     "input/Keyboard.cpp"
     "input/Mouse.cpp"
     "input/Camera.cpp"

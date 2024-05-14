@@ -17,16 +17,6 @@ void SceneManager::LateUpdate()
 	m_Scene->LateUpdate();
 }
 
-TimeManager& SceneManager::GetTimeManager()
-{
-	return m_TimeManager;
-}
-
-const TimeManager& mk::Time()
-{
-	return SceneManager::GetInstance().GetTimeManager();
-}
-
 Scene& SceneManager::LoadScene(const std::string& name)
 {
 	m_Scene = std::make_unique<Scene>(name);

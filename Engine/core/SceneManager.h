@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
 #include <memory>
-#include "ISingleton.h"
-#include "TimeManager.h"
 #include "Scene.h"
+#include "CRTP/ISingleton.h"
 
 namespace mk
 {
@@ -29,14 +28,9 @@ namespace mk
 		void Update();
 		void LateUpdate();
 
-		TimeManager& GetTimeManager();
-
 	private:
 		SceneManager() = default;
 
 		std::unique_ptr<Scene> m_Scene{};
-		TimeManager m_TimeManager{};
 	};
-
-	const TimeManager& Time();
 }

@@ -77,6 +77,7 @@ void Camera::Move(const Keyboard& keyboard)
 {
 	bool hasMoved{ false };
 	glm::vec2 moveDir{};
+	
 	if (keyboard.ButtonPress(GLFW_KEY_W))
 	{
 		moveDir.y += 1;
