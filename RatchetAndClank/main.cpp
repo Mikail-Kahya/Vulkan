@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "engine/ResourceManager.h"
-#include "engine/Scene.h"
-#include "engine/SceneManager.h"
+#include "core/ResourceManager.h"
+#include "core/Scene.h"
+#include "core/SceneManager.h"
 #include "vulkan/VulkanBase.h"
 
 using namespace mk;
@@ -30,35 +30,35 @@ void Load()
 	const std::string shader2DName{ "shader2D" };
 	const std::string shader3DName{ "shader3D" };
 	const std::string texture{ "test.jpg" };
-	Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-
-	Mesh3D* plane = scenePtr->AddMesh3D(shader3DName, texture);
-	plane->Load(vertices3D, indices);
-	plane->SetPosition({ -1, 0, 0 });
-
-	Mesh3D* plane2 = scenePtr->AddMesh3D(shader3DName, texture);
-	plane2->Load(vertices3D, indices);
-	plane2->SetPosition({ 1, 0, 0 });
-
-	Mesh2D* plane2D = scenePtr->AddMesh2D(shader2DName);
-	plane2D->Load(vertices, indices);
-
-	Mesh2D* plane2D2 = scenePtr->AddMesh2D(shader2DName);
-	for (auto& vertex : vertices)
-		vertex.pos *= -1;
-	plane2D2->Load(vertices, indices);
+	//Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
+	//
+	//Mesh3D* plane = scenePtr->AddMesh3D(shader3DName, texture);
+	//plane->Load(vertices3D, indices);
+	//plane->SetPosition({ -1, 0, 0 });
+	//
+	//Mesh3D* plane2 = scenePtr->AddMesh3D(shader3DName, texture);
+	//plane2->Load(vertices3D, indices);
+	//plane2->SetPosition({ 1, 0, 0 });
+	//
+	//Mesh2D* plane2D = scenePtr->AddMesh2D(shader2DName);
+	//plane2D->Load(vertices, indices);
+	//
+	//Mesh2D* plane2D2 = scenePtr->AddMesh2D(shader2DName);
+	//for (auto& vertex : vertices)
+	//	vertex.pos *= -1;
+	//plane2D2->Load(vertices, indices);
 
 	//Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName, "tuktuk.png");
 	//tuktuk->Load("tuktuk.obj");
 
-	Mesh3D* ratchet = scenePtr->AddMesh3D(shader3DName, "Ratchet/Ratchet.png");
-	ratchet->Load("Ratchet/Ratchet.obj");
-	ratchet->SetScale({ 2.5f, 2.5f, 2.5f });
+	//Mesh3D* ratchet = scenePtr->AddMesh3D(shader3DName, "Ratchet/Ratchet.png");
+	//ratchet->Load("Ratchet/Ratchet.obj");
+	//ratchet->SetScale({ 2.5f, 2.5f, 2.5f });
 
-	Mesh3D* clank = scenePtr->AddMesh3D(shader3DName, "Clank/ClankBackpack.png");
-	clank->Load("Clank/ClankBackpack.obj");
-	clank->SetPosition({ 0, 1, -1 });
-	clank->SetScale({ 0.1f, 0.1f, 0.1f });
+	//Mesh3D* clank = scenePtr->AddMesh3D(shader3DName, "Clank/ClankBackpack.png");
+	//clank->Load("Clank/ClankBackpack.obj");
+	//clank->SetPosition({ 0, 1, -1 });
+	//clank->SetScale({ 0.1f, 0.1f, 0.1f });
 
 
 	std::cout << "Controls:\n\n"
