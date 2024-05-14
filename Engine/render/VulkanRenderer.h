@@ -13,10 +13,10 @@ namespace mk
 	class VulkanRenderer final : public IRenderer
 	{
 	public:
+		VulkanRenderer() = default;
 		VulkanRenderer(int width, int height);
 		
 		void Render() const override;
-		void Destroy();
 
 		int GetHeight() const noexcept;
 		int GetWidth() const noexcept;
@@ -25,14 +25,9 @@ namespace mk
 		void UnregisterRender(void* renderPtr) override;
 
 	private:
-		VulkanRenderer() = default;
-		void RenderTexture(const MeshComponent* renderComponentPtr) const;
 
 		// Sorts by float. Whenever the float changes
 		std::list<MeshComponent*> m_Renderers{};
-
-		float m_AutoDepth{};
-		bool m_DepthChanged{ false };
 		int m_Width{};
 		int m_Height{};
 	};
