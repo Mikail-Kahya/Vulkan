@@ -2,28 +2,38 @@
 
 using namespace mk;
 
-void SceneManager::Draw() const
+void SceneManager::FixedUpdate()
 {
-	m_CurrentScenePtr->Draw();
+	m_Scene->FixedUpdate();
 }
 
-void SceneManager::Cleanup()
+void SceneManager::Update()
 {
-	m_CurrentScenePtr = nullptr;
-	m_Scenes.clear();
+	m_Scene->Update();
 }
 
-Scene* SceneManager::LoadScene(const std::string& sceneName)
+void SceneManager::LateUpdate()
 {
-	m_CurrentScenePtr = &m_Scenes[sceneName];
-	
-	return m_CurrentScenePtr;
+	m_Scene->LateUpdate();
 }
 
-void SceneManager::RemoveScene(const std::string& sceneName)
+TimeManager& SceneManager::GetTimeManager()
 {
-	if (!m_Scenes.contains(sceneName))
-		return;
+	return m_TimeManager;
+}
 
-	m_Scenes.erase(sceneName);
+const TimeManager& mk::Time()
+{
+	return SceneManager::GetInstance().GetTimeManager();
+}
+
+Scene& SceneManager::LoadScene(const std::string& name)
+{
+	m_Scene = std::make_unique<Scene>(name);
+	return *m_Scene;
+}
+
+Scene& SceneManager::GetScene() const
+{
+	return *m_Scene;
 }

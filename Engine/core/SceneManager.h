@@ -1,31 +1,42 @@
 #pragma once
-#include <map>
 #include <string>
-
+#include <memory>
+#include "ISingleton.h"
+#include "TimeManager.h"
 #include "Scene.h"
-#include "interfaces/Singleton.h"
 
 namespace mk
 {
-	class SceneManager final : public Singleton<SceneManager>
+	// Design for future when loading from files
+		// Load scene with file, allow preloading, and hold one current scene 
+
+	class SceneManager final : public ISingleton<SceneManager>
 	{
+		friend class ISingleton<SceneManager>;
 	public:
-		SceneManager()				= default;
-		~SceneManager() override	= default;
+		
+		~SceneManager() override = default;
 
 		SceneManager(const SceneManager& other)					= delete;
 		SceneManager(SceneManager&& other) noexcept				= delete;
 		SceneManager& operator=(const SceneManager& other)		= delete;
 		SceneManager& operator=(SceneManager&& other) noexcept	= delete;
 
-		void Draw() const;
-		void Cleanup();
+		Scene& LoadScene(const std::string& name);
+		Scene& GetScene() const;
 
-		Scene* LoadScene(const std::string& sceneName);
-		void RemoveScene(const std::string& sceneName);
+		void FixedUpdate();
+		void Update();
+		void LateUpdate();
+
+		TimeManager& GetTimeManager();
 
 	private:
-		Scene* m_CurrentScenePtr{};
-		std::map<std::string, Scene> m_Scenes{};
+		SceneManager() = default;
+
+		std::unique_ptr<Scene> m_Scene{};
+		TimeManager m_TimeManager{};
 	};
+
+	const TimeManager& Time();
 }

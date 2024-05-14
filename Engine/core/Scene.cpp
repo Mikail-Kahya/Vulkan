@@ -1,72 +1,64 @@
 #include "Scene.h"
+#include "GameObject.h"
 
-#include "Mesh2D.h"
-#include "abstraction/Pipeline2D.h"
-#include "abstraction/Pipeline3D.h"
-#include "ResourceManager.h"
-#include "vulkan/VulkanBase.h"
+#include <algorithm>
 
 using namespace mk;
 
-void Scene::Draw() const
+unsigned int Scene::m_IdCounter = 0;
+
+Scene::Scene(const std::string& name) : m_Name(name) {}
+
+Scene::~Scene() = default;
+
+void Scene::Start()
 {
-	std::vector<Mesh3D*> meshes3D{};
-	for (const auto& meshSet : m_Mesh3DSets)
-	{
-		for (const auto& mesh : meshSet.second)
+	CleanupGameObjects();
+}
+
+void Scene::FixedUpdate()
+{
+	for (auto& object : m_Objects)
+		object->FixedUpdate();
+}
+
+void Scene::Update()
+{
+	for(auto& object : m_Objects)
+		object->Update();
+}
+
+void Scene::LateUpdate()
+{
+	for (auto& object : m_Objects)
+		object->LateUpdate();
+	CleanupGameObjects();
+}
+
+GameObject* Scene::SpawnObject(const std::string& name)
+{
+	m_ObjectBuffer.emplace_back(std::make_unique<GameObject>(name));
+	return m_ObjectBuffer.back().get();
+}
+
+void Scene::RemoveAll()
+{
+	m_Objects.clear();
+}
+
+void Scene::CleanupGameObjects()
+{
+	// Remove destroy flagged components
+	auto eraseIt = std::stable_partition(m_Objects.begin(), m_Objects.end(), [](const std::unique_ptr<GameObject>& object)
 		{
-			mesh->Update();
-			meshes3D.push_back(mesh.get());
-		}
+			return !object->DestroyFlagged();
+		});
 
-		meshSet.first->Draw(meshes3D);
-		meshes3D.clear();
-	}
+	m_Objects.erase(eraseIt, m_Objects.end());
 
-	std::vector<Mesh2D*> meshes2D{};
-	for (const auto& meshSet : m_Mesh2DSets)
-	{
-		for (const auto& mesh : meshSet.second)
-			meshes2D.push_back(mesh.get());
-	
-		meshSet.first->Draw(meshes2D);
-		meshes2D.clear();
-	}
-}
-
-Mesh2D* Scene::AddMesh2D(const std::string& shader)
-{
-	Pipeline2D* pipeline = ResourceManager::GetInstance().LoadShader2D(shader);
-
-	m_Mesh2DSets[pipeline].emplace_back(std::make_unique<Mesh2D>());
-
-	return m_Mesh2DSets[pipeline].back().get();
-}
-
-Mesh3D* Scene::AddMesh3D(const std::string& shader, const std::string& texture)
-{
-	ResourceManager& resources{ ResourceManager::GetInstance() };
-	const bool canClear{ m_Mesh3DSets.empty() };
-	Pipeline3D* pipeline = resources.LoadShader3D(shader);
-	m_Mesh3DSets[pipeline].emplace_back(std::make_unique<Mesh3D>(resources.LoadTexture(texture)));
-
-	return m_Mesh3DSets[pipeline].back().get();
-}
-
-void Scene::RemoveMesh(Mesh2D* meshPtr)
-{
-	for (auto& meshSet : m_Mesh2DSets)
-	{
-		if (std::erase_if(meshSet.second, [meshPtr](const std::unique_ptr<Mesh2D>& mesh) { return mesh.get() == meshPtr; }))
-			return;
-	}
-}
-
-void Scene::RemoveMesh(Mesh3D* meshPtr)
-{
-	for (auto& meshSet : m_Mesh3DSets)
-	{
-		if (std::erase_if(meshSet.second, [meshPtr](const std::unique_ptr<Mesh3D>& mesh) { return mesh.get() == meshPtr; }))
-			return;
-	}
+	// Move components and flush buffer
+	m_Objects.insert(m_Objects.end(),
+		std::make_move_iterator(m_ObjectBuffer.begin()),
+		std::make_move_iterator(m_ObjectBuffer.end()));
+	m_ObjectBuffer.clear();
 }
