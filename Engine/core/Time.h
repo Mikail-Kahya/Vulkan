@@ -12,9 +12,9 @@ namespace mk
 		Time& operator=(Time&& other) noexcept	= default;
 
 		static void Update();
-		static float GetTotalTime();
-		static float GetFPS();
-		static float GetDeltaTime();
+		static float TotalElapsedTime();
+		static float FPS();
+		static float DeltaTime();
 
 		constexpr static float FIXED_TIME{ 0.02f };
 

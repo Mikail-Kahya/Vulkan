@@ -13,18 +13,18 @@ void Time::Update()
 	m_LastUpdated = now;
 }
 
-float Time::GetTotalTime()
+float Time::TotalElapsedTime()
 {
 	using namespace std::chrono;
 	return duration<float>(high_resolution_clock::now() - m_Start).count();
 }
 
-float Time::GetFPS()
+float Time::FPS()
 {
 	return 1 / m_DeltaTime;
 }
 
-float Time::GetDeltaTime()
+float Time::DeltaTime()
 {
 	return m_DeltaTime;
 }
