@@ -3,22 +3,26 @@
 
 namespace mk
 {
-	struct Time
+	class Time final
 	{
-		Time();
+	public:
+		Time(const Time& other)					= default;
+		Time(Time&& other) noexcept				= default;
+		Time& operator=(const Time& other)		= default;
+		Time& operator=(Time&& other) noexcept	= default;
 
-		Time(const Time& other) = default;
-		Time(Time&& other) = default;
-		Time& operator=(const Time& other) = default;
-		Time& operator=(Time&& other) = default;
+		static void Update();
+		static float GetTotalTime();
+		static float GetFPS();
+		static float GetDeltaTime();
 
-		float GetTotalTime() const;
-		float GetFPS() const;
-
-		float deltaTime{};
-		float fixedDeltaTime{ 0.02f };
+		constexpr static float FIXED_TIME{ 0.02f };
 
 	private:
-		std::chrono::steady_clock::time_point start{};
+		Time() = default;
+
+		inline static float m_DeltaTime{};
+		static std::chrono::high_resolution_clock::time_point m_Start;
+		static std::chrono::high_resolution_clock::time_point m_LastUpdated;
 	};
 }

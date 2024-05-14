@@ -1,19 +1,30 @@
 #include "Time.h"
 
 using namespace mk;
+using namespace std::chrono;
 
-Time::Time()
-	: start{ std::chrono::steady_clock::now() }
+high_resolution_clock::time_point Time::m_Start { high_resolution_clock::now() };
+high_resolution_clock::time_point Time::m_LastUpdated{ high_resolution_clock::now() };
+
+void Time::Update()
 {
+	high_resolution_clock::time_point now{ high_resolution_clock::now() };
+	m_DeltaTime = duration<float>(now - m_LastUpdated).count();
+	m_LastUpdated = now;
 }
 
-float Time::GetTotalTime() const
+float Time::GetTotalTime()
 {
 	using namespace std::chrono;
-	return duration<float>(high_resolution_clock::now() - start).count();
+	return duration<float>(high_resolution_clock::now() - m_Start).count();
 }
 
-float Time::GetFPS() const
+float Time::GetFPS()
 {
-	return 1 / deltaTime;
+	return 1 / m_DeltaTime;
+}
+
+float Time::GetDeltaTime()
+{
+	return m_DeltaTime;
 }
