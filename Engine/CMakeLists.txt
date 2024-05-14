@@ -25,9 +25,10 @@ set(ENGINE_NAME ${ENGINE_NAME} PARENT_SCOPE)
 #    DEPENDS ${SPIRV_BINARY_FILES}
 #)
 
-
 set(SOURCES
-    # Add other source files here    
+# -----------------------------------------------------------------
+# --------------------------VULKAN---------------------------------
+# -----------------------------------------------------------------
     "vulkan/VulkanStructs.cpp"
     "vulkan/VulkanUtils.cpp" 
     "vulkan/VulkanBase.cpp"
@@ -49,17 +50,54 @@ set(SOURCES
     "abstraction/Texture.cpp" 
     "abstraction/DepthBuffer.cpp"
 
+# -----------------------------------------------------------------
+# ------------------------COMPONENTS-------------------------------
+# -----------------------------------------------------------------
+    "components/MeshComponent.cpp"
+
+# -----------------------------------------------------------------
+# --------------------------CORE-----------------------------------
+# -----------------------------------------------------------------
+    "core/GameObject.cpp"
+    "core/IComponent.cpp"
+    "core/IObserver.cpp"
     "core/ResourceManager.cpp" 
-    "core/SceneManager.cpp" 
-    "core/Scene.cpp" 
-    "core/Mesh3D.cpp"
-    "core/Mesh2D.cpp"
-    "core/Camera.cpp" 
-    "core/Utils.cpp" 
-    "core/Mouse.cpp" 
-    "core/Keyboard.cpp" 
-    "core/Time.cpp" 
+    "core/Scene.cpp"
+    "core/SceneManager.cpp"
+    "core/ServiceLocator.cpp" 
     "core/structs.cpp"
+    "core/Time.cpp" 
+    "core/Transform.cpp"
+    "core/Utils.cpp" 
+
+# -----------------------------------------------------------------
+# --------------------------CRTP-----------------------------------
+# -----------------------------------------------------------------
+    "CRTP/ISingleton.h"
+
+# -----------------------------------------------------------------
+# --------------------------INPUT----------------------------------
+# -----------------------------------------------------------------
+    "input/Input.h"
+    "input/InputMapping.h"
+    "input/InputManager.cpp"
+    "input/Keyboard.cpp"
+    "input/Mouse.cpp"
+    "input/Camera.cpp"
+
+# -----------------------------------------------------------------
+# --------------------------RENDER---------------------------------
+# -----------------------------------------------------------------
+    "render/Mesh3D.cpp"
+    "render/Mesh2D.cpp"
+    "render/VulkanRenderer.cpp"
+
+
+# -----------------------------------------------------------------
+# --------------------------SOUND----------------------------------
+# -----------------------------------------------------------------
+    "sound/DefaultSoundSystem.cpp"
+    "sound/NullSoundSystem.h"
 )
 
 # Create the executable
