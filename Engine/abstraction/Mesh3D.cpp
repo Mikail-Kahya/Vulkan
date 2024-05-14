@@ -8,16 +8,12 @@
 
 using namespace mk;
 
-Mesh3D::Mesh3D(const Texture* texture)
-	: m_UniformBuffer{ texture }
-{
-}
-
 void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const
 {
 	if (!m_VertexBuffer.IsValid())
 		return;
-	m_UniformBuffer.SetActive(commandBuffer, pipelineLayout);
+	if (m_UniformBuffer)
+		m_UniformBuffer->SetActive(commandBuffer, pipelineLayout);
 	m_VertexBuffer.Draw(commandBuffer);
 }
 
@@ -25,8 +21,8 @@ void Mesh3D::Update()
 {
 	if (m_FlagTransform)
 		SetTransform();
-
-	m_UniformBuffer.Update(m_WorldTransform);
+	if (m_UniformBuffer)
+		m_UniformBuffer->Update(m_WorldTransform);
 }
 
 void Mesh3D::Load(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
@@ -79,6 +75,11 @@ void Mesh3D::AddScale(const glm::vec3& scale)
 {
 	m_Scale += scale;
 	FlagTransform();
+}
+
+void Mesh3D::SetTexture(Texture* texturePtr)
+{
+	m_UniformBuffer = std::make_unique<UniformBuffer>(texturePtr);
 }
 
 void Mesh3D::ClampRotation()

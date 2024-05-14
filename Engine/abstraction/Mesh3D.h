@@ -12,7 +12,7 @@ namespace mk
 	{
 		using Vertex = Vertex3D;
 	public:
-		Mesh3D(const Texture* texture);
+		Mesh3D() = default;
 		~Mesh3D()	= default;
 
 		Mesh3D(const Mesh3D& other)					= delete;
@@ -33,14 +33,16 @@ namespace mk
 		void AddRotation(const glm::vec3& rotation);
 		void AddScale(const glm::vec3& scale);
 
+		void SetTexture(Texture* texturePtr);
+
 	private:
 		void ClampRotation();
 		float ClampAxis(float angle) const;
 		void SetTransform();
 		void FlagTransform();
 
-		UniformBuffer m_UniformBuffer;
 		VertexBuffer m_VertexBuffer{};
+		std::unique_ptr<UniformBuffer> m_UniformBuffer{};
 		glm::mat4 m_WorldTransform{};
 		glm::vec3 m_Position{};
 		glm::vec3 m_Rotation{};
