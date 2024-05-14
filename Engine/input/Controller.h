@@ -13,9 +13,9 @@ namespace mk
 		~Controller() = default;
 
 		Controller(const Controller& other)					= delete;
-		Controller(Controller&& other) noexcept				= default;
+		Controller(Controller&& other) noexcept				= delete;
 		Controller& operator=(const Controller& other)		= delete;
-		Controller& operator=(Controller&& other) noexcept	= default;
+		Controller& operator=(Controller&& other) noexcept	= delete;
 
 		void KeyDown(KeyInput input);
 		void KeyUp(KeyInput input);
