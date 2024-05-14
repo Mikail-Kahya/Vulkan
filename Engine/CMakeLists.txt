@@ -93,8 +93,8 @@ set(SOURCES
 # -----------------------------------------------------------------
 # --------------------------RENDER---------------------------------
 # -----------------------------------------------------------------
-    "render/Mesh3D.cpp"
-    "render/Mesh2D.cpp"
+    "abstraction/Mesh3D.cpp"
+    "abstraction/Mesh2D.cpp"
     "render/VulkanRenderer.cpp"
 
 
