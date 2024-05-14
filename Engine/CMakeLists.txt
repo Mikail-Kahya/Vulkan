@@ -32,18 +32,6 @@ set(SOURCES
     "vulkan/VulkanUtils.cpp" 
     "vulkan/VulkanBase.cpp"
 
-    "engine/ResourceManager.cpp" 
-    "engine/SceneManager.cpp" 
-    "engine/Scene.cpp" 
-    "engine/Mesh3D.cpp"
-    "engine/Mesh2D.cpp"
-    "engine/Camera.cpp" 
-    "engine/Utils.cpp" 
-    "engine/Mouse.cpp" 
-    "engine/Keyboard.cpp" 
-    "engine/Time.cpp" 
-    "engine/structs.cpp"
-
     "abstraction/Shader.cpp"
     "abstraction/SwapChain.cpp" 
     "abstraction/CommandPool.cpp" 
@@ -58,7 +46,21 @@ set(SOURCES
     "abstraction/CommandBuffer.cpp" 
     "abstraction/Window.cpp" 
     "abstraction/SecondaryCommandBuffer.cpp" 
-    "abstraction/Texture.cpp" "abstraction/DepthBuffer.cpp")
+    "abstraction/Texture.cpp" 
+    "abstraction/DepthBuffer.cpp"
+
+    "core/ResourceManager.cpp" 
+    "core/SceneManager.cpp" 
+    "core/Scene.cpp" 
+    "core/Mesh3D.cpp"
+    "core/Mesh2D.cpp"
+    "core/Camera.cpp" 
+    "core/Utils.cpp" 
+    "core/Mouse.cpp" 
+    "core/Keyboard.cpp" 
+    "core/Time.cpp" 
+    "core/structs.cpp"
+)
 
 # Create the executable
 add_library(${ENGINE_NAME} STATIC ${SOURCES})
