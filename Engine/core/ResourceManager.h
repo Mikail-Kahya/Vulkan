@@ -27,7 +27,6 @@ namespace mk
 		Pipeline2D* LoadShader2D(const std::string& shader);
 		Pipeline3D* LoadShader3D(const std::string& shader);
 		Texture* LoadTexture(const std::string& texture);
-		void Update();
 		void Cleanup();
 
 	private:

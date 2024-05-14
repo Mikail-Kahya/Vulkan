@@ -46,10 +46,6 @@ Texture* ResourceManager::LoadTexture(const std::string& texture)
 	return &m_Textures[texture];
 }
 
-void ResourceManager::Update()
-{
-}
-
 void ResourceManager::Cleanup()
 {
 	m_Pipelines2D.clear();
