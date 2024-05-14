@@ -32,6 +32,7 @@ find_package(Vulkan REQUIRED)
 # Include Directories
 include_directories(${Vulkan_INCLUDE_DIRS})
 
+add_subdirectory(external/soloud)
 add_subdirectory(Engine)
 add_subdirectory(RatchetAndClank)
 

@@ -109,7 +109,7 @@ set(SOURCES
 add_library(${ENGINE_NAME} STATIC ${SOURCES})
 # 
 # Link libraries
-
+  SET(XINPUT_LIB XInput)
 include(FetchContent)
 
 FetchContent_Declare(tinyobjloader
@@ -123,9 +123,23 @@ FetchContent_MakeAvailable(tinyobjloader)
 
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb)
-target_link_libraries(${ENGINE_NAME} PUBLIC ${Vulkan_LIBRARIES} glfw)
-target_link_libraries(${ENGINE_NAME} PUBLIC ${Vulkan_LIBRARIES} glm)
-target_link_libraries(${ENGINE_NAME} PUBLIC ${Vulkan_LIBRARIES} tinyobjloader)
+target_link_libraries(${ENGINE_NAME} PUBLIC 
+    ${Vulkan_LIBRARIES} 
+    glfw
+    glm
+    tinyobjloader
+    XINPUT_LIB
+)
+
+#soloud
+target_link_libraries(${ENGINE_NAME} PUBLIC soloud)
+
+if(EMSCRIPTEN)
+    target_compile_definitions(soloud PUBLIC WITH_SDL2_STATIC)
+else()
+    target_compile_definitions(soloud PUBLIC WITH_MINIAUDIO)
+    #target_link_libraries(soloud PUBLIC ${sdl2_SOURCE_DIR})
+endif()
 
 #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 #    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"
