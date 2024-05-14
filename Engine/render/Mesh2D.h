@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "Structs.h"
+#include "core/Structs.h"
 #include "abstraction/VertexBuffer.h"
 
 namespace mk

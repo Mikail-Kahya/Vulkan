@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "Structs.h"
+#include "core/Structs.h"
 #include "abstraction/UniformBuffer.h"
 #include "abstraction/VertexBuffer.h"
 
