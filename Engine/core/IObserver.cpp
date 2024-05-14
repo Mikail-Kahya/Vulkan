@@ -9,24 +9,20 @@ IObserver::~IObserver()
 		subjectPtr->RemoveObserver(this);
 }
 
-void IObserver::OnNotify(ISubject* subjectPtr, ObserveEvent* event)
+void IObserver::OnNotify(ISubject* subjectPtr, IEvent* event)
 {
-	switch (event->type)
-	{
-	case "observe":
+	if (dynamic_cast<ObserveEvent*>(event))
 		subjectPtr->AddObserver(this);
-		break;
-	case STOP_OBSERVING:
-	case OBJECT_DESTROY:
+	else if (	dynamic_cast<StopObserveEvent*>(event) ||
+				dynamic_cast<ObjectDestroyEvent*>(event))
 		subjectPtr->RemoveObserver(this);
-		break;
-	}
 }
 
 ISubject::~ISubject()
 {
+	const std::unique_ptr<ObjectDestroyEvent> event{};
 	for (IObserver* observerPtr : m_Observers)
-		observerPtr->OnNotify(this, { EventType::OBJECT_DESTROY });
+		observerPtr->OnNotify(this, event.get());
 }
 
 void ISubject::AddObserver(IObserver* observerPtr)
@@ -34,8 +30,9 @@ void ISubject::AddObserver(IObserver* observerPtr)
 	const auto foundIter = std::find(m_Observers.begin(), m_Observers.end(), observerPtr);
 	if (foundIter == m_Observers.end())
 	{
+		const std::unique_ptr<ObserveEvent> event{};
 		m_Observers.emplace_back(observerPtr);
-		observerPtr->OnNotify(this, { EventType::OBSERVE });
+		observerPtr->OnNotify(this, event.get());
 	}
 }
 
@@ -44,13 +41,14 @@ void ISubject::RemoveObserver(IObserver* observerPtr)
 	const auto foundIter = std::find(m_Observers.begin(), m_Observers.end(), observerPtr);
 	if (foundIter == m_Observers.end())
 	{
+		const std::unique_ptr<ObserveEvent> event{};
 		m_Observers.erase(foundIter);
-		observerPtr->OnNotify(this, { EventType::STOP_OBSERVING });
+		observerPtr->OnNotify(this, event.get());
 	}
 }
 
-void ISubject::Notify(std::unique_ptr<IEvent>&& event)
+void ISubject::Notify(const std::unique_ptr<IEvent>& event)
 {
 	for (IObserver* observerPtr : m_Observers)
-		observerPtr->OnNotify(this, event);
+		observerPtr->OnNotify(this, event.get());
 }

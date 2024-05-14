@@ -43,7 +43,7 @@ namespace mk
 	public:
 		IObserver() = default;
 		virtual ~IObserver();
-		virtual void OnNotify(ISubject* subjectPtr, ObserveEvent* event);
+		virtual void OnNotify(ISubject* subjectPtr, IEvent* event);
 
 	private:
 		std::vector<ISubject*> m_Subjects{};
@@ -59,7 +59,7 @@ namespace mk
 		void RemoveObserver(IObserver* observerPtr);
 
 	protected:
-		void Notify(std::unique_ptr<IEvent>&& event);
+		void Notify(const std::unique_ptr<IEvent>& event);
 
 	private:
 		std::vector<IObserver*> m_Observers{};
