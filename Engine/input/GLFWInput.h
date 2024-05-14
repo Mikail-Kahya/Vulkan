@@ -31,7 +31,7 @@ namespace mk
 
 		uint8_t m_ControllerIdx{};
 		std::unique_ptr<Mouse> m_Mouse{};
-		std::vector<Controller> m_Controllers{};
+		std::vector<std::unique_ptr<Controller>> m_Controllers{};
 		std::vector<std::unique_ptr<Command>> m_Commands{};
 		GLFWwindow* m_WindowPtr{};
 	};

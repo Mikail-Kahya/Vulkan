@@ -17,17 +17,17 @@ bool GLFWInput::ProcessInput()
 
 	glfwPollEvents();
 
-	for (Controller& controller : m_Controllers)
+	for (const auto& controller : m_Controllers)
 	{
-		for (const auto& mapping : controller.GetInputMapping().GetMappings())
+		for (const auto& mapping : controller->GetInputMapping().GetMappings())
 		{
 			const KeyInput key{ mapping.first.keyboardInput };
 			if (glfwGetKey(m_WindowPtr, key))
-				controller.KeyUp(key);
+				controller->KeyUp(key);
 			else
-				controller.KeyDown(key);
+				controller->KeyDown(key);
 		}
-		controller.HandleInput();
+		controller->HandleInput();
 	}
 
 	return true;
@@ -39,19 +39,19 @@ controller_id GLFWInput::RegisterController()
 	// Reuse old controllers
 	const auto foundInvalidController =
 		std::find_if(m_Controllers.begin(), m_Controllers.end(),
-			[this](const Controller& controller)
+			[this](const auto& controller)
 			{
-				return !ValidController(controller.GetIdx());
+				return !ValidController(controller->GetIdx());
 			});
 
 	if (foundInvalidController == m_Controllers.end())
 	{
-		m_Controllers.emplace_back(m_ControllerIdx, 1000, true);
+		m_Controllers.emplace_back(std::make_unique<Controller>(m_ControllerIdx, 1000, true));
 		return ++m_ControllerIdx;
 	}
 
-	foundInvalidController->Enable();
-	return foundInvalidController->GetIdx();
+	foundInvalidController->get()->Enable();
+	return foundInvalidController->get()->GetIdx();
 }
 
 void GLFWInput::UnregisterController(controller_id id)
@@ -59,7 +59,7 @@ void GLFWInput::UnregisterController(controller_id id)
 	if (!ValidController(id))
 		return;
 
-	m_Controllers[id].Disable();
+	m_Controllers[id]->Disable();
 }
 
 void GLFWInput::AddBinding(controller_id id, const Action& action, Command* commandPtr)
@@ -67,7 +67,7 @@ void GLFWInput::AddBinding(controller_id id, const Action& action, Command* comm
 	if (!ValidController(id))
 		return;
 
-	m_Controllers[id].AddBinding(action, commandPtr);
+	m_Controllers[id]->AddBinding(action, commandPtr);
 }
 
 bool GLFWInput::ValidController(controller_id id) const
@@ -75,5 +75,5 @@ bool GLFWInput::ValidController(controller_id id) const
 	if (id >= m_ControllerIdx)
 		return false;
 
-	return m_Controllers[id].IsEnabled();
+	return m_Controllers[id]->IsEnabled();
 }
