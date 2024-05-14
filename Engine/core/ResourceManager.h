@@ -2,19 +2,17 @@
 #include <map>
 #include <string>
 
-#include "CRTP/ISingleton.h"
 #include "abstraction/Pipeline2D.h"
 #include "abstraction/Pipeline3D.h"
 #include "abstraction/Texture.h"
 
 namespace mk
 {
-	class ResourceManager final : public ISingleton<ResourceManager>
+	class ResourceManager final
 	{
-		friend class ISingleton<ResourceManager>;
 	public:
-		
-		~ResourceManager() override	= default;
+		ResourceManager() = default;
+		~ResourceManager() = default;
 
 		ResourceManager(const ResourceManager& other)					= delete;
 		ResourceManager(ResourceManager&& other) noexcept				= delete;
@@ -24,19 +22,19 @@ namespace mk
 		static void SetDefaultShaderPath(std::string path);
 		static void SetDefaultTexturePath(std::string path);
 
-		Pipeline2D* LoadShader2D(const std::string& shader);
-		Pipeline3D* LoadShader3D(const std::string& shader);
-		Texture* LoadTexture(const std::string& texture);
-		void Cleanup();
+		static Pipeline2D* LoadShader2D(const std::string& vertex, const std::string& fragment);
+		static Pipeline3D* LoadShader3D(const std::string& vertex, const std::string& fragment);
+		static Texture* LoadTexture(const std::string& texture);
+		static void Cleanup();
 
 	private:
-		ResourceManager() = default;
+		
 
 		inline static std::string s_ShaderPath{};
 		inline static std::string s_TexturePath{};
 
-		std::map<std::string, Pipeline2D> m_Pipelines2D{};
-		std::map<std::string, Pipeline3D> m_Pipelines3D{};
-		std::map<std::string, Texture> m_Textures{};
+		inline static std::map<std::string, Pipeline2D> m_Pipelines2D{};
+		inline static std::map<std::string, Pipeline3D> m_Pipelines3D{};
+		inline static std::map<std::string, Texture> m_Textures{};
 	};
 }
