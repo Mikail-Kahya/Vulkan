@@ -11,15 +11,6 @@
 
 using namespace mk;
 
-void VulkanBase::Run(const std::function<void()>& load)
-{
-	InitVulkan();
-	Time::Update();
-	load();
-	MainLoop();
-	Cleanup();
-}
-
 void VulkanBase::WindowChanged()
 {
 	m_FrameBufferResized = true;
@@ -110,31 +101,10 @@ void VulkanBase::InitVulkan()
 	m_Keyboard = Keyboard{ m_Window->GetWindow() };
 }
 
-void VulkanBase::MainLoop()
-{
-	if (false)
-	{
-		glfwPollEvents();
-		m_Mouse.Update();
-		m_Camera.Update(m_Mouse, m_Keyboard);
-		DrawFrame();
-		return;
-	}
-	while (!m_Window->ShouldClose())
-	{
-		Time::Update();
-		glfwPollEvents();
-		m_Mouse.Update();
-		m_Camera.Update(m_Mouse, m_Keyboard);
-		DrawFrame();
-	}
-
-	m_Device->Wait();
-}
-
 void VulkanBase::Cleanup()
 {
-	ResourceManager::GetInstance().Cleanup();
+	m_Device->Wait();
+	ResourceManager::Cleanup();
 
 	m_RenderPass.reset(nullptr);
 	m_SwapChain.reset(nullptr);

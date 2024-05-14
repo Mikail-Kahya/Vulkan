@@ -33,7 +33,9 @@ namespace mk
 	public:
 		virtual ~VulkanBase() override = default;
 
-		void Run(const std::function<void()>& load);
+		void InitVulkan();
+		void DrawFrame();
+		void Cleanup();
 		void WindowChanged();
 
 		GLFWwindow* GetWindow() const;
@@ -56,10 +58,6 @@ namespace mk
 	private:
 		VulkanBase() = default;
 
-		void InitVulkan();
-		void MainLoop();
-		void Cleanup();
-		void DrawFrame();
 		void UpdateWindow();
 
 		// Members
