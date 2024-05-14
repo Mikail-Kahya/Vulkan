@@ -70,7 +70,7 @@ void Pipeline2D::Destroy()
 	}
 }
 
-void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
+void Pipeline2D::StartDrawing()
 {
 	const VulkanBase& app{ VulkanBase::GetInstance() };
 	const SwapChain& swapChain{ app.GetSwapChain() };
@@ -84,11 +84,21 @@ void Pipeline2D::Draw(const std::vector<Mesh*>& meshes) const
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	m_DrawCommandBuffer = commandBuffer;
+}
 
-	for (Mesh* mesh : meshes)
-		mesh->Draw(commandBuffer);
+void Pipeline2D::Draw(Mesh* meshPtr) const
+{
+	if (m_DrawCommandBuffer == VK_NULL_HANDLE)
+		return;
 
+	meshPtr->Draw(m_DrawCommandBuffer);
+}
+
+void Pipeline2D::EndDrawing()
+{
 	//m_CommandBuffer->End(renderPass);
+	m_DrawCommandBuffer = VK_NULL_HANDLE;
 }
 
 void Pipeline2D::CreatePipelineLayout()

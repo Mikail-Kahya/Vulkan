@@ -2,7 +2,7 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
-#include "engine/Mesh3D.h"
+#include "render/Mesh3D.h"
 #include "Shader.h"
 
 namespace mk
@@ -25,7 +25,9 @@ namespace mk
 		void Initialize(const std::string& shaderName);
 		void Destroy();
 
-		void Draw(const std::vector<Mesh*>& meshes) const;
+		void StartDrawing();
+		void Draw(Mesh* meshPtr) const;
+		void EndDrawing();
 
 	private:
 		void CreatePipelineLayout();
@@ -35,5 +37,6 @@ namespace mk
 		VkPipelineLayout m_PipelineLayout{ VK_NULL_HANDLE };
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
 		std::unique_ptr<SecondaryCommandBuffer> m_CommandBuffer;
+		VkCommandBuffer m_DrawCommandBuffer{ VK_NULL_HANDLE };
 	};
 }
