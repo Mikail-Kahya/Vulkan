@@ -1,8 +1,7 @@
 #pragma once
 #include <memory>
 #include <vulkan/vulkan_core.h>
-
-#include "render/Mesh2D.h"
+#include "abstraction/Mesh2D.h"
 #include "Shader.h"
 
 namespace mk
@@ -22,7 +21,7 @@ namespace mk
 		Pipeline2D& operator=(const Pipeline2D& other)		= delete;
 		Pipeline2D& operator=(Pipeline2D&& other) noexcept;
 
-		void Initialize(const std::string& shaderName);
+		void Initialize(const std::string& vertex, const std::string& fragment);
 		void Destroy();
 
 		void StartDrawing();

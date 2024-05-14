@@ -41,9 +41,9 @@ Pipeline3D& Pipeline3D::operator=(Pipeline3D&& other) noexcept
 	return *this;
 }
 
-void Pipeline3D::Initialize(const std::string& shaderName)
+void Pipeline3D::Initialize(const std::string& vertex, const std::string& fragment)
 {
-	m_Shader = std::make_unique<Shader>(shaderName, shaderName);
+	m_Shader = std::make_unique<Shader>(vertex, fragment);
 	m_Shader->Initialize(VulkanBase::GetInstance().GetDevice());
 	CreatePipelineLayout();
 	CreatePipeline();

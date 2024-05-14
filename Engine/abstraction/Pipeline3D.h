@@ -2,7 +2,7 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
-#include "render/Mesh3D.h"
+#include "abstraction/Mesh3D.h"
 #include "Shader.h"
 
 namespace mk
@@ -22,7 +22,7 @@ namespace mk
 		Pipeline3D& operator=(const Pipeline3D& other) = delete;
 		Pipeline3D& operator=(Pipeline3D&& other) noexcept;
 
-		void Initialize(const std::string& shaderName);
+		void Initialize(const std::string& vertex, const std::string& fragment);
 		void Destroy();
 
 		void StartDrawing();
