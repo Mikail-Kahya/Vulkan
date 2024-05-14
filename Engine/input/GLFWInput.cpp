@@ -15,6 +15,8 @@ bool GLFWInput::ProcessInput()
 	if (glfwWindowShouldClose(m_WindowPtr))
 		return false;
 
+	glfwPollEvents();
+
 	for (Controller& controller : m_Controllers)
 	{
 		for (const auto& mapping : controller.GetInputMapping().GetMappings())

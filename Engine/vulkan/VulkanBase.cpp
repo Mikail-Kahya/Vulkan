@@ -4,6 +4,7 @@
 #include "core/Time.h"
 #include "core/ResourceManager.h"
 #include "core/SceneManager.h"
+#include "core/ServiceLocator.h"
 #include "input/Camera.h"
 #include "input/Keyboard.h"
 #include "input/Mouse.h"
@@ -151,7 +152,7 @@ void VulkanBase::DrawFrame()
 		UpdateWindow();
 
 	m_RenderPass->StartRecording(m_ImageIdx);
-	SceneManager::GetInstance().Draw();
+	ServiceLocator::GetRenderer().Render();
 	m_RenderPass->StopRecording();
 	m_SwapChain->Present(m_ImageIdx);
 	m_SwapChain->NextFrame();
@@ -164,5 +165,4 @@ void VulkanBase::UpdateWindow()
 	m_FrameBufferResized = false;
 	m_DepthBuffer = std::make_unique<DepthBuffer>();
 	m_RenderPass->Update();
-	ResourceManager::GetInstance().Update();
 }

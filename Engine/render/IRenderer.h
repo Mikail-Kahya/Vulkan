@@ -1,7 +1,4 @@
 #pragma once
-#include <future>
-#include <string>
-
 namespace mk
 {
 	class IRenderer
