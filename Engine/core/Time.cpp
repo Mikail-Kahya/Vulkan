@@ -2,15 +2,18 @@
 
 using namespace mk;
 
-void Time::Update()
+Time::Time()
+	: start{ std::chrono::steady_clock::now() }
 {
-	using namespace std::chrono;
-	high_resolution_clock::time_point now{ high_resolution_clock::now() };
-	m_DeltaTime = duration<float>(now - m_PrevTime).count();
-	m_PrevTime = now;
 }
 
-float Time::DeltaTime()
+float Time::GetTotalTime() const
 {
-	return m_DeltaTime;
+	using namespace std::chrono;
+	return duration<float>(high_resolution_clock::now() - start).count();
+}
+
+float Time::GetFPS() const
+{
+	return 1 / deltaTime;
 }
