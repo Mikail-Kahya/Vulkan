@@ -1,14 +1,19 @@
 #pragma once
 namespace mk
 {
+	using mesh_handle = size_t;
+
 	class IRenderer
 	{
 	public:
 		virtual ~IRenderer() = default;
 
-		virtual void Render() const						= 0;
-		virtual void RegisterRender(void* objectPtr)	= 0;
-		virtual void UnregisterRender(void* objectPtr)	= 0;
+		virtual void Render() const	= 0;
+		virtual void Update() const	= 0;
+		virtual mesh_handle RegisterRender(void* objectPtr)	= 0;
+		virtual void UnregisterRender(mesh_handle handle)	= 0;
+		virtual void SetTexture(mesh_handle handle, const std::string& path)	= 0;
+		virtual void SetMesh(mesh_handle handle, const std::string& path)		= 0;
 
 	protected:
 		IRenderer() = default;

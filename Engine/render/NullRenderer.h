@@ -15,7 +15,10 @@ namespace mk
 		NullRenderer& operator=(NullRenderer&& other) noexcept	= delete;
 
 		void Render() const override {}
-		void RegisterRender(void* objectPtr) override {}
-		void UnregisterRender(void* objectPtr) override {}
+		void Update() const override {}
+		mesh_handle RegisterRender(void*) override { return 0; }
+		void UnregisterRender(mesh_handle) override {}
+		void SetTexture(mesh_handle, const std::string&) override {}
+		void SetMesh(mesh_handle, const std::string&) override {}
 	};
 }
