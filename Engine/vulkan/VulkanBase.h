@@ -7,13 +7,13 @@
 #include <GLFW/glfw3.h>
 
 #include "VulkanStructs.h"
-#include "engine/Camera.h"
-#include "interfaces/Singleton.h"
+#include "input/Camera.h"
+#include "input/Mouse.h"
+#include "CRTP/ISingleton.h"
 
 #include "abstraction/CommandPool.h"
 #include "abstraction/DepthBuffer.h"
 #include "abstraction/DescriptorPool.h"
-#include "engine/Mouse.h"
 #include "abstraction/SwapChain.h"
 #include "abstraction/Device.h"
 #include "abstraction/RenderPass.h"
@@ -26,9 +26,9 @@ namespace mk
 
 namespace mk
 {
-	class VulkanBase final : public Singleton<VulkanBase>
+	class VulkanBase final : public ISingleton<VulkanBase>
 	{
-		friend class Singleton<VulkanBase>;
+		friend class ISingleton<VulkanBase>;
 
 	public:
 		virtual ~VulkanBase() override = default;

@@ -2,16 +2,16 @@
 #include <map>
 #include <string>
 
-#include "interfaces/Singleton.h"
+#include "CRTP/ISingleton.h"
 #include "abstraction/Pipeline2D.h"
 #include "abstraction/Pipeline3D.h"
 #include "abstraction/Texture.h"
 
 namespace mk
 {
-	class ResourceManager final : public Singleton<ResourceManager>
+	class ResourceManager final : public ISingleton<ResourceManager>
 	{
-		friend class Singleton<ResourceManager>;
+		friend class ISingleton<ResourceManager>;
 	public:
 		
 		~ResourceManager() override	= default;

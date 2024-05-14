@@ -1,9 +1,12 @@
 #include "VulkanBase.h"
 
 #include "VulkanUtils.h"
-#include "engine/ResourceManager.h"
-#include "engine/SceneManager.h"
-#include "engine/Time.h"
+#include "core/Time.h"
+#include "core/ResourceManager.h"
+#include "core/SceneManager.h"
+#include "input/Camera.h"
+#include "input/Keyboard.h"
+#include "input/Mouse.h"
 
 using namespace mk;
 
@@ -130,15 +133,14 @@ void VulkanBase::MainLoop()
 
 void VulkanBase::Cleanup()
 {
-	SceneManager::GetInstance().Cleanup();
 	ResourceManager::GetInstance().Cleanup();
 
-	//m_RenderPass.reset(nullptr);
-	//m_SwapChain.reset(nullptr);
-	//m_CommandPool.reset(nullptr);
-	//m_DescriptorPool.reset(nullptr);
-	//m_Device.reset();
-	//m_Window.reset(nullptr);
+	m_RenderPass.reset(nullptr);
+	m_SwapChain.reset(nullptr);
+	m_CommandPool.reset(nullptr);
+	m_DescriptorPool.reset(nullptr);
+	m_Device.reset();
+	m_Window.reset(nullptr);
 }
 
 void VulkanBase::DrawFrame()
