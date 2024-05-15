@@ -3,15 +3,22 @@
 #include <string_view>
 
 #include "core/IComponent.h"
+#include "render/IRenderer.h"
 
 namespace mk
 {
-	class Texture2D;
+	class Pipeline3D;
+}
+
+namespace mk
+{
+	class Texture;
+	class Mesh3D;
 
 	class MeshComponent final : public IComponent
 	{
 	public:
-		MeshComponent(std::string vertex, std::string fragment, bool projectedOnScreen = false);
+		MeshComponent() = default;
 		~MeshComponent() override;
 
 		MeshComponent(const MeshComponent& other)				= delete;
@@ -19,18 +26,16 @@ namespace mk
 		MeshComponent& operator=(const MeshComponent& other)	= delete;
 		MeshComponent& operator=(MeshComponent&& other)			= delete;
 
-		void Start() override;
+		void SetShader(const std::string& vertex, const std::string& fragment);
+		void SetMesh(const std::string& obj);
+		void SetTexture(const std::string& texture) const;
 
-		void SetTexture(const std::string& texture);
-
-		const std::string& GetVertexShader() const;
-		const std::string& GetFragmentShader() const;
-		bool IsProjected() const;
-
+		Mesh3D* GetMesh() const;
+		Pipeline3D* GetPipeline() const;
 
 	private:
-		const std::string m_VertexShader{};
-		const std::string m_FragmentShader{};
-		const bool m_ProjectedOnScreen{ false };
+		Pipeline3D* m_Pipeline{};
+		Mesh3D* m_MeshPtr{};
+		mesh_handle m_Handle{};
 	};
 }

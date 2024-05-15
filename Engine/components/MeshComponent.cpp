@@ -5,38 +5,36 @@
 
 using namespace mk;
 
-MeshComponent::MeshComponent(std::string vertex, std::string fragment, bool projectedOnScreen)
-	: m_VertexShader{ std::move(vertex) }
-	, m_FragmentShader{ std::move(fragment) }
-	, m_ProjectedOnScreen{ projectedOnScreen }
-{
-}
-
 MeshComponent::~MeshComponent()
 {
-	ServiceLocator::GetRenderer().UnregisterRender(this);
+	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
 }
 
-void MeshComponent::Start()
+void MeshComponent::SetShader(const std::string& vertex, const std::string& fragment)
 {
+	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	m_Pipeline = ResourceManager::LoadShader3D(vertex, fragment);
 	ServiceLocator::GetRenderer().RegisterRender(this);
 }
 
-void MeshComponent::SetTexture(const std::string& texture)
+void MeshComponent::SetMesh(const std::string& obj)
 {
+	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	m_MeshPtr = ResourceManager::LoadMesh3D(obj);
+	ServiceLocator::GetRenderer().RegisterRender(this);
 }
 
-const std::string& MeshComponent::GetVertexShader() const
+void MeshComponent::SetTexture(const std::string& texture) const
 {
-	return m_VertexShader;
+	m_MeshPtr->SetTexture(texture);
 }
 
-const std::string& MeshComponent::GetFragmentShader() const
+Mesh3D* MeshComponent::GetMesh() const
 {
-	return m_FragmentShader;
+	return m_MeshPtr;
 }
 
-bool MeshComponent::IsProjected() const
+Pipeline3D* MeshComponent::GetPipeline() const
 {
-	return m_ProjectedOnScreen;
+	return m_Pipeline;
 }
