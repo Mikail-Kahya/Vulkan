@@ -83,9 +83,10 @@ int main() {
 
 	ResourceManager::SetDefaultShaderPath("shaders/");
 	ResourceManager::SetDefaultTexturePath("resources/");
+	ResourceManager::SetDefaultMeshPath("resources/");
 
 	try {
-		VulkanBase::GetInstance().Run(&Load);
+		//VulkanBase::GetInstance().Run(&Load);
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
