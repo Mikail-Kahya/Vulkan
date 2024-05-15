@@ -13,6 +13,7 @@ MeshComponent::~MeshComponent()
 void MeshComponent::SetShader(const std::string& vertex, const std::string& fragment)
 {
 	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	m_Handle = -1;
 	m_Pipeline = ResourceManager::LoadShader3D(vertex, fragment);
 	ServiceLocator::GetRenderer().RegisterRender(this);
 }
@@ -20,6 +21,7 @@ void MeshComponent::SetShader(const std::string& vertex, const std::string& frag
 void MeshComponent::SetMesh(const std::string& obj)
 {
 	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	m_Handle = -1;
 	m_MeshPtr = ResourceManager::LoadMesh3D(obj);
 	ServiceLocator::GetRenderer().RegisterRender(this);
 }

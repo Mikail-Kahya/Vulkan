@@ -1,7 +1,7 @@
 #pragma once
 namespace mk
 {
-	using mesh_handle = size_t;
+	using mesh_handle = int32_t;
 
 	class IRenderer
 	{

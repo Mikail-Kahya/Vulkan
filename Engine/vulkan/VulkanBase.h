@@ -34,7 +34,7 @@ namespace mk
 		virtual ~VulkanBase() override = default;
 
 		void InitVulkan();
-		void DrawFrame();
+		void DrawFrame(const std::function<void()>& render);
 		void Cleanup();
 		void WindowChanged();
 

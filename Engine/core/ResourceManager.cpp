@@ -76,4 +76,7 @@ void ResourceManager::Cleanup()
 {
 	s_Pipelines2D.clear();
 	s_Pipelines3D.clear();
+	s_Meshes2D.clear();
+	s_Meshes3D.clear();
+	s_Textures.clear();
 }

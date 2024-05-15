@@ -36,6 +36,6 @@ namespace mk
 	private:
 		Pipeline3D* m_Pipeline{};
 		Mesh3D* m_MeshPtr{};
-		mesh_handle m_Handle{};
+		mesh_handle m_Handle{ -1 };
 	};
 }

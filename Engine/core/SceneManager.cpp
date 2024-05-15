@@ -4,17 +4,20 @@ using namespace mk;
 
 void SceneManager::FixedUpdate()
 {
-	m_Scene->FixedUpdate();
+	if (m_Scene)
+		m_Scene->FixedUpdate();
 }
 
 void SceneManager::Update()
 {
-	m_Scene->Update();
+	if (m_Scene)
+		m_Scene->Update();
 }
 
 void SceneManager::LateUpdate()
 {
-	m_Scene->LateUpdate();
+	if (m_Scene)
+		m_Scene->LateUpdate();
 }
 
 Scene& SceneManager::LoadScene(const std::string& name)

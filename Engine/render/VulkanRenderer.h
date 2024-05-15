@@ -8,15 +8,11 @@ namespace mk
 {
 	class MeshComponent;
 
-	/**
-	 * Simple RAII wrapper for the SDL renderer
-	 */
 	class VulkanRenderer final : public IRenderer
 	{
 	public:
-		VulkanRenderer() = default;
 		VulkanRenderer(int width, int height);
-		~VulkanRenderer() override = default;
+		~VulkanRenderer() override;
 
 		VulkanRenderer(const VulkanRenderer& other)					= delete;
 		VulkanRenderer(VulkanRenderer&& other) noexcept				= delete;
@@ -34,8 +30,10 @@ namespace mk
 
 	private:
 		class VulkanImpl;
-		std::unique_ptr<VulkanImpl> m_Impl;
+		using Impl = std::unique_ptr<VulkanImpl>;
+
 		std::vector<MeshComponent*> m_Renderers{};
+		Impl m_Impl;
 		int m_Width{};
 		int m_Height{};
 	};

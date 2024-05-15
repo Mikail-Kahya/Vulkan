@@ -26,6 +26,8 @@ set(ENGINE_NAME ${ENGINE_NAME} PARENT_SCOPE)
 #)
 
 set(SOURCES
+    "MkVulktra.cpp"
+
 # -----------------------------------------------------------------
 # --------------------------VULKAN---------------------------------
 # -----------------------------------------------------------------
@@ -109,7 +111,6 @@ set(SOURCES
 add_library(${ENGINE_NAME} STATIC ${SOURCES})
 # 
 # Link libraries
-  SET(XINPUT_LIB XInput)
 include(FetchContent)
 
 FetchContent_Declare(tinyobjloader
@@ -121,6 +122,8 @@ FetchContent_Declare(tinyobjloader
 
 FetchContent_MakeAvailable(tinyobjloader)
 
+SET(XINPUT_LIB XInput)
+
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb)
 target_link_libraries(${ENGINE_NAME} PUBLIC 
@@ -128,7 +131,7 @@ target_link_libraries(${ENGINE_NAME} PUBLIC
     glfw
     glm
     tinyobjloader
-    XINPUT_LIB
+    ${XINPUT_LIB} 
 )
 
 #soloud

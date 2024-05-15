@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "MkVulktra.h"
+#include "components/MeshComponent.h"
 #include "core/ResourceManager.h"
 #include "core/Scene.h"
 #include "core/SceneManager.h"
@@ -30,12 +32,24 @@ void Load()
 	const std::string shader2DName{ "shader2D" };
 	const std::string shader3DName{ "shader3D" };
 	const std::string texture{ "test.jpg" };
-	//Scene* scenePtr = SceneManager::GetInstance().LoadScene("Triangle");
-	//
-	//Mesh3D* plane = scenePtr->AddMesh3D(shader3DName, texture);
-	//plane->Load(vertices3D, indices);
-	//plane->SetPosition({ -1, 0, 0 });
-	//
+	Scene& scene = SceneManager::GetInstance().LoadScene("Triangle");
+
+	GameObject* ratchet =  scene.SpawnObject("Ratchet");
+	MeshComponent* meshCompPtr = ratchet->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("Ratchet/Ratchet.obj");
+	meshCompPtr->SetTexture("Ratchet/Ratchet.png");
+	meshCompPtr->SetShader(shader3DName, shader3DName);
+
+
+	GameObject* tuktuk = scene.SpawnObject("tuktuk");
+	meshCompPtr = ratchet->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("tuktuk.obj");
+	meshCompPtr->SetTexture("tuktuk.png");
+	meshCompPtr->SetShader(shader3DName, shader3DName);
+
+	//ratchet->Load("Ratchet/Ratchet.obj");
+	//ratchet->SetScale({ 2.5f, 2.5f, 2.5f });
+
 	//Mesh3D* plane2 = scenePtr->AddMesh3D(shader3DName, texture);
 	//plane2->Load(vertices3D, indices);
 	//plane2->SetPosition({ 1, 0, 0 });
@@ -86,7 +100,8 @@ int main() {
 	ResourceManager::SetDefaultMeshPath("resources/");
 
 	try {
-		//VulkanBase::GetInstance().Run(&Load);
+		MkVulktra engine{};
+		engine.Run(&Load);
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;

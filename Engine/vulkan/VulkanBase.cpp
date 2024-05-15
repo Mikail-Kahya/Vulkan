@@ -103,18 +103,12 @@ void VulkanBase::InitVulkan()
 
 void VulkanBase::Cleanup()
 {
+	m_SwapChain->Wait();
 	m_Device->Wait();
 	ResourceManager::Cleanup();
-
-	m_RenderPass.reset(nullptr);
-	m_SwapChain.reset(nullptr);
-	m_CommandPool.reset(nullptr);
-	m_DescriptorPool.reset(nullptr);
-	m_Device.reset();
-	m_Window.reset(nullptr);
 }
 
-void VulkanBase::DrawFrame()
+void VulkanBase::DrawFrame(const std::function<void()>& render)
 {
 	m_SwapChain->Wait();
 	m_ImageIdx = m_SwapChain->GetImageIdx();
@@ -122,7 +116,7 @@ void VulkanBase::DrawFrame()
 		UpdateWindow();
 
 	m_RenderPass->StartRecording(m_ImageIdx);
-	ServiceLocator::GetRenderer().Render();
+	render();
 	m_RenderPass->StopRecording();
 	m_SwapChain->Present(m_ImageIdx);
 	m_SwapChain->NextFrame();

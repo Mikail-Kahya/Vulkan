@@ -21,12 +21,13 @@ class VulkanRenderer::VulkanImpl final
 	using Meshes2D = std::vector<Mesh2D*>;
 
 public:
-	VulkanImpl() { VulkanBase::GetInstance().InitVulkan(); }
-	~VulkanImpl()
-	{
-		ResourceManager::Cleanup();
-		VulkanBase::GetInstance().Cleanup();
-	}
+	VulkanImpl() = default;
+	~VulkanImpl() = default;
+
+	VulkanImpl(const VulkanImpl& other)					= delete;
+	VulkanImpl(VulkanImpl&& other) noexcept				= delete;
+	VulkanImpl& operator=(const VulkanImpl& other)		= delete;
+	VulkanImpl& operator=(VulkanImpl&& other) noexcept	= delete;
 
 	void Render() const;
 
@@ -90,13 +91,22 @@ void VulkanRenderer::VulkanImpl::RemoveMesh3D(Pipeline3D* pipelinePtr, Mesh3D* m
 
 VulkanRenderer::VulkanRenderer(int width, int height)
 	: m_Impl{ std::make_unique<VulkanImpl>() }
+	, m_Width{ width }
+	, m_Height{ height }
+{
+}
+
+VulkanRenderer::~VulkanRenderer()
 {
 }
 
 
 void VulkanRenderer::Render() const
 {
-	m_Impl->Render();
+	VulkanBase::GetInstance().DrawFrame([this]()
+	{
+			m_Impl->Render();
+	});
 }
 
 int VulkanRenderer::GetHeight() const noexcept
@@ -109,22 +119,32 @@ int VulkanRenderer::GetWidth() const noexcept
 	return 0;
 }
 
-mesh_handle VulkanRenderer::RegisterRender(void* renderPtr)
+mesh_handle VulkanRenderer::RegisterRender(void* objectPtr)
 {
-	MeshComponent* meshCompPtr = reinterpret_cast<MeshComponent*>(renderPtr);
+	MeshComponent* meshCompPtr = reinterpret_cast<MeshComponent*>(objectPtr);
+	if (meshCompPtr->GetPipeline() == nullptr || meshCompPtr->GetMesh() == nullptr)
+		return -1;
+
 	m_Impl->AddMesh3D(meshCompPtr->GetPipeline(), meshCompPtr->GetMesh());
 	
 	const auto invalidSlot = std::find(m_Renderers.begin(), m_Renderers.end(), nullptr);
 	if (invalidSlot == m_Renderers.end())
 	{
 		m_Renderers.emplace_back(meshCompPtr);
-		return m_Renderers.size() - 1;
+		return static_cast<mesh_handle>(m_Renderers.size() - 1);
 	}
+
+	*invalidSlot = meshCompPtr;
 
 	return static_cast<mesh_handle>(std::distance(m_Renderers.begin(), invalidSlot));
 }
 
 void VulkanRenderer::UnregisterRender(mesh_handle handle)
 {
+	if (handle < 0)
+		return;
+	if (m_Renderers[handle]->GetPipeline() == nullptr)
+		return;
+	m_Impl->RemoveMesh3D(m_Renderers[handle]->GetPipeline(), m_Renderers[handle]->GetMesh());
 	m_Renderers[handle] = nullptr;
 }

@@ -27,13 +27,12 @@ namespace mk
 	template<is_vertex VertexType>
 	bool ParseOBJ(const std::string& filename, std::vector<VertexType>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true)
 	{
-		std::string fullPath{ "resources/" + filename };
 		tinyobj::attrib_t attrib{};
 		std::vector<tinyobj::shape_t> shapes{};
 		std::vector<tinyobj::material_t> materials{};
 		std::string warn{};
 		std::string err{};
-		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, fullPath.c_str()))
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str()))
 			throw std::runtime_error(warn + err);
 
 		std::unordered_map<VertexType, uint32_t> uniqueVertices{};
