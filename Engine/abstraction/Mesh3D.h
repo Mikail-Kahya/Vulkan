@@ -33,7 +33,7 @@ namespace mk
 		void AddRotation(const glm::vec3& rotation);
 		void AddScale(const glm::vec3& scale);
 
-		void SetTexture(Texture* texturePtr);
+		void SetTexture(const std::string& textureFile);
 
 	private:
 		void ClampRotation();

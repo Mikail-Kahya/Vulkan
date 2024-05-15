@@ -4,6 +4,7 @@
 #include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "core/ResourceManager.h"
 #include "core/Utils.h"
 
 using namespace mk;
@@ -77,9 +78,9 @@ void Mesh3D::AddScale(const glm::vec3& scale)
 	FlagTransform();
 }
 
-void Mesh3D::SetTexture(Texture* texturePtr)
+void Mesh3D::SetTexture(const std::string& textureFile)
 {
-	m_UniformBuffer = std::make_unique<UniformBuffer>(texturePtr);
+	m_UniformBuffer = std::make_unique<UniformBuffer>(ResourceManager::LoadTexture(textureFile));
 }
 
 void Mesh3D::ClampRotation()
