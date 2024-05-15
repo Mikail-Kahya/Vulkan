@@ -39,10 +39,11 @@ void Load()
 	meshCompPtr->SetMesh("Ratchet/Ratchet.obj");
 	meshCompPtr->SetTexture("Ratchet/Ratchet.png");
 	meshCompPtr->SetShader(shader3DName, shader3DName);
+	ratchet->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 
 
 	GameObject* tuktuk = scene.SpawnObject("tuktuk");
-	meshCompPtr = ratchet->AddComponent<MeshComponent>();
+	meshCompPtr = tuktuk->AddComponent<MeshComponent>();
 	meshCompPtr->SetMesh("tuktuk.obj");
 	meshCompPtr->SetTexture("tuktuk.png");
 	meshCompPtr->SetShader(shader3DName, shader3DName);

@@ -29,10 +29,6 @@ namespace mk
 		void SetRotation(const glm::vec3& rotation);
 		void SetScale(const glm::vec3& scale);
 
-		void AddPosition(const glm::vec3& position);
-		void AddRotation(const glm::vec3& rotation);
-		void AddScale(const glm::vec3& scale);
-
 		void SetTexture(const std::string& textureFile);
 
 	private:

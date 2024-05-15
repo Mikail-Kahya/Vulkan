@@ -194,7 +194,7 @@ void GameObject::SetLocalRotation(const glm::vec3& rotation)
 
 void GameObject::SetLocalScale(const glm::vec3& scale)
 {
-	m_LocalTransform.SetRotation(scale);
+	m_LocalTransform.SetScale(scale);
 	FlagScaleDirty();
 }
 

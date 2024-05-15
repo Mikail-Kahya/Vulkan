@@ -1,5 +1,6 @@
 #include "MeshComponent.h"
 
+#include "core/GameObject.h"
 #include "core/ServiceLocator.h"
 #include "core/ResourceManager.h"
 
@@ -8,6 +9,14 @@ using namespace mk;
 MeshComponent::~MeshComponent()
 {
 	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+}
+
+void MeshComponent::LateUpdate()
+{
+	IComponent::LateUpdate();
+	m_MeshPtr->SetPosition(GetOwner()->GetWorldPosition());
+	m_MeshPtr->SetRotation(GetOwner()->GetWorldRotation());
+	m_MeshPtr->SetScale(GetOwner()->GetWorldScale());
 }
 
 void MeshComponent::SetShader(const std::string& vertex, const std::string& fragment)

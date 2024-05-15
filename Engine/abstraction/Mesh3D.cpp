@@ -42,12 +42,16 @@ void Mesh3D::Load(const std::string& objFile)
 
 void Mesh3D::SetPosition(const glm::vec3& position)
 {
+	if (m_Position == position)
+		return;
 	m_Position = position;
 	FlagTransform();
 }
 
 void Mesh3D::SetRotation(const glm::vec3& rotation)
 {
+	if (m_Rotation == rotation)
+		return;
 	m_Rotation = rotation;
 	ClampRotation();
 	FlagTransform();
@@ -55,27 +59,10 @@ void Mesh3D::SetRotation(const glm::vec3& rotation)
 
 void Mesh3D::SetScale(const glm::vec3& scale)
 {
+	if (m_Scale == scale)
+		return;
 	m_Scale = scale;
 	FlagTransform();	
-}
-
-void Mesh3D::AddPosition(const glm::vec3& position)
-{
-	m_Position += position;
-	FlagTransform();
-}
-
-void Mesh3D::AddRotation(const glm::vec3& rotation)
-{
-	m_Rotation += rotation;
-	ClampRotation();
-	FlagTransform();
-}
-
-void Mesh3D::AddScale(const glm::vec3& scale)
-{
-	m_Scale += scale;
-	FlagTransform();
 }
 
 void Mesh3D::SetTexture(const std::string& textureFile)

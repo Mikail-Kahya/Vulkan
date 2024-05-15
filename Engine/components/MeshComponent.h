@@ -26,6 +26,8 @@ namespace mk
 		MeshComponent& operator=(const MeshComponent& other)	= delete;
 		MeshComponent& operator=(MeshComponent&& other)			= delete;
 
+		void LateUpdate() override;
+
 		void SetShader(const std::string& vertex, const std::string& fragment);
 		void SetMesh(const std::string& obj);
 		void SetTexture(const std::string& texture) const;

@@ -110,6 +110,9 @@ void VulkanBase::Cleanup()
 
 void VulkanBase::DrawFrame(const std::function<void()>& render)
 {
+	m_Mouse.Update();
+	m_Camera.Update(m_Mouse, m_Keyboard);
+
 	m_SwapChain->Wait();
 	m_ImageIdx = m_SwapChain->GetImageIdx();
 	if (m_FrameBufferResized)
