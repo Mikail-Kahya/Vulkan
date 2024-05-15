@@ -13,8 +13,8 @@ namespace mk
 		NullInput& operator=(const NullInput& other)		= delete;
 		NullInput& operator=(NullInput&& other) noexcept	= delete;
 
-		bool ProcessInput() override {}
-		controller_id RegisterController() override {}
+		bool ProcessInput() override { return false; }
+		controller_id RegisterController() override { return  0; }
 		void UnregisterController(controller_id id) override {}
 	};
 }
