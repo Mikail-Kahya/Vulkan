@@ -21,10 +21,13 @@ namespace mk
 
 		static void SetDefaultShaderPath(std::string path);
 		static void SetDefaultTexturePath(std::string path);
+		static void SetDefaultMeshPath(std::string path);
 
 		static Pipeline2D* LoadShader2D(const std::string& vertex, const std::string& fragment);
 		static Pipeline3D* LoadShader3D(const std::string& vertex, const std::string& fragment);
 		static Texture* LoadTexture(const std::string& texture);
+		static Mesh3D* LoadMesh3D(const std::string& obj);
+		static Mesh2D* LoadMesh2D(const std::string& obj);
 		static void Cleanup();
 
 	private:
@@ -32,9 +35,12 @@ namespace mk
 
 		inline static std::string s_ShaderPath{};
 		inline static std::string s_TexturePath{};
+		inline static std::string s_MeshPath{};
 
-		inline static std::map<std::string, Pipeline2D> m_Pipelines2D{};
-		inline static std::map<std::string, Pipeline3D> m_Pipelines3D{};
-		inline static std::map<std::string, Texture> m_Textures{};
+		inline static std::map<std::string, Pipeline2D> s_Pipelines2D{};
+		inline static std::map<std::string, Pipeline3D> s_Pipelines3D{};
+		inline static std::map<std::string, Texture> s_Textures{};
+		inline static std::map<std::string, std::unique_ptr<Mesh3D>> s_Meshes3D{};
+		inline static std::map<std::string, std::unique_ptr<Mesh2D>> s_Meshes2D{};
 	};
 }
