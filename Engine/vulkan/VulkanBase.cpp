@@ -4,7 +4,6 @@
 #include "core/Time.h"
 #include "core/ResourceManager.h"
 #include "core/SceneManager.h"
-#include "core/ServiceLocator.h"
 #include "input/Camera.h"
 #include "input/Keyboard.h"
 #include "input/Mouse.h"

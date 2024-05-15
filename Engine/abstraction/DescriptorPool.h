@@ -19,6 +19,7 @@ namespace mk
 
 		VkDescriptorSetLayout GetLayout() const;
 		VkDescriptorSetAllocateInfo GetAllocationInfo() const;
+		VkDescriptorPool GetVkDescriptorPool() const;
 
 	private:
 		void CreateDescriptorLayout();

@@ -19,17 +19,17 @@ UniformBuffer::UniformBuffer(const Texture* texture)
 
 UniformBuffer::~UniformBuffer()
 {
-	const VkDevice device{ VulkanBase::GetInstance().GetDevice() };
+	VkDevice device{ VulkanBase::GetInstance().GetDevice() };
 
-	for (auto memory : m_UniformBuffersMemory)
-		vkFreeMemory(device, memory, nullptr);
+	vkFreeDescriptorSets(device, VulkanBase::GetInstance().GetDescriptorPool().GetVkDescriptorPool(),
+		static_cast<uint32_t>(m_DescriptorSets.size()), m_DescriptorSets.data());
 
 	for (auto buffer : m_UniformBuffers)
 		vkDestroyBuffer(device, buffer, nullptr);
-		
 	m_UniformBuffers.clear();
 
-	
+	for (auto memory : m_UniformBuffersMemory)
+		vkFreeMemory(device, memory, nullptr);
 	m_UniformBuffersMemory.clear();
 }
 

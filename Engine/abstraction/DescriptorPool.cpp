@@ -42,6 +42,11 @@ VkDescriptorSetAllocateInfo DescriptorPool::GetAllocationInfo() const
 	return m_AllocInfo;
 }
 
+VkDescriptorPool DescriptorPool::GetVkDescriptorPool() const
+{
+	return m_DescriptorPool;
+}
+
 void DescriptorPool::CreateDescriptorLayout()
 {
 	VkDescriptorSetLayoutBinding uboLayoutBinding{};
