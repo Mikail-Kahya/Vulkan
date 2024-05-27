@@ -1,5 +1,6 @@
 #include "Mouse.h"
 
+#include <cfloat>
 #include <iostream>
 
 #include "glm/geometric.hpp"

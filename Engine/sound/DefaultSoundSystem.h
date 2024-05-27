@@ -2,6 +2,7 @@
 #include <functional>
 #include <memory>
 #include <queue>
+#include <thread>
 
 #include "ISoundSystem.h"
 

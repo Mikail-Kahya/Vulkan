@@ -29,7 +29,8 @@ namespace mk
 
 		void RemoveCommand(Command* commandPtr)
 		{
-			auto commandIter = std::ranges::find_if(m_Commands, [commandPtr](const std::unique_ptr<Command>& command)
+            auto commandIter = std::find_if(m_Commands.begin(), m_Commands.end(),
+                [commandPtr](const std::unique_ptr<Command>& command)
 				{
 					return command.get() == commandPtr;
 				});

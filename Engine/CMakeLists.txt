@@ -109,6 +109,7 @@ set(SOURCES
 
 # Create the executable
 add_library(${ENGINE_NAME} STATIC ${SOURCES})
+target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # 
 # Link libraries
 include(FetchContent)
@@ -124,7 +125,7 @@ FetchContent_MakeAvailable(tinyobjloader)
 
 SET(XINPUT_LIB XInput)
 
-target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/stb)
 target_link_libraries(${ENGINE_NAME} PUBLIC 
     ${Vulkan_LIBRARIES} 
@@ -143,6 +144,12 @@ else()
     target_compile_definitions(soloud PUBLIC WITH_MINIAUDIO)
     #target_link_libraries(soloud PUBLIC ${sdl2_SOURCE_DIR})
 endif()
+
+#jolt (help by Matias Devred)
+target_include_directories(${ENGINE_NAME} PRIVATE ${JoltPhysics_SOURCE_DIR}/..)
+target_link_libraries(${ENGINE_NAME} PRIVATE Jolt)
+
+
 
 #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 #    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"

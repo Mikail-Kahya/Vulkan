@@ -1,5 +1,6 @@
 #include "VulkanUtils.h"
 
+#include <cstring>
 #include <iostream>
 #include <set>
 #include <algorithm>

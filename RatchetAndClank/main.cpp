@@ -5,7 +5,6 @@
 #include "core/ResourceManager.h"
 #include "core/Scene.h"
 #include "core/SceneManager.h"
-#include "vulkan/VulkanBase.h"
 
 using namespace mk;
 

@@ -112,7 +112,8 @@ namespace mk
 	template <std::derived_from<IComponent> ComponentType>
 	ComponentType* GameObject::GetComponent() const
 	{
-		auto componentIt = std::ranges::find_if(m_Components, [](const std::unique_ptr<IComponent>& component)
+        auto componentIt = std::find_if(m_Components.begin(), m_Components.end(),
+            [](const std::unique_ptr<IComponent>& component)
 			{
 				return dynamic_cast<ComponentType*>(component.get());
 			});
@@ -120,7 +121,8 @@ namespace mk
 		if (componentIt != m_Components.end())
 			return dynamic_cast<ComponentType*>(componentIt->get());
 
-		componentIt = std::ranges::find_if(m_ComponentBuffer, [](const std::unique_ptr<IComponent>& component)
+        componentIt = std::find_if(m_ComponentBuffer.begin(), m_ComponentBuffer.end(),
+            [](const std::unique_ptr<IComponent>& component)
 			{
 				return dynamic_cast<ComponentType*>(component.get());
 			});
