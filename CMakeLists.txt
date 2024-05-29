@@ -26,16 +26,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glfw)
 
-#(help by Matias Devred)
-FetchContent_Declare(
-    jolt
-    GIT_REPOSITORY https://github.com/jrouwe/JoltPhysics.git
-    GIT_SHALLOW TRUE
-    GIT_TAG        v5.0.0
-    SOURCE_SUBDIR "Build"
-)
-FetchContent_MakeAvailable(jolt)
-
 # Find the required packages
 find_package(Vulkan REQUIRED)
 

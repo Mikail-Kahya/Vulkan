@@ -1,4 +1,6 @@
 #pragma once
+#include "stdint.h"
+
 namespace mk
 {
 	using mesh_handle = int32_t;
