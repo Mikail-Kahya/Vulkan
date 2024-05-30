@@ -114,7 +114,8 @@ set(SOURCES
     "physics/JoltPhysicsSystem.cpp" "components/ColliderComponent.cpp")
 
 # Create the executable
-add_library(${ENGINE_NAME} STATIC ${SOURCES})
+add_library(${ENGINE_NAME} STATIC ${SOURCES}
+    components/cameracomponent.h components/cameracomponent.cpp)
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # 
 # Link libraries

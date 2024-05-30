@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "Time.h"
 #include "core/Time.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -27,12 +26,34 @@ void Camera::Update(const Mouse& mouse, const Keyboard& keyboard)
 		Rotate(mouse.GetDisplacement());
 
 	Move(keyboard);
+    Update();
+}
 
-	if (m_FlagProjection)
-		CalculateProjectionMatrix();
+void Camera::Update()
+{
+    if (m_FlagView)
+        CalculateViewMatrix();
 
-	if (m_FlagView)
-		CalculateViewMatrix();
+    if (m_FlagProjection)
+        CalculateProjectionMatrix();
+}
+
+void Camera::SetPosition(const glm::vec3 &position)
+{
+    m_Position = position;
+    FlagView();
+}
+
+void Camera::SetRotation(const glm::vec3 &rotation)
+{
+    SetYaw(rotation.y);
+    SetPitch(rotation.x);
+
+    FlagView();
+
+    glm::mat4 rotationMat = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
+    rotationMat = glm::rotate(rotationMat, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
+    m_Forward = glm::normalize(rotationMat * glm::vec4{ 0, 0, 1, 1 });
 }
 
 const glm::mat4& Camera::GetViewMatrix() const
@@ -70,8 +91,18 @@ void Camera::CalculateViewMatrix()
 	// Right handed
 	m_Right = glm::normalize(glm::cross(m_Forward, { 0,1,0 }));
 	m_Up = glm::normalize(glm::cross(m_Right, m_Forward));
-	
-	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+
+    m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+}
+
+void Camera::SetYaw(float rotation)
+{
+    m_TotalYaw = std::fmod(rotation, 360.f);
+}
+
+void Camera::SetPitch(float rotation)
+{
+    m_TotalPitch = std::clamp(m_TotalPitch, -90.f, 90.f);
 }
 
 void Camera::Move(const Keyboard& keyboard)
@@ -134,12 +165,8 @@ void Camera::Rotate(const glm::vec2& mouseDir)
 	if (!mouseMoved)
 		return;
 	FlagView();
-	//glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
-	//rotation = glm::rotate(rotation, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
-
 	glm::mat4 rotation = glm::rotate(glm::mat4{ 1 }, glm::radians(m_TotalYaw), glm::vec3{ 0, 1, 0 });
 	rotation = glm::rotate(rotation, glm::radians(m_TotalPitch), glm::vec3{ 1, 0, 0 });
-
 	m_Forward = glm::normalize(rotation * glm::vec4{ 0, 0, 1, 1 });
 }
 

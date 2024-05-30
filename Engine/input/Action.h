@@ -2,6 +2,7 @@
 #include "InputKeys.h"
 #include "KeyboardInput.h"
 #include "ControllerInput.h"
+#include "Mouse.h"
 
 namespace mk
 {
@@ -21,4 +22,21 @@ namespace mk
 		KeyInput keyboardInput{};
 		ActionType type{};
 	};
+
+    struct DirectionAction final
+    {
+        enum class InputType{ mouse, leftStick, rightStick };
+
+        DirectionAction() = default;
+        ~DirectionAction() = default;
+
+        DirectionAction(const DirectionAction& other)					= default;
+        DirectionAction(DirectionAction&& other) noexcept				= default;
+        DirectionAction& operator=(const DirectionAction& other)		= default;
+        DirectionAction& operator=(DirectionAction&& other) noexcept	= default;
+
+        glm::vec2 Triggered(const ControllerInput& controller, const Mouse* mouse) const;
+
+        InputType inputType{};
+    };
 }

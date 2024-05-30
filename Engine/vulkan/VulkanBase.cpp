@@ -1,11 +1,7 @@
 #include "VulkanBase.h"
 
-#include "VulkanUtils.h"
-#include "core/Time.h"
 #include "core/ResourceManager.h"
-#include "core/SceneManager.h"
 #include "input/Camera.h"
-#include "input/Keyboard.h"
 #include "input/Mouse.h"
 
 using namespace mk;
@@ -65,7 +61,7 @@ const CommandPool& VulkanBase::GetCommandPool() const
 	return *m_CommandPool;
 }
 
-const Camera& VulkanBase::GetCamera() const
+Camera& VulkanBase::GetCamera()
 {
 	return m_Camera;
 }
@@ -96,8 +92,6 @@ void VulkanBase::InitVulkan()
 	m_RenderPass = std::make_unique<RenderPass>();
 
 	m_Camera = Camera{ static_cast<float>(m_SwapChain->GetWidth()), static_cast<float>(m_SwapChain->GetHeight()), 45.f };
-	m_Mouse = Mouse{ m_Window->GetWindow() };
-	m_Keyboard = Keyboard{ m_Window->GetWindow() };
 }
 
 void VulkanBase::Cleanup()
@@ -109,8 +103,7 @@ void VulkanBase::Cleanup()
 
 void VulkanBase::DrawFrame(const std::function<void()>& render)
 {
-	m_Mouse.Update();
-	m_Camera.Update(m_Mouse, m_Keyboard);
+    m_Camera.Update();
 
 	m_SwapChain->Wait();
 	m_ImageIdx = m_SwapChain->GetImageIdx();
@@ -122,7 +115,6 @@ void VulkanBase::DrawFrame(const std::function<void()>& render)
 	m_RenderPass->StopRecording();
 	m_SwapChain->Present(m_ImageIdx);
 	m_SwapChain->NextFrame();
-	
 }
 
 void VulkanBase::UpdateWindow()

@@ -13,5 +13,19 @@ bool Action::Triggered(const ControllerInput& controller, const KeyboardInput& k
 	case ActionType::up:
 		return keyboard.ButtonUp(keyboardInput) || controller.ButtonUp(controllerInput);
 	}
-	return false;
+    return false;
+}
+
+glm::vec2 DirectionAction::Triggered(const ControllerInput& controller, const Mouse* mouse) const
+{
+    switch (inputType)
+    {
+    case InputType::leftStick:
+        return controller.GetLeftStickInput();
+    case InputType::mouse:
+        return mouse->GetDisplacement();
+	case InputType::rightStick:
+		return controller.GetRightStickInput();
+    }
+    return {};
 }

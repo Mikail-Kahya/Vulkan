@@ -2,6 +2,7 @@
 
 namespace mk
 {
+	class Mouse;
 	using controller_id = int32_t;
 
 	class IInput
@@ -16,7 +17,8 @@ namespace mk
 		virtual bool ProcessInput() = 0;
 		virtual controller_id RegisterController() = 0;
 		virtual void UnregisterController(controller_id id)	= 0;
-
+		virtual const Mouse* GetMouse() const = 0;
+			
 	protected:
 		IInput() = default;
 	};

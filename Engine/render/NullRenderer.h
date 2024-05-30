@@ -18,5 +18,8 @@ namespace mk
 		void Update() override {}
 		mesh_handle RegisterRender(void*) override { return 0; }
 		void UnregisterRender(mesh_handle) override {}
+        void RegisterCamera(CameraComponent*) override {}
+        void UnregisterCamera(CameraComponent*) override {}
+        void SetActiveCamera(CameraComponent*) override {}
 	};
 }

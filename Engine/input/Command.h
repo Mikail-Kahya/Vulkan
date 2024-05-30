@@ -1,4 +1,5 @@
 #pragma once
+#include "glm/vec2.hpp"
 
 namespace mk
 {
@@ -47,4 +48,19 @@ namespace mk
 		EditorCommand& operator=(const EditorCommand& other) = delete;
 		EditorCommand& operator=(EditorCommand&& other) noexcept = delete;
 	};
+
+	class DirectionCommand : public GameObjectCommand
+	{
+	public:
+		DirectionCommand(GameObject* object) : GameObjectCommand(object) {}
+		~DirectionCommand() override = default;
+
+		DirectionCommand(const DirectionCommand& other) = delete;
+		DirectionCommand(DirectionCommand&& other) noexcept = delete;
+		DirectionCommand& operator=(const DirectionCommand& other) = delete;
+		DirectionCommand& operator=(DirectionCommand&& other) noexcept = delete;
+
+		void Execute() override {}
+		virtual void Execute(const glm::vec2& direction) = 0;
+    };
 }

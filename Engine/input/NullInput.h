@@ -1,9 +1,10 @@
 #pragma once
 #include "IInput.h"
+#include "Mouse.h"
 
 namespace mk
 {
-	class NullInput : public IInput
+	class NullInput final : public IInput
 	{
 	public:
 		NullInput()				= default;
@@ -16,5 +17,9 @@ namespace mk
 		bool ProcessInput() override { return false; }
 		controller_id RegisterController() override { return  0; }
 		void UnregisterController(controller_id id) override {}
+		const Mouse* GetMouse() const override { return &m_Mouse; }
+
+	private:
+		Mouse m_Mouse{};
 	};
 }

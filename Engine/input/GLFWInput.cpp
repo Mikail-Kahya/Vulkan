@@ -16,6 +16,7 @@ bool GLFWInput::ProcessInput()
 		return false;
 
 	glfwPollEvents();
+	m_Mouse->Update();
 
 	for (const auto& controller : m_Controllers)
 	{
@@ -47,7 +48,7 @@ controller_id GLFWInput::RegisterController()
 	if (foundInvalidController == m_Controllers.end())
 	{
 		m_Controllers.emplace_back(std::make_unique<Controller>(m_ControllerIdx, 1000, true));
-		return ++m_ControllerIdx;
+        return m_ControllerIdx++;
 	}
 
 	foundInvalidController->get()->Enable();
@@ -70,9 +71,22 @@ void GLFWInput::AddBinding(controller_id id, const Action& action, Command* comm
 	m_Controllers[id]->AddBinding(action, commandPtr);
 }
 
+void GLFWInput::AddDirectionalBinding(controller_id id, const DirectionAction& action, DirectionCommand* commandPtr)
+{
+	if (!ValidController(id))
+		return;
+
+	m_Controllers[id]->AddDirectionBinding(action, commandPtr);
+}
+
+const Mouse* GLFWInput::GetMouse() const
+{
+	return m_Mouse.get();
+}
+
 bool GLFWInput::ValidController(controller_id id) const
 {
-	if (id >= m_ControllerIdx)
+    if (id >= m_ControllerIdx)
 		return false;
 
 	return m_Controllers[id]->IsEnabled();

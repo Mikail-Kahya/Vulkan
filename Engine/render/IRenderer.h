@@ -3,6 +3,7 @@
 
 namespace mk
 {
+    class CameraComponent;
 	using mesh_handle = int32_t;
 
 	class IRenderer
@@ -14,6 +15,10 @@ namespace mk
 		virtual void Update()		= 0;
 		virtual mesh_handle RegisterRender(void* objectPtr)	= 0;
 		virtual void UnregisterRender(mesh_handle handle)	= 0;
+
+        virtual void RegisterCamera(CameraComponent* cameraPtr)     = 0;
+        virtual void UnregisterCamera(CameraComponent* cameraPtr)   = 0;
+        virtual void SetActiveCamera(CameraComponent* cameraPtr)    = 0;
 
 	protected:
 		IRenderer() = default;

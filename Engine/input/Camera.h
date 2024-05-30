@@ -17,7 +17,10 @@ namespace mk
 		Camera& operator=(const Camera& other)		= default;
 		Camera& operator=(Camera&& other) noexcept	= default;
 
-		void Update(const Mouse& mouse, const Keyboard& keyboard);
+        void Update(const Mouse& mouse, const Keyboard& keyboard); // remove in the future
+        void Update();
+        void SetPosition(const glm::vec3& position);
+        void SetRotation(const glm::vec3& rotation);
 
 		const glm::mat4& GetViewMatrix() const;
 		const glm::mat4& GetProjectionMatrix() const;
@@ -28,10 +31,13 @@ namespace mk
 	private:
 		void CalculateProjectionMatrix();
 		void CalculateViewMatrix();
-		
+
+        void SetYaw(float rotation);
+        void SetPitch(float rotation);
+
 		// Controls
-		void Move(const Keyboard& keyboard);
-		void Rotate(const glm::vec2& mouseDir);
+        void Move(const Keyboard& keyboard); // remove in the future
+        void Rotate(const glm::vec2& mouseDir); // remove in the future
 
 		// Helpers
 		void FlagView();
@@ -54,8 +60,8 @@ namespace mk
 		float m_TotalPitch{};
 		float m_TotalYaw{ 180 };
 		
-		float m_RotateSpeed{ 10.f };
-		float m_MoveSpeed{ 10.f };
+        float m_RotateSpeed{ 10.f }; // remove in the future
+        float m_MoveSpeed{ 10.f }; // remove in the future
 
 		bool m_FlagProjection{ true };
 		bool m_FlagView{ true };

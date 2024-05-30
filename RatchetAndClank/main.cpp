@@ -1,10 +1,19 @@
 #include <iostream>
 
+#include <components/cameracomponent.h>
+
+#include <core/ServiceLocator.h>
+#include <input/CommandInput.h>
+#include <input/InputMapping.h>
+
 #include "MkVulktra.h"
+#include "input/GLFWInput.h"
+#include "playercommands.h"
 #include "components/MeshComponent.h"
 #include "core/ResourceManager.h"
 #include "core/Scene.h"
 #include "core/SceneManager.h"
+#include "input/Action.h"
 
 using namespace mk;
 
@@ -40,6 +49,12 @@ void Load()
 	meshCompPtr->SetShader(shader3DName, shader3DName);
 	ratchet->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 
+    GameObject* playerCamera = scene.SpawnObject("Camera");
+    playerCamera->SetParent(ratchet);
+    playerCamera->SetLocalPosition({ 0, 2.f, 10.f });
+    CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
+    cameraCompPtr->Activate();
+
 
 	GameObject* tuktuk = scene.SpawnObject("tuktuk");
 	meshCompPtr = tuktuk->AddComponent<MeshComponent>();
@@ -47,33 +62,39 @@ void Load()
 	meshCompPtr->SetTexture("tuktuk.png");
 	meshCompPtr->SetShader(shader3DName, shader3DName);
 
-	//ratchet->Load("Ratchet/Ratchet.obj");
-	//ratchet->SetScale({ 2.5f, 2.5f, 2.5f });
+    CommandInput* commandInput = dynamic_cast<CommandInput*>(&ServiceLocator::GetInputSystem());
+    const controller_id id = commandInput->RegisterController();
 
-	//Mesh3D* plane2 = scenePtr->AddMesh3D(shader3DName, texture);
-	//plane2->Load(vertices3D, indices);
-	//plane2->SetPosition({ 1, 0, 0 });
-	//
-	//Mesh2D* plane2D = scenePtr->AddMesh2D(shader2DName);
-	//plane2D->Load(vertices, indices);
-	//
-	//Mesh2D* plane2D2 = scenePtr->AddMesh2D(shader2DName);
-	//for (auto& vertex : vertices)
-	//	vertex.pos *= -1;
-	//plane2D2->Load(vertices, indices);
+    // controls
+    Action forward{};
+    forward.controllerInput = Input::dPadUp;
+    forward.keyboardInput = GLFW_KEY_W;
+    forward.type = ActionType::hold;
 
-	//Mesh3D* tuktuk = scenePtr->AddMesh3D(shader3DName, "tuktuk.png");
-	//tuktuk->Load("tuktuk.obj");
+    Action back{};
+    back.controllerInput = Input::dPadDown;
+    back.keyboardInput = GLFW_KEY_S;
+    back.type = ActionType::hold;
 
-	//Mesh3D* ratchet = scenePtr->AddMesh3D(shader3DName, "Ratchet/Ratchet.png");
-	//ratchet->Load("Ratchet/Ratchet.obj");
-	//ratchet->SetScale({ 2.5f, 2.5f, 2.5f });
+    Action left{};
+    left.controllerInput = Input::dPadLeft;
+    left.keyboardInput = GLFW_KEY_A;
+    left.type = ActionType::hold;
 
-	//Mesh3D* clank = scenePtr->AddMesh3D(shader3DName, "Clank/ClankBackpack.png");
-	//clank->Load("Clank/ClankBackpack.obj");
-	//clank->SetPosition({ 0, 1, -1 });
-	//clank->SetScale({ 0.1f, 0.1f, 0.1f });
+    Action right{};
+    right.controllerInput = Input::dPadRight;
+    right.keyboardInput = GLFW_KEY_D;
+    right.type = ActionType::hold;
 
+	DirectionAction look{};
+	look.inputType = DirectionAction::InputType::mouse;
+
+    // input
+    commandInput->AddBinding(id, forward, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{0, 0, 1}, 10.f));
+    commandInput->AddBinding(id, back, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{0, 0, -1}, 10.f));
+    commandInput->AddBinding(id, left, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{-1, 0, 0}, 10.f));
+    commandInput->AddBinding(id, right, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{1, 0, 0}, 10.f));
+	commandInput->AddDirectionalBinding(id, look, commandInput->AddCommand<RotateCommand>(ratchet, 50.f));
 
 	std::cout << "Controls:\n\n"
 		<< "=========\n\n"

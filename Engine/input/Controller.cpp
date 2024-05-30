@@ -1,6 +1,7 @@
 #include "Controller.h"
 
 #include "Command.h"
+#include "Core/ServiceLocator.h"
 
 using namespace mk;
 
@@ -33,6 +34,14 @@ void Controller::HandleInput()
 		if (mapping.first.Triggered(m_Controller, m_Keyboard))
 			mapping.second->Execute();
 	}
+	const Mouse* mousePtr{ ServiceLocator::GetInputSystem().GetMouse() };
+	for (const auto& mapping : m_DirectionInputMapping.GetMappings())
+	{
+        constexpr float epsilon{ 0.0001f };
+        const glm::vec2 direction{ mapping.first.Triggered(m_Controller, mousePtr) };
+        if (abs(direction.x) > epsilon || abs(direction.y) > epsilon)
+            mapping.second->Execute(direction);
+	}
 }
 
 uint8_t Controller::GetIdx() const
@@ -40,9 +49,14 @@ uint8_t Controller::GetIdx() const
 	return m_Idx;
 }
 
-const InputMapping& Controller::GetInputMapping() const
+const Controller::DefaultInputMapping& Controller::GetInputMapping() const
 {
 	return m_InputMapping;
+}
+
+const Controller::DirectionInputMapping& Controller::GetDirectionInputMapping() const
+{
+	return m_DirectionInputMapping;
 }
 
 void Controller::AddBinding(const Action& action, Command* commandPtr)
@@ -53,6 +67,16 @@ void Controller::AddBinding(const Action& action, Command* commandPtr)
 void Controller::RemoveBinding(Command* commandPtr)
 {
 	m_InputMapping.RemoveMapping(commandPtr);
+}
+
+void Controller::AddDirectionBinding(const DirectionAction& action, DirectionCommand* commandPtr)
+{
+	m_DirectionInputMapping.AddMapping(action, commandPtr);
+}
+
+void Controller::RemoveDirectionBinding(DirectionCommand* commandPtr)
+{
+	m_DirectionInputMapping.RemoveMapping(commandPtr);
 }
 
 void Controller::ClearBindings()

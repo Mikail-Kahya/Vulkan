@@ -25,6 +25,8 @@ namespace mk
 		controller_id RegisterController() override;
 		void UnregisterController(controller_id id) override;
 		void AddBinding(controller_id id, const Action& action, Command* commandPtr) override;
+        void AddDirectionalBinding(controller_id id, const DirectionAction& action, DirectionCommand* commandPtr) override;
+		const Mouse* GetMouse() const override;
 
 	private:
 		bool ValidController(controller_id id) const;

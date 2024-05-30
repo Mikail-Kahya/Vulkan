@@ -2,12 +2,17 @@
 #include "ControllerInput.h"
 #include "KeyboardInput.h"
 #include "InputMapping.h"
-#include "Keyboard.h"
+
+#include "Action.h"
+#include "Command.h"
 
 namespace mk
 {
 	class Controller final
 	{
+		using DefaultInputMapping = InputMapping<Action, Command>;
+		using DirectionInputMapping = InputMapping<DirectionAction, DirectionCommand>;
+
 	public:
 		Controller(uint8_t idx, KeyInput nrKeys, bool useKeyboard = false);
 		~Controller() = default;
@@ -22,10 +27,15 @@ namespace mk
 		void HandleInput();
 
 		uint8_t GetIdx() const;
-		const InputMapping& GetInputMapping() const;
+		const DefaultInputMapping& GetInputMapping() const;
+		const DirectionInputMapping& GetDirectionInputMapping() const;
 
 		void AddBinding(const Action& action, Command* commandPtr);
 		void RemoveBinding(Command* commandPtr);
+
+		void AddDirectionBinding(const DirectionAction& action, DirectionCommand* commandPtr);
+		void RemoveDirectionBinding(DirectionCommand* commandPtr);
+
 		void ClearBindings();
 
 		void Enable();
@@ -33,7 +43,8 @@ namespace mk
 		bool IsEnabled() const;
 
 	private:
-		InputMapping m_InputMapping{};
+		DefaultInputMapping m_InputMapping{};
+		DirectionInputMapping m_DirectionInputMapping{};
 		ControllerInput m_Controller;
 		KeyboardInput m_Keyboard;
 		uint8_t m_Idx{};

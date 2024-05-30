@@ -17,6 +17,7 @@ namespace mk
 		CommandInput& operator=(CommandInput&& other) noexcept	= delete;
 
 		virtual void AddBinding(controller_id id, const Action& action, Command* commandPtr) = 0;
+        virtual void AddDirectionalBinding(controller_id id, const DirectionAction& action, DirectionCommand* commandPtr) = 0;
 
 		template<std::derived_from<Command> CommandType, typename... Args>
 		CommandType* AddCommand(const Args&... args)

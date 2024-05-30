@@ -31,7 +31,8 @@ set(SOURCES
 )
 
 # Create the executable
-add_executable(${GAME_NAME} ${SOURCES} ${GLSL_SOURCE_FILES})
+add_executable(${GAME_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}
+    playercommands.h playercommands.cpp)
 add_dependencies(${GAME_NAME} Shaders)
 
 

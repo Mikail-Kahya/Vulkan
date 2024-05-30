@@ -1,6 +1,3 @@
-#include <stdexcept>
-#include <cstring>
-
 #include "VulkanRenderer.h"
 
 #include "tiny_obj_loader.h"
@@ -10,8 +7,8 @@
 #include "abstraction/Pipeline2D.h"
 #include "abstraction/Pipeline3D.h"
 #include "components/MeshComponent.h"
-#include "core/ResourceManager.h"
-#include "core/Utils.h"
+#include "components/cameracomponent.h"
+#include "core/GameObject.h"
 
 using namespace mk;
 
@@ -29,7 +26,7 @@ public:
 	VulkanImpl& operator=(const VulkanImpl& other)		= delete;
 	VulkanImpl& operator=(VulkanImpl&& other) noexcept	= delete;
 
-	void Render() const;
+    void Render(CameraComponent* cameraPtr) const;
 
 	void AddMesh2D(Pipeline2D* pipelinePtr, Mesh2D* meshPtr);
 	void AddMesh3D(Pipeline3D* pipelinePtr, Mesh3D* meshPtr);
@@ -41,9 +38,12 @@ private:
 	std::unordered_map<Pipeline3D*, Meshes3D> m_Mesh3DSets{};
 };
 
-void VulkanRenderer::VulkanImpl::Render() const
+void VulkanRenderer::VulkanImpl::Render(CameraComponent* cameraPtr) const
 {
-	for (const auto& meshSet : m_Mesh3DSets)
+    Camera& camera{  VulkanBase::GetInstance().GetCamera() };
+    camera.SetPosition(cameraPtr->GetOwner()->GetWorldPosition());
+    camera.SetRotation(cameraPtr->GetOwner()->GetWorldRotation());
+    for (const auto& meshSet : m_Mesh3DSets)
 	{
 		meshSet.first->StartDrawing();
 		for (const auto& mesh : meshSet.second)
@@ -100,13 +100,15 @@ VulkanRenderer::~VulkanRenderer()
 {
 }
 
-
 void VulkanRenderer::Render() const
 {
-	VulkanBase::GetInstance().DrawFrame([this]()
-	{
-			m_Impl->Render();
-	});
+    if (!m_RenderCamera)
+        return;
+    VulkanBase::GetInstance().DrawFrame([this]()
+                                        {
+                                            m_Impl->Render(m_RenderCamera);
+                                        });
+
 }
 
 int VulkanRenderer::GetHeight() const noexcept
@@ -146,5 +148,27 @@ void VulkanRenderer::UnregisterRender(mesh_handle handle)
 	if (m_Renderers[handle]->GetPipeline() == nullptr)
 		return;
 	m_Impl->RemoveMesh3D(m_Renderers[handle]->GetPipeline(), m_Renderers[handle]->GetMesh());
-	m_Renderers[handle] = nullptr;
+    m_Renderers[handle] = nullptr;
+}
+
+void VulkanRenderer::RegisterCamera(CameraComponent *cameraPtr)
+{
+    m_Cameras.push_back(cameraPtr);
+}
+
+void VulkanRenderer::UnregisterCamera(CameraComponent *cameraPtr)
+{
+    const auto foundIt = std::find(m_Cameras.begin(), m_Cameras.end(), cameraPtr);
+    if (foundIt != m_Cameras.end())
+    {
+        if (m_RenderCamera == *foundIt)
+            SetActiveCamera(nullptr);
+        m_Cameras.erase(foundIt);
+    }
+}
+
+void VulkanRenderer::SetActiveCamera(CameraComponent *cameraPtr)
+{
+    m_RenderCamera = cameraPtr;
+    // if nullptr spawn spectactor object
 }

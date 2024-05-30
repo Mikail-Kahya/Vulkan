@@ -87,7 +87,7 @@ void DescriptorPool::CreateDescriptorPool()
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = nrSets * 2;
+    poolInfo.maxSets = nrSets * static_cast<uint32_t>(poolSizes.size());
 
 	if (vkCreateDescriptorPool(VulkanBase::GetInstance().GetDevice(), &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create descriptor pool");

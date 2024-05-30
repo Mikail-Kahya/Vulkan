@@ -8,6 +8,7 @@ namespace mk
 	class Mouse final
 	{
 	public:
+		Mouse() = default;
 		Mouse(GLFWwindow* windowPtr);
 		~Mouse() = default;
 

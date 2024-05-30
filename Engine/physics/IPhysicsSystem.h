@@ -3,7 +3,7 @@
 
 namespace mk
 {
-	class ColliderComponent;
+    class ColliderComponent;
     using collider_id = size_t;
 
 	class IPhysicsSystem

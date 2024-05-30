@@ -6,7 +6,6 @@
 #include <memory>
 #include <GLFW/glfw3.h>
 
-#include "VulkanStructs.h"
 #include "input/Camera.h"
 #include "input/Mouse.h"
 #include "CRTP/ISingleton.h"
@@ -48,7 +47,7 @@ namespace mk
 		const RenderPass& GetRenderPass() const;;
 		const SwapChain& GetSwapChain() const;
 		const CommandPool& GetCommandPool() const;
-		const Camera& GetCamera() const;
+        Camera& GetCamera();
 		const DescriptorPool& GetDescriptorPool() const;
 		const DepthBuffer& GetDepthBuffer() const;
 		uint32_t GetImageIdx() const;
@@ -69,8 +68,6 @@ namespace mk
 		std::unique_ptr<DepthBuffer> m_DepthBuffer{};
 		std::unique_ptr<RenderPass> m_RenderPass{};
 		Camera m_Camera{};
-		Mouse m_Mouse{ nullptr };
-		Keyboard m_Keyboard{ nullptr };
 
 		uint32_t m_ImageIdx{};
 
