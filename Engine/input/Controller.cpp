@@ -17,13 +17,13 @@ Controller::Controller(uint8_t idx, KeyInput nrKeys, bool useKeyboard)
 void Controller::KeyDown(KeyInput input)
 {
 	if (m_UseKeyboard)
-		m_Keyboard.PollButton(input, true);
+        m_Keyboard.PollButton(input, false);
 }
 
 void Controller::KeyUp(KeyInput input)
 {
 	if (m_UseKeyboard)
-		m_Keyboard.PollButton(input, false);
+        m_Keyboard.PollButton(input, true);
 }
 
 void Controller::HandleInput()

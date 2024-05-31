@@ -27,7 +27,8 @@ bool KeyboardInput::ButtonDown(KeyInput key) const
 
 bool KeyboardInput::ButtonHold(KeyInput key) const
 {
-	return m_CurrentKeys[key];}
+    return m_CurrentKeys[key];
+}
 
 bool KeyboardInput::ButtonUp(KeyInput key) const
 {
