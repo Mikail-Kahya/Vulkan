@@ -31,11 +31,11 @@ void Mesh3D::Load(const std::vector<Vertex>& vertices, const std::vector<uint32_
 	m_VertexBuffer.SetIndices(indices);
 }
 
-void Mesh3D::Load(const std::string& objFile)
+void Mesh3D::Load(const std::string& objFile, bool invert)
 {
 	std::vector<Vertex> vertices{};
 	std::vector<uint32_t> indices{};
-	if (ParseOBJ<Vertex3D>(objFile, vertices, indices))
+	if (ParseOBJ<Vertex3D>(objFile, vertices, indices, !invert))
 		Load(vertices, indices);
 }
 

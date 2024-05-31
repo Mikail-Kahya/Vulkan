@@ -26,7 +26,7 @@ namespace mk
 		static Pipeline2D* LoadShader2D(const std::string& vertex, const std::string& fragment);
 		static Pipeline3D* LoadShader3D(const std::string& vertex, const std::string& fragment);
 		static Texture* LoadTexture(const std::string& texture);
-		static Mesh3D* LoadMesh3D(const std::string& obj);
+		static Mesh3D* LoadMesh3D(const std::string& obj, bool invert = false);
 		static Mesh2D* LoadMesh2D(const std::string& obj);
 		static void Cleanup();
 

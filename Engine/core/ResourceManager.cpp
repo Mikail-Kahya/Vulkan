@@ -52,12 +52,12 @@ Texture* ResourceManager::LoadTexture(const std::string& texture)
 	return &s_Textures[texture];
 }
 
-Mesh3D* ResourceManager::LoadMesh3D(const std::string& obj)
+Mesh3D* ResourceManager::LoadMesh3D(const std::string& obj, bool invert)
 {
 	if (!s_Meshes3D.contains(obj))
 	{
 		s_Meshes3D[obj] = std::make_unique<Mesh3D>();
-		s_Meshes3D[obj]->Load(s_MeshPath + obj);
+		s_Meshes3D[obj]->Load(s_MeshPath + obj, invert);
 	}
 	return s_Meshes3D[obj].get();
 }

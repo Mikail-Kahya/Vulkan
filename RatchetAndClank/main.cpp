@@ -1,3 +1,4 @@
+#include <array>
 #include <iostream>
 
 #include <components/cameracomponent.h>
@@ -95,10 +96,11 @@ GameObject* CreatePlayer(Scene& scene, const std::string& shader)
 	look.inputType = DirectionAction::InputType::mouse;
 
 	// input
-	commandInput->AddBinding(id, forward, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 0, 0, 1 }, 10.f));
-	commandInput->AddBinding(id, back, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 0, 0, -1 }, 10.f));
-	commandInput->AddBinding(id, left, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ -1, 0, 0 }, 10.f));
-	commandInput->AddBinding(id, right, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 1, 0, 0 }, 10.f));
+	constexpr float speed{ 20.f };
+	commandInput->AddBinding(id, forward, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 0, 0, 1 }, speed));
+	commandInput->AddBinding(id, back, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 0, 0, -1 }, speed));
+	commandInput->AddBinding(id, left, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ -1, 0, 0 }, speed));
+	commandInput->AddBinding(id, right, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 1, 0, 0 }, speed));
 	commandInput->AddDirectionalBinding(id, look, commandInput->AddCommand<RotateCommand>(player, glm::vec2{ 5.5f, 0 }));
 
 	return player;
@@ -106,7 +108,44 @@ GameObject* CreatePlayer(Scene& scene, const std::string& shader)
 
 void CreateEnvironment(Scene& scene, const std::string& shader)
 {
-	
+	const std::string dome{ "environment/skydome.obj" };
+	ResourceManager::LoadMesh3D(dome, true);
+
+	GameObject* sky = scene.SpawnObject("Sky");
+	sky->SetLocalScale(glm::vec3{ 800.f });
+	MeshComponent* meshCompPtr = sky->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh(dome);
+	meshCompPtr->SetTexture("environment/space.png");
+	meshCompPtr->SetShader(shader, shader);
+
+	GameObject* floor = scene.SpawnObject("Floor");
+	floor->SetLocalScale(glm::vec3{ 800.f });
+	meshCompPtr = floor->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("environment/ground.obj");
+	meshCompPtr->SetTexture("environment/rock.jpg");
+	meshCompPtr->SetShader(shader, shader);
+
+	constexpr int nrRockModels{ 2 };
+	constexpr int nrRocks{ 5 };
+	const std::array<std::string, nrRockModels> rocks{ "rock1", "rock2" };
+	constexpr int limitX{ 500 };
+	constexpr int limitZ{ 500 };
+	constexpr int limitScale{ 10 };
+	for (int idx{}; idx < nrRocks; ++idx)
+	{
+		const std::string& rockModel{ rocks[rand() % nrRockModels] };
+		GameObject* rock = scene.SpawnObject(rockModel);
+		rock->SetLocalPosition(glm::vec3{ 
+			rand() % limitX - limitX * 0.5f,
+			-10.f,
+			rand() % limitZ - limitZ * 0.5f
+		});
+		rock->SetLocalScale(glm::vec3{ rand() % limitScale + limitScale * 0.5f });
+		meshCompPtr = rock->AddComponent<MeshComponent>();
+		meshCompPtr->SetMesh("environment/" + rockModel + ".obj");
+		meshCompPtr->SetTexture("environment/rock.jpg");
+		meshCompPtr->SetShader(shader, shader);
+	}
 }
 
 void Load()
@@ -128,7 +167,7 @@ void Load()
 	Scene& scene = SceneManager::GetInstance().LoadScene("Triangle");
 
 	AddClank(scene, CreatePlayer(scene, shader3DName), shader3DName);
-
+	CreateEnvironment(scene, shader3DName);
 	
 
 	std::cout << "Controls:\n\n"
@@ -151,6 +190,7 @@ int main() {
 	//_putenv_s("DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1", "1");
 	//_putenv_s("DISABLE_LAYER_NV_OPTIMUS_1", "1");
 
+	srand(time(0));
 	ResourceManager::SetDefaultShaderPath("shaders/");
 	ResourceManager::SetDefaultTexturePath("resources/");
 	ResourceManager::SetDefaultMeshPath("resources/");

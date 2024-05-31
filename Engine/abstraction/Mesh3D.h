@@ -23,7 +23,7 @@ namespace mk
 		void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const;
 		void Update();
 		void Load(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
-		void Load(const std::string& objFile);
+		void Load(const std::string& objFile, bool invert = false);
 
 		void SetPosition(const glm::vec3& position);
 		void SetRotation(const glm::vec3& rotation);
