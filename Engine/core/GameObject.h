@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Transform.h"
+#include "glm/ext/matrix_float4x4.hpp"
 
 namespace mk
 {
@@ -43,6 +44,8 @@ namespace mk
 		const glm::vec3& GetLocalScale() const;
 		
 		const glm::vec3& GetForward();
+		const glm::vec3& GetUp();
+		const glm::vec3& GetRight();
 
 		void SetLocalPosition(const glm::vec3& position);
 		void SetLocalRotation(const glm::vec3& rotation);
@@ -75,10 +78,12 @@ namespace mk
 	private:
 		void ComponentCleanup();
 
+		void UpdateTransform();
+
 		void UpdateWorldPosition();
 		void UpdateWorldRotation();
 		void UpdateWorldScale();
-		void UpdateForward();
+		void UpdateAxis();
 
 		void FlagPositionDirty();
 		void FlagRotationDirty();
@@ -102,6 +107,8 @@ namespace mk
 		Transform m_LocalTransform{};
 		Transform m_WorldTransform{};
 		glm::vec3 m_Forward{};
+		glm::vec3 m_Right{};
+		glm::vec3 m_Up{};
 		bool m_PositionIsDirty{ false };
 		bool m_RotationIsDirty{ false };
 		bool m_ScaleIsDirty{ false };

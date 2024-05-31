@@ -42,19 +42,38 @@ void Load()
 	const std::string texture{ "test.jpg" };
 	Scene& scene = SceneManager::GetInstance().LoadScene("Triangle");
 
-	GameObject* ratchet =  scene.SpawnObject("Ratchet");
-	MeshComponent* meshCompPtr = ratchet->AddComponent<MeshComponent>();
+	// 
+	GameObject* ratchet = scene.SpawnObject("Ratchet");
+	
+	// Mesh
+	GameObject* ratchetMesh = scene.SpawnObject("RatchetMesh");
+	ratchetMesh->SetParent(ratchet);
+	ratchetMesh->SetLocalRotation({ 0, -90.f, 0 });
+	ratchetMesh->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+	MeshComponent* meshCompPtr = ratchetMesh->AddComponent<MeshComponent>();
 	meshCompPtr->SetMesh("Ratchet/Ratchet.obj");
 	meshCompPtr->SetTexture("Ratchet/Ratchet.png");
 	meshCompPtr->SetShader(shader3DName, shader3DName);
-	ratchet->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 
-    GameObject* playerCamera = scene.SpawnObject("Camera");
-    playerCamera->SetParent(ratchet);
-    playerCamera->SetLocalPosition({ 0, 2.f, 10.f });
-    CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
-    cameraCompPtr->Activate();
 
+	GameObject* playerCamera = scene.SpawnObject("Camera");
+	playerCamera->SetParent(ratchet);
+	playerCamera->SetLocalPosition({ 0, 2.f, -10.f });
+	//playerCamera->SetLocalRotation({ 0, 180, 0 });
+	CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
+	cameraCompPtr->Activate();
+
+	//
+	//// Camera
+	//GameObject* cameraArm = scene.SpawnObject("CameraArm");
+	//cameraArm->SetParent(ratchet);
+	//
+	//GameObject* playerCamera = scene.SpawnObject("Camera");
+	//playerCamera->SetParent(cameraArm);
+	//playerCamera->SetLocalPosition({ 0, 2.f, -10.f });
+	//playerCamera->SetLocalRotation({ 0, 180, 0 });
+	//CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
+	//cameraCompPtr->Activate();
 
 	GameObject* tuktuk = scene.SpawnObject("tuktuk");
 	meshCompPtr = tuktuk->AddComponent<MeshComponent>();
@@ -94,7 +113,8 @@ void Load()
     commandInput->AddBinding(id, back, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{0, 0, -1}, 10.f));
     commandInput->AddBinding(id, left, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{-1, 0, 0}, 10.f));
     commandInput->AddBinding(id, right, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{1, 0, 0}, 10.f));
-	commandInput->AddDirectionalBinding(id, look, commandInput->AddCommand<RotateCommand>(ratchet, 50.f));
+	commandInput->AddDirectionalBinding(id, look, commandInput->AddCommand<RotateCommand>(ratchet, glm::vec2{ 5.5f, 0.f }));
+
 
 	std::cout << "Controls:\n\n"
 		<< "=========\n\n"

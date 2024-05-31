@@ -46,7 +46,7 @@ class MovementComponent;
     class RotateCommand : public DirectionCommand
     {
     public:
-        RotateCommand(GameObject* gameObject, float rotateSpeed);
+        RotateCommand(GameObject* gameObject, const  glm::vec2& rotateSpeed);
         ~RotateCommand() override = default;
 
         RotateCommand(const RotateCommand& other) = delete;
@@ -57,7 +57,7 @@ class MovementComponent;
 		void Execute(const glm::vec2& direction) override;
 
     private:
-        const float m_RotateSpeed{};
+        const glm::vec2 m_RotateSpeed{};
     };
 }
 

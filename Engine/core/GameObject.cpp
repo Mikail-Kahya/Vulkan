@@ -4,7 +4,6 @@
 #include "GameObject.h"
 #include "IComponent.h"
 #include "glm/fwd.hpp"
-#include "glm/vec4.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
 using namespace mk;
@@ -23,7 +22,6 @@ GameObject::GameObject(GameObject&& other) noexcept
 	, m_Destroy{ other.m_Destroy }
 	, m_LocalTransform{ other.m_LocalTransform }
 	, m_WorldTransform{ other.m_WorldTransform }
-	, m_PositionIsDirty{ other.m_PositionIsDirty }
 	, m_Parent{ other.m_Parent }
 	, m_Children{ std::move(other.m_Children) }
 	, m_Components{ std::move(other.m_Components) }
@@ -39,7 +37,6 @@ GameObject& GameObject::operator=(GameObject&& other) noexcept
 	m_Destroy = other.m_Destroy;
 	m_LocalTransform = std::move(other.m_LocalTransform);
 	m_WorldTransform = std::move(other.m_WorldTransform);
-	m_PositionIsDirty = other.m_PositionIsDirty;
 	m_Parent = other.m_Parent;
 	m_Children = std::move(other.m_Children);
 	m_Components = std::move(other.m_Components);
@@ -140,21 +137,21 @@ bool GameObject::IsStatic() const
 const glm::vec3& GameObject::GetWorldPosition()
 {
 	if (m_PositionIsDirty)
-		UpdateWorldPosition();
+        UpdateWorldPosition();
 	return m_WorldTransform.GetPosition();
 }
 
 const glm::vec3& GameObject::GetWorldRotation()
 {
 	if (m_RotationIsDirty)
-		UpdateWorldRotation();
+        UpdateWorldRotation();
 	return m_WorldTransform.GetRotation();
 }
 
 const glm::vec3& GameObject::GetWorldScale()
 {
 	if (m_ScaleIsDirty)
-		UpdateWorldScale();
+        UpdateWorldScale();
 	return m_WorldTransform.GetScale();
 }
 
@@ -176,8 +173,22 @@ const glm::vec3& GameObject::GetLocalScale() const
 const glm::vec3& GameObject::GetForward()
 {
 	if (m_RotationIsDirty)
-		UpdateForward();
+		UpdateWorldRotation();
 	return m_Forward;
+}
+
+const glm::vec3& GameObject::GetUp()
+{
+	if (m_RotationIsDirty)
+		UpdateWorldRotation();
+	return m_Up;
+}
+
+const glm::vec3& GameObject::GetRight()
+{
+	if (m_RotationIsDirty)
+		UpdateWorldRotation();
+	return m_Right;
 }
 
 void GameObject::SetLocalPosition(const glm::vec3& position)
@@ -244,7 +255,13 @@ void GameObject::UpdateWorldPosition()
 	if (m_Parent == nullptr)
 		m_WorldTransform.SetPosition(m_LocalTransform.GetPosition());
 	else
-		m_WorldTransform.SetPosition(m_Parent->GetWorldPosition() + m_LocalTransform.GetPosition());
+    {
+        glm::vec3 pos{ GetParent()->GetWorldPosition() };
+        pos += m_Parent->GetForward() * m_LocalTransform.GetPosition().z;
+        pos += m_Parent->GetRight() * m_LocalTransform.GetPosition().x;
+        pos += m_Parent->GetUp() * m_LocalTransform.GetPosition().y;
+		m_WorldTransform.SetPosition(pos);
+    }
 
 	m_PositionIsDirty = false;
 }
@@ -260,6 +277,7 @@ void GameObject::UpdateWorldRotation()
 		m_WorldTransform.SetRotation(m_Parent->GetWorldRotation() + m_LocalTransform.GetRotation());
 
 	m_RotationIsDirty = false;
+	UpdateAxis();
 }
 
 void GameObject::UpdateWorldScale()
@@ -275,7 +293,7 @@ void GameObject::UpdateWorldScale()
 	m_ScaleIsDirty = false;
 }
 
-void GameObject::UpdateForward()
+void GameObject::UpdateAxis()
 {
 	const glm::vec3& rotation{ GetWorldRotation() };
 	glm::mat4 rotator = glm::rotate(glm::mat4{ 1 }, glm::radians(rotation.y), glm::vec3{ 0, 1, 0 });
@@ -283,6 +301,8 @@ void GameObject::UpdateForward()
 	rotator = glm::rotate(rotator, glm::radians(rotation.z), glm::vec3{ 0, 0, 1 });
 
 	m_Forward = glm::normalize(rotator * glm::vec4{ 0, 0, 1, 1 });
+    m_Right = glm::cross(m_Forward, { 0, 1, 0 });
+    m_Up = glm::cross(m_Right, m_Forward);
 }
 
 void GameObject::FlagPositionDirty()
@@ -370,10 +390,10 @@ GameObject* GameObject::GetChildWithName(const std::string& name, bool recursive
 	for (const GameObject* childPtr : m_Children)
 	{
 		foundChildPtr = childPtr->GetChildWithName(name, recursively);
-		if (foundChildPtr != nullptr )
+		if (foundChildPtr != nullptr)
 			return foundChildPtr;
 	}
-		
+
 
 	return nullptr;
 }

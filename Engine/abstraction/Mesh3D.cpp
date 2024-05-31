@@ -1,7 +1,6 @@
 #include "Mesh3D.h"
 
 // temp includes
-#include <chrono>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "core/ResourceManager.h"
