@@ -154,17 +154,17 @@ else()
 endif()
 
 #jolt (help by Matias Devred)
-FetchContent_Declare(
-    jolt
-    GIT_REPOSITORY https://github.com/jrouwe/JoltPhysics.git
-    GIT_SHALLOW TRUE
-    GIT_TAG        v5.0.0
-    SOURCE_SUBDIR "Build"
-)
-FetchContent_MakeAvailable(jolt)
-
-target_include_directories(${ENGINE_NAME} PRIVATE ${JoltPhysics_SOURCE_DIR}/..)
-target_link_libraries(${ENGINE_NAME} PRIVATE Jolt)
+#FetchContent_Declare(
+#    jolt
+#    GIT_REPOSITORY https://github.com/jrouwe/JoltPhysics.git
+#    GIT_SHALLOW TRUE
+#    GIT_TAG        v5.0.0
+#    SOURCE_SUBDIR "Build"
+#)
+#FetchContent_MakeAvailable(jolt)
+#
+#target_include_directories(${ENGINE_NAME} PRIVATE ${JoltPhysics_SOURCE_DIR}/..)
+#target_link_libraries(${ENGINE_NAME} PRIVATE Jolt)
 
 
 

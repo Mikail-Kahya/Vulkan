@@ -104,11 +104,21 @@ void VulkanRenderer::Render() const
 {
     if (!m_RenderCamera)
         return;
+
     VulkanBase::GetInstance().DrawFrame([this]()
                                         {
                                             m_Impl->Render(m_RenderCamera);
                                         });
 
+}
+
+void VulkanRenderer::Update()
+{
+	for (auto renderComp : m_Renderers)
+        renderComp->LateUpdate();
+    m_RenderCamera->GetOwner()->GetWorldRotation();
+    m_RenderCamera->GetOwner()->GetWorldPosition();
+    m_RenderCamera->GetOwner()->GetWorldScale();
 }
 
 int VulkanRenderer::GetHeight() const noexcept

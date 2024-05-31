@@ -13,11 +13,11 @@ namespace mk
 		JoltPhysicsSystem(JoltPhysicsSystem&& other) noexcept				= delete;
 		JoltPhysicsSystem& operator=(const JoltPhysicsSystem& other)		= delete;
 		JoltPhysicsSystem& operator=(JoltPhysicsSystem&& other) noexcept	= delete;
-		
 
-		void Update() override;
-        collider_id RegisterCollider(ColliderComponent* colliderPtr) override;
-        void UnregisterCollider(collider_id id) override;
+
+        void Update() override {}
+        collider_id RegisterCollider(ColliderComponent* colliderPtr) override {0}
+        void UnregisterCollider(collider_id id) override {}
 
     private:
         class JoltPhysicsImpl;

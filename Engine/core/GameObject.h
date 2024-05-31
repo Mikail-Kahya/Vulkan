@@ -105,9 +105,9 @@ namespace mk
 		std::string m_Name{};
 		Transform m_LocalTransform{};
 		Transform m_WorldTransform{};
-		glm::vec3 m_Forward{};
-		glm::vec3 m_Right{};
-		glm::vec3 m_Up{};
+		glm::vec3 m_Forward{ 0, 0, 1 };
+		glm::vec3 m_Right{ 1, 0, 0 };
+		glm::vec3 m_Up{ 0,1,0 };
 		bool m_PositionIsDirty{ false };
 		bool m_RotationIsDirty{ false };
 		bool m_ScaleIsDirty{ false };

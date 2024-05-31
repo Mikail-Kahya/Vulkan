@@ -21,7 +21,7 @@ namespace mk
 		VulkanRenderer& operator=(VulkanRenderer&& other) noexcept	= delete;
 		
 		void Render() const override;
-        void Update() override {}
+		void Update() override;
 
 		int GetHeight() const noexcept;
 		int GetWidth() const noexcept;

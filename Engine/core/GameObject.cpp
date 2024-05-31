@@ -230,16 +230,19 @@ void GameObject::AddLocalScale(const glm::vec3& deltaScale)
 void GameObject::AddPitch(float deltaPitch)
 {
 	AddLocalRotation({ deltaPitch, 0, 0 });
+    FlagRotationDirty();
 }
 
 void GameObject::AddYaw(float deltaYaw)
 {
 	AddLocalRotation({ 0, deltaYaw, 0 });
+    FlagRotationDirty();
 }
 
 void GameObject::AddRoll(float deltaRoll)
 {
 	AddLocalRotation({ 0, 0, deltaRoll });
+    FlagRotationDirty();
 }
 
 void GameObject::SetStatic(bool isStatic)
@@ -256,11 +259,10 @@ void GameObject::UpdateWorldPosition()
 		m_WorldTransform.SetPosition(m_LocalTransform.GetPosition());
 	else
     {
-        glm::vec3 pos{ GetParent()->GetWorldPosition() };
-        pos += m_Parent->GetForward() * m_LocalTransform.GetPosition().z;
-        pos += m_Parent->GetRight() * m_LocalTransform.GetPosition().x;
-        pos += m_Parent->GetUp() * m_LocalTransform.GetPosition().y;
-		m_WorldTransform.SetPosition(pos);
+        glm::vec3 pos{ m_Parent->GetForward() * m_LocalTransform.GetPosition().z * m_LocalTransform.GetScale().z };
+        pos += m_Parent->GetRight() * m_LocalTransform.GetPosition().x * m_LocalTransform.GetScale().x;
+        pos += m_Parent->GetUp() * m_LocalTransform.GetPosition().y * m_LocalTransform.GetScale().y;
+		m_WorldTransform.SetPosition(GetParent()->GetWorldPosition() + pos);
     }
 
 	m_PositionIsDirty = false;
@@ -274,12 +276,13 @@ void GameObject::UpdateWorldRotation()
 	if (m_Parent == nullptr)
 		m_WorldTransform.SetRotation(m_LocalTransform.GetRotation());
 	else
+	{
 		m_WorldTransform.SetRotation(m_Parent->GetWorldRotation() + m_LocalTransform.GetRotation());
+		FlagPositionDirty();
+	}
 
-	m_RotationIsDirty = false;
-	FlagPositionDirty();
 	UpdateAxis();
-	UpdateWorldPosition();
+	m_RotationIsDirty = false;
 }
 
 void GameObject::UpdateWorldScale()
@@ -290,14 +293,14 @@ void GameObject::UpdateWorldScale()
 	if (m_Parent == nullptr)
 		m_WorldTransform.SetScale(m_LocalTransform.GetScale());
 	else
-		m_WorldTransform.SetScale(m_Parent->GetWorldScale() + m_LocalTransform.GetScale());
+		m_WorldTransform.SetScale(m_Parent->GetWorldScale() * m_LocalTransform.GetScale());
 
 	m_ScaleIsDirty = false;
 }
 
 void GameObject::UpdateAxis()
 {
-	const glm::vec3& rotation{ GetWorldRotation() };
+	const glm::vec3& rotation{ m_WorldTransform.GetRotation() };
 	glm::mat4 rotator = glm::rotate(glm::mat4{ 1 }, glm::radians(rotation.y), glm::vec3{ 0, 1, 0 });
 	rotator = glm::rotate(rotator, glm::radians(rotation.x), glm::vec3{ 1, 0, 0 });
 	rotator = glm::rotate(rotator, glm::radians(rotation.z), glm::vec3{ 0, 0, 1 });

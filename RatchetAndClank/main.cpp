@@ -17,6 +17,98 @@
 
 using namespace mk;
 
+GameObject* CreateRatchetPart(Scene& scene, GameObject* ratchet, const std::string& part, const std::string& shader)
+{
+	GameObject* ratchetMesh = scene.SpawnObject(part);
+	ratchetMesh->SetParent(ratchet);
+	
+	MeshComponent* meshCompPtr = ratchetMesh->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("Ratchet/" + part + ".obj");
+	meshCompPtr->SetTexture("Ratchet/" + part + ".png");
+	meshCompPtr->SetShader(shader, shader);
+	return ratchetMesh;
+}
+
+void AddClank(Scene& scene, GameObject* ratchet, const std::string& shader)
+{
+	GameObject* clank = scene.SpawnObject("Clank");
+	clank->SetParent(ratchet);
+	clank->SetLocalPosition({ 0, 16.f, -5.f });
+	clank->SetLocalRotation({ 0, 180.f, 0 });
+	clank->SetLocalScale({ 0.1f, 0.1f, 0.1f });
+	MeshComponent* meshCompPtr = clank->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("Clank/ClankBackpack.obj");
+	meshCompPtr->SetTexture("Clank/ClankBackpack.png");
+	meshCompPtr->SetShader(shader, shader);
+}
+
+GameObject* CreatePlayer(Scene& scene, const std::string& shader)
+{
+	GameObject* player = scene.SpawnObject("Player");
+
+	GameObject* ratchet = scene.SpawnObject("RatchetWrapper");
+	ratchet->SetLocalRotation({ 0, -90.f, 0 });
+	ratchet->SetLocalScale({ 3.f, 3.f, 3.f });
+	ratchet->SetParent(player);
+
+	CreateRatchetPart(scene, ratchet, "RatchetBody", shader);
+	CreateRatchetPart(scene, ratchet, "Watch", shader);
+	CreateRatchetPart(scene, ratchet, "Pants", shader);
+	CreateRatchetPart(scene, ratchet, "Hat", shader);
+
+
+
+	// Camera
+	GameObject* playerCamera = scene.SpawnObject("Camera");
+	playerCamera->SetParent(player);
+	//playerCamera->SetLocalPosition({ 0, 5.f, -40.f });
+	playerCamera->SetLocalPosition({ 0, 5.f, -25.f });
+	//playerCamera->SetLocalRotation({ 0, 180, 0 });
+	CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
+	cameraCompPtr->Activate();
+
+	CommandInput* commandInput = dynamic_cast<CommandInput*>(&ServiceLocator::GetInputSystem());
+	const controller_id id = commandInput->RegisterController();
+
+	// controls
+	Action forward{};
+	forward.controllerInput = Input::dPadUp;
+	forward.keyboardInput = GLFW_KEY_W;
+	forward.type = ActionType::hold;
+
+	Action back{};
+	back.controllerInput = Input::dPadDown;
+	back.keyboardInput = GLFW_KEY_S;
+	back.type = ActionType::hold;
+
+	Action left{};
+	left.controllerInput = Input::dPadLeft;
+	left.keyboardInput = GLFW_KEY_A;
+	left.type = ActionType::hold;
+
+	Action right{};
+	right.controllerInput = Input::dPadRight;
+	right.keyboardInput = GLFW_KEY_D;
+	right.type = ActionType::hold;
+
+	DirectionAction look{};
+	look.inputType = DirectionAction::InputType::mouse;
+
+	// input
+	commandInput->AddBinding(id, forward, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 0, 0, 1 }, 10.f));
+	commandInput->AddBinding(id, back, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 0, 0, -1 }, 10.f));
+	commandInput->AddBinding(id, left, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ -1, 0, 0 }, 10.f));
+	commandInput->AddBinding(id, right, commandInput->AddCommand<MoveCommand>(player, glm::vec3{ 1, 0, 0 }, 10.f));
+	commandInput->AddDirectionalBinding(id, look, commandInput->AddCommand<RotateCommand>(player, glm::vec2{ 5.5f, 0 }));
+
+	return player;
+}
+
+void CreateEnvironment(Scene& scene, const std::string& shader)
+{
+	
+}
+
 void Load()
 {
 	std::vector<Vertex2D> vertices = {
@@ -24,13 +116,6 @@ void Load()
 	{{-0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
 	{{-0.5f, 0.8f}, {0.0f, 0.0f, 1.0f}},
 	{{-0.8f, 0.8f}, {1.0f, 1.0f, 1.0f}}
-	};
-
-	const std::vector<Vertex3D> vertices3D = {
-	{{-0.5f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f}, {0, 0}},
-	{{0.5f, -0.5f, 0.f}, {0.0f, 1.0f, 0.0f}, {1, 0}},
-	{{0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f}, {1, 1}},
-	{{-0.5f, 0.5f, 0.f}, {1.0f, 1.0f, 1.0f}, {0, 1}}
 	};
 
 	const std::vector<uint32_t> indices = {
@@ -42,79 +127,9 @@ void Load()
 	const std::string texture{ "test.jpg" };
 	Scene& scene = SceneManager::GetInstance().LoadScene("Triangle");
 
-	// 
-	GameObject* ratchet = scene.SpawnObject("Ratchet");
+	AddClank(scene, CreatePlayer(scene, shader3DName), shader3DName);
+
 	
-	// Mesh
-	GameObject* ratchetMesh = scene.SpawnObject("RatchetMesh");
-	ratchetMesh->SetParent(ratchet);
-	ratchetMesh->SetLocalRotation({ 0, -90.f, 0 });
-	ratchetMesh->SetLocalScale({ 2.5f, 2.5f, 2.5f });
-	MeshComponent* meshCompPtr = ratchetMesh->AddComponent<MeshComponent>();
-	meshCompPtr->SetMesh("Ratchet/Ratchet.obj");
-	meshCompPtr->SetTexture("Ratchet/Ratchet.png");
-	meshCompPtr->SetShader(shader3DName, shader3DName);
-
-
-	GameObject* playerCamera = scene.SpawnObject("Camera");
-	playerCamera->SetParent(ratchet);
-	playerCamera->SetLocalPosition({ 0, 2.f, -10.f });
-	//playerCamera->SetLocalRotation({ 0, 180, 0 });
-	CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
-	cameraCompPtr->Activate();
-
-	//
-	//// Camera
-	//GameObject* cameraArm = scene.SpawnObject("CameraArm");
-	//cameraArm->SetParent(ratchet);
-	//
-	//GameObject* playerCamera = scene.SpawnObject("Camera");
-	//playerCamera->SetParent(cameraArm);
-	//playerCamera->SetLocalPosition({ 0, 2.f, -10.f });
-	//playerCamera->SetLocalRotation({ 0, 180, 0 });
-	//CameraComponent* cameraCompPtr = playerCamera->AddComponent<CameraComponent>();
-	//cameraCompPtr->Activate();
-
-	GameObject* tuktuk = scene.SpawnObject("tuktuk");
-	meshCompPtr = tuktuk->AddComponent<MeshComponent>();
-	meshCompPtr->SetMesh("tuktuk.obj");
-	meshCompPtr->SetTexture("tuktuk.png");
-	meshCompPtr->SetShader(shader3DName, shader3DName);
-
-    CommandInput* commandInput = dynamic_cast<CommandInput*>(&ServiceLocator::GetInputSystem());
-    const controller_id id = commandInput->RegisterController();
-
-    // controls
-    Action forward{};
-    forward.controllerInput = Input::dPadUp;
-    forward.keyboardInput = GLFW_KEY_W;
-    forward.type = ActionType::hold;
-
-    Action back{};
-    back.controllerInput = Input::dPadDown;
-    back.keyboardInput = GLFW_KEY_S;
-    back.type = ActionType::hold;
-
-    Action left{};
-    left.controllerInput = Input::dPadLeft;
-    left.keyboardInput = GLFW_KEY_A;
-    left.type = ActionType::hold;
-
-    Action right{};
-    right.controllerInput = Input::dPadRight;
-    right.keyboardInput = GLFW_KEY_D;
-    right.type = ActionType::hold;
-
-	DirectionAction look{};
-	look.inputType = DirectionAction::InputType::mouse;
-
-    // input
-    commandInput->AddBinding(id, forward, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{0, 0, 1}, 10.f));
-    commandInput->AddBinding(id, back, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{0, 0, -1}, 10.f));
-    commandInput->AddBinding(id, left, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{-1, 0, 0}, 10.f));
-    commandInput->AddBinding(id, right, commandInput->AddCommand<MoveCommand>(ratchet, glm::vec3{1, 0, 0}, 10.f));
-	commandInput->AddDirectionalBinding(id, look, commandInput->AddCommand<RotateCommand>(ratchet, glm::vec2{ 5.5f, 0.f }));
-
 
 	std::cout << "Controls:\n\n"
 		<< "=========\n\n"
