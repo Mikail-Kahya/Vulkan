@@ -16,8 +16,10 @@ namespace mk
 
 		void Render() const override {}
 		void Update() override {}
-		mesh_handle RegisterRender(void*) override { return 0; }
-		void UnregisterRender(mesh_handle) override {}
+		mesh_handle RegisterMeshRender(MeshComponent*) override { return 0; }
+		mesh_handle RegisterSpriteRender(SpriteComponent*) override { return 0; }
+		void UnregisterMeshRender(mesh_handle) override {}
+		void UnregisterSpriteRender(mesh_handle) override {}
         void RegisterCamera(CameraComponent*) override {}
         void UnregisterCamera(CameraComponent*) override {}
         void SetActiveCamera(CameraComponent*) override {}

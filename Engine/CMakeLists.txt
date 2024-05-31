@@ -116,7 +116,7 @@ set(SOURCES
 )
 
 # Create the executable
-add_library(${ENGINE_NAME} STATIC ${SOURCES} )
+add_library(${ENGINE_NAME} STATIC ${SOURCES}  "components/SpriteComponent.cpp" "components/SpriteComponent.h")
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # 
 # Link libraries

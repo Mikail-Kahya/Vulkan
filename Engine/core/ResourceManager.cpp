@@ -72,6 +72,16 @@ Mesh2D* ResourceManager::LoadMesh2D(const std::string& obj)
 	return s_Meshes2D[obj].get();
 }
 
+Mesh2D* ResourceManager::LoadMesh2D(const std::string& id, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
+{
+	if (!s_Meshes2D.contains(id))
+	{
+		s_Meshes2D[id] = std::make_unique<Mesh2D>();
+		s_Meshes2D[id]->Load(vertices, indices);
+	}
+	return s_Meshes2D[id].get();
+}
+
 void ResourceManager::Cleanup()
 {
 	s_Pipelines2D.clear();

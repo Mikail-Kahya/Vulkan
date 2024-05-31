@@ -10,12 +10,13 @@
 #include "MkVulktra.h"
 #include "input/GLFWInput.h"
 #include "playercommands.h"
-#include "components/MeshComponent.h"
 #include "core/ResourceManager.h"
 #include "core/Scene.h"
 #include "core/SceneManager.h"
 #include "input/Action.h"
 
+#include "components/MeshComponent.h"
+#include "components/SpriteComponent.h"
 using namespace mk;
 
 GameObject* CreateRatchetPart(Scene& scene, GameObject* ratchet, const std::string& part, const std::string& shader)
@@ -148,7 +149,7 @@ void CreateEnvironment(Scene& scene, const std::string& shader)
 	}
 }
 
-void Load()
+void LoadSecondPipeline(Scene& scene)
 {
 	std::vector<Vertex2D> vertices = {
 	{{-0.8f, 0.5f}, {1.0f, 0.0f, 0.0f}},
@@ -162,12 +163,25 @@ void Load()
 	};
 
 	const std::string shader2DName{ "shader2D" };
+	const std::string shape{ "shape" };
+	ResourceManager::LoadMesh2D(shape, vertices, indices);
+
+	GameObject* shapeObj = scene.SpawnObject("Shape");
+	shapeObj->SetLocalScale(glm::vec3{ 800.f });
+	SpriteComponent* spriteCompPtr = shapeObj->AddComponent<SpriteComponent>();
+	spriteCompPtr->SetMesh(shape);
+	spriteCompPtr->SetShader(shader2DName, shader2DName);
+}
+
+void Load()
+{
+	
 	const std::string shader3DName{ "shader3D" };
-	const std::string texture{ "test.jpg" };
-	Scene& scene = SceneManager::GetInstance().LoadScene("Triangle");
+	Scene& scene = SceneManager::GetInstance().LoadScene("RatchetTest");
 
 	AddClank(scene, CreatePlayer(scene, shader3DName), shader3DName);
 	CreateEnvironment(scene, shader3DName);
+	LoadSecondPipeline(scene);
 	
 
 	std::cout << "Controls:\n\n"

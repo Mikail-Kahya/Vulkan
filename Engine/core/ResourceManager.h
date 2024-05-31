@@ -28,6 +28,7 @@ namespace mk
 		static Texture* LoadTexture(const std::string& texture);
 		static Mesh3D* LoadMesh3D(const std::string& obj, bool invert = false);
 		static Mesh2D* LoadMesh2D(const std::string& obj);
+		static Mesh2D* LoadMesh2D(const std::string& id, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 		static void Cleanup();
 
 	private:

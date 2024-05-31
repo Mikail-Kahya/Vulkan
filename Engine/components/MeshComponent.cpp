@@ -8,7 +8,7 @@ using namespace mk;
 
 MeshComponent::~MeshComponent()
 {
-	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	ServiceLocator::GetRenderer().UnregisterMeshRender(m_Handle);
 }
 
 void MeshComponent::LateUpdate()
@@ -21,18 +21,18 @@ void MeshComponent::LateUpdate()
 
 void MeshComponent::SetShader(const std::string& vertex, const std::string& fragment)
 {
-	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	ServiceLocator::GetRenderer().UnregisterMeshRender(m_Handle);
 	m_Handle = -1;
 	m_Pipeline = ResourceManager::LoadShader3D(vertex, fragment);
-	ServiceLocator::GetRenderer().RegisterRender(this);
+	ServiceLocator::GetRenderer().RegisterMeshRender(this);
 }
 
 void MeshComponent::SetMesh(const std::string& obj)
 {
-	ServiceLocator::GetRenderer().UnregisterRender(m_Handle);
+	ServiceLocator::GetRenderer().UnregisterMeshRender(m_Handle);
 	m_Handle = -1;
 	m_MeshPtr = ResourceManager::LoadMesh3D(obj);
-	ServiceLocator::GetRenderer().RegisterRender(this);
+	ServiceLocator::GetRenderer().RegisterMeshRender(this);
 }
 
 void MeshComponent::SetTexture(const std::string& texture) const

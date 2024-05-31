@@ -8,6 +8,7 @@
 #include "abstraction/Pipeline3D.h"
 #include "components/MeshComponent.h"
 #include "components/cameracomponent.h"
+#include "components/SpriteComponent.h"
 #include "core/GameObject.h"
 
 using namespace mk;
@@ -27,6 +28,8 @@ public:
 	VulkanImpl& operator=(VulkanImpl&& other) noexcept	= delete;
 
     void Render(CameraComponent* cameraPtr) const;
+	int GetHeight() const;
+	int GetWidth() const;
 
 	void AddMesh2D(Pipeline2D* pipelinePtr, Mesh2D* meshPtr);
 	void AddMesh3D(Pipeline3D* pipelinePtr, Mesh3D* meshPtr);
@@ -63,6 +66,16 @@ void VulkanRenderer::VulkanImpl::Render(CameraComponent* cameraPtr) const
 	}
 }
 
+int VulkanRenderer::VulkanImpl::GetHeight() const
+{
+	return VulkanBase::GetInstance().GetSwapChain().GetHeight();
+}
+
+int VulkanRenderer::VulkanImpl::GetWidth() const
+{
+	return VulkanBase::GetInstance().GetSwapChain().GetWidth();
+}
+
 void VulkanRenderer::VulkanImpl::AddMesh2D(Pipeline2D* pipelinePtr, Mesh2D* meshPtr)
 {
 	m_Mesh2DSets[pipelinePtr].emplace_back(meshPtr);
@@ -91,8 +104,6 @@ void VulkanRenderer::VulkanImpl::RemoveMesh3D(Pipeline3D* pipelinePtr, Mesh3D* m
 
 VulkanRenderer::VulkanRenderer(int width, int height)
 	: m_Impl{ std::make_unique<VulkanImpl>() }
-	, m_Width{ width }
-	, m_Height{ height }
 {
 }
 
@@ -114,7 +125,7 @@ void VulkanRenderer::Render() const
 
 void VulkanRenderer::Update()
 {
-	for (auto renderComp : m_Renderers)
+	for (auto renderComp : m_Meshes)
         renderComp->LateUpdate();
     m_RenderCamera->GetOwner()->GetWorldRotation();
     m_RenderCamera->GetOwner()->GetWorldPosition();
@@ -123,42 +134,70 @@ void VulkanRenderer::Update()
 
 int VulkanRenderer::GetHeight() const noexcept
 {
-	return 0;
+	return m_Impl->GetHeight();
 }
 
 int VulkanRenderer::GetWidth() const noexcept
 {
-	return 0;
+	return m_Impl->GetWidth();
 }
 
-mesh_handle VulkanRenderer::RegisterRender(void* objectPtr)
+mesh_handle VulkanRenderer::RegisterMeshRender(MeshComponent* meshCompPtr)
 {
-	MeshComponent* meshCompPtr = reinterpret_cast<MeshComponent*>(objectPtr);
 	if (meshCompPtr->GetPipeline() == nullptr || meshCompPtr->GetMesh() == nullptr)
 		return -1;
 
 	m_Impl->AddMesh3D(meshCompPtr->GetPipeline(), meshCompPtr->GetMesh());
 	
-	const auto invalidSlot = std::find(m_Renderers.begin(), m_Renderers.end(), nullptr);
-	if (invalidSlot == m_Renderers.end())
+	const auto invalidSlot = std::find(m_Meshes.begin(), m_Meshes.end(), nullptr);
+	if (invalidSlot == m_Meshes.end())
 	{
-		m_Renderers.emplace_back(meshCompPtr);
-		return static_cast<mesh_handle>(m_Renderers.size() - 1);
+		m_Meshes.emplace_back(meshCompPtr);
+		return static_cast<mesh_handle>(m_Meshes.size() - 1);
 	}
 
 	*invalidSlot = meshCompPtr;
 
-	return static_cast<mesh_handle>(std::distance(m_Renderers.begin(), invalidSlot));
+	return static_cast<mesh_handle>(std::distance(m_Meshes.begin(), invalidSlot));
 }
 
-void VulkanRenderer::UnregisterRender(mesh_handle handle)
+mesh_handle VulkanRenderer::RegisterSpriteRender(SpriteComponent* objectPtr)
+{
+	if (objectPtr->GetPipeline() == nullptr || objectPtr->GetMesh() == nullptr)
+		return -1;
+
+	m_Impl->AddMesh2D(objectPtr->GetPipeline(), objectPtr->GetMesh());
+
+	const auto invalidSlot = std::find(m_Sprites.begin(), m_Sprites.end(), nullptr);
+	if (invalidSlot == m_Sprites.end())
+	{
+		m_Sprites.emplace_back(objectPtr);
+		return static_cast<mesh_handle>(m_Sprites.size() - 1);
+	}
+
+	*invalidSlot = objectPtr;
+
+	return static_cast<mesh_handle>(std::distance(m_Sprites.begin(), invalidSlot));
+}
+
+void VulkanRenderer::UnregisterMeshRender(mesh_handle handle)
 {
 	if (handle < 0)
 		return;
-	if (m_Renderers[handle]->GetPipeline() == nullptr)
+	if (m_Meshes[handle]->GetPipeline() == nullptr)
 		return;
-	m_Impl->RemoveMesh3D(m_Renderers[handle]->GetPipeline(), m_Renderers[handle]->GetMesh());
-    m_Renderers[handle] = nullptr;
+	m_Impl->RemoveMesh3D(m_Meshes[handle]->GetPipeline(), m_Meshes[handle]->GetMesh());
+    m_Meshes[handle] = nullptr;
+}
+
+void VulkanRenderer::UnregisterSpriteRender(mesh_handle handle)
+{
+	if (handle < 0)
+		return;
+	if (m_Sprites[handle]->GetPipeline() == nullptr)
+		return;
+	m_Impl->RemoveMesh2D(m_Sprites[handle]->GetPipeline(), m_Sprites[handle]->GetMesh());
+	m_Sprites[handle] = nullptr;
 }
 
 void VulkanRenderer::RegisterCamera(CameraComponent *cameraPtr)

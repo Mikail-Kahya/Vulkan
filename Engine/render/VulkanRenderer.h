@@ -26,8 +26,10 @@ namespace mk
 		int GetHeight() const noexcept;
 		int GetWidth() const noexcept;
 
-		mesh_handle RegisterRender(void* objectPtr) override;
-		void UnregisterRender(mesh_handle handle) override;
+		mesh_handle RegisterMeshRender(MeshComponent* meshCompPtr) override;
+		mesh_handle RegisterSpriteRender(SpriteComponent* objectPtr) override;
+		void UnregisterMeshRender(mesh_handle handle) override;
+		void UnregisterSpriteRender(mesh_handle handle) override;
 
         void RegisterCamera(CameraComponent* cameraPtr) override;
         void UnregisterCamera(CameraComponent* cameraPtr) override;
@@ -37,12 +39,11 @@ namespace mk
 		class VulkanImpl;
 		using Impl = std::unique_ptr<VulkanImpl>;
 
-		std::vector<MeshComponent*> m_Renderers{};
+		std::vector<MeshComponent*> m_Meshes{};
+		std::vector<SpriteComponent*> m_Sprites{};
         std::vector<CameraComponent*> m_Cameras{};
         CameraComponent* m_RenderCamera{};
 		Impl m_Impl;
-		int m_Width{};
-		int m_Height{};
 	};
 }
 
