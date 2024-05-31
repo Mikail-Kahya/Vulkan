@@ -277,7 +277,9 @@ void GameObject::UpdateWorldRotation()
 		m_WorldTransform.SetRotation(m_Parent->GetWorldRotation() + m_LocalTransform.GetRotation());
 
 	m_RotationIsDirty = false;
+	FlagPositionDirty();
 	UpdateAxis();
+	UpdateWorldPosition();
 }
 
 void GameObject::UpdateWorldScale()
@@ -301,8 +303,8 @@ void GameObject::UpdateAxis()
 	rotator = glm::rotate(rotator, glm::radians(rotation.z), glm::vec3{ 0, 0, 1 });
 
 	m_Forward = glm::normalize(rotator * glm::vec4{ 0, 0, 1, 1 });
-    m_Right = glm::cross(m_Forward, { 0, 1, 0 });
-    m_Up = glm::cross(m_Right, m_Forward);
+    m_Right = glm::normalize(glm::cross(m_Forward, { 0, 1, 0 }));
+    m_Up = glm::normalize(glm::cross(m_Right, m_Forward));
 }
 
 void GameObject::FlagPositionDirty()
