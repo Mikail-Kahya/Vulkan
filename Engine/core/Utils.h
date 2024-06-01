@@ -42,12 +42,17 @@ namespace mk
 			for (const auto& index : shape.mesh.indices) {
 				// Fill vertex
 				VertexType vertex{};
-		
-				vertex.color = { 1.0f, 1.0f, 1.0f };
+
 				constexpr int idx0{ 0 };
 				constexpr int idx1{ 1 };
 				constexpr int idx2{ 2 };
 		
+				vertex.color = {
+					 attrib.colors[3 * index.vertex_index + idx0],
+					 attrib.colors[3 * index.vertex_index + idx1],
+					 attrib.colors[3 * index.vertex_index + idx2]
+				};
+
 				if constexpr (std::same_as<VertexType, Vertex2D>)
 				{
 					vertex.pos = {	attrib.vertices[3 * index.vertex_index + idx0],

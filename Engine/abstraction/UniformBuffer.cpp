@@ -11,6 +11,12 @@
 
 using namespace mk;
 
+UniformBuffer::UniformBuffer()
+{
+	CreateUniformBuffers();
+	CreateNoTextureDescriptorSets();
+}
+
 UniformBuffer::UniformBuffer(const Texture* texture)
 {
 	CreateUniformBuffers();
@@ -70,6 +76,38 @@ void UniformBuffer::CreateUniformBuffers()
 						m_UniformBuffers[idx], m_UniformBuffersMemory[idx]);
 
 		vkMapMemory(device, m_UniformBuffersMemory[idx], 0, bufferSize, 0, &m_UniformBuffersMapped[idx]);
+	}
+}
+
+void UniformBuffer::CreateNoTextureDescriptorSets()
+{
+	const VulkanBase& vulkanBase{ VulkanBase::GetInstance() };
+	const VkDevice device{ vulkanBase.GetDevice() };
+	const auto allocInfo{ vulkanBase.GetDescriptorPool().GetAllocationInfo() };
+
+	m_DescriptorSets.resize(VulkanBase::MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(VulkanBase::GetInstance().GetDevice(), &allocInfo, m_DescriptorSets.data()) != VK_SUCCESS)
+		throw std::runtime_error("Failed to allocate descriptor sets");
+
+	for (size_t idx{}; idx < VulkanBase::MAX_FRAMES_IN_FLIGHT; ++idx)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_UniformBuffers[idx];
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(UniformBufferObject);
+
+		std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = m_DescriptorSets[idx];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].dstArrayElement = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+		descriptorWrites[0].pImageInfo = nullptr; // Optional
+		descriptorWrites[0].pTexelBufferView = nullptr; // Optional
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 }
 

@@ -12,8 +12,8 @@ namespace mk
 	{
 		using Vertex = Vertex3D;
 	public:
-		Mesh3D() = default;
-		~Mesh3D()	= default;
+		Mesh3D();
+		~Mesh3D() = default;
 
 		Mesh3D(const Mesh3D& other)					= delete;
 		Mesh3D(Mesh3D&& other) noexcept				= delete;

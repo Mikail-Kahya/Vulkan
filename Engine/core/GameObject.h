@@ -77,8 +77,6 @@ namespace mk
 	private:
 		void ComponentCleanup();
 
-		void UpdateTransform();
-
 		void UpdateWorldPosition();
 		void UpdateWorldRotation();
 		void UpdateWorldScale();

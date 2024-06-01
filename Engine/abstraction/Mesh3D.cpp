@@ -8,6 +8,11 @@
 
 using namespace mk;
 
+Mesh3D::Mesh3D()
+	: m_UniformBuffer{ std::make_unique<UniformBuffer>() }
+{
+}
+
 void Mesh3D::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout) const
 {
 	if (!m_VertexBuffer.IsValid())

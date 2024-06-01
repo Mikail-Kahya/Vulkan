@@ -11,7 +11,7 @@ namespace mk
 	class UniformBuffer final
 	{
 	public:
-		UniformBuffer() = default;
+		UniformBuffer();
 		UniformBuffer(const Texture* texture);
 		~UniformBuffer();
 
@@ -25,6 +25,7 @@ namespace mk
 
 	private:
 		void CreateUniformBuffers();
+		void CreateNoTextureDescriptorSets();
 		void CreateDescriptorSets(const Texture* texture);
 
 

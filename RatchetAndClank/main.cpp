@@ -126,6 +126,13 @@ void CreateEnvironment(Scene& scene, const std::string& shader)
 	meshCompPtr->SetTexture("environment/rock.jpg");
 	meshCompPtr->SetShader(shader, shader);
 
+	GameObject* planets = scene.SpawnObject("planets");
+	planets->SetLocalPosition(glm::vec3{ 500.f, 50.f, 100.f });
+	planets->SetLocalScale(glm::vec3{ 20.f });
+	meshCompPtr = planets->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("environment/planets.obj");
+	meshCompPtr->SetShader(shader, shader+"Color");
+
 	constexpr int nrRockModels{ 2 };
 	constexpr int nrRocks{ 5 };
 	const std::array<std::string, nrRockModels> rocks{ "rock1", "rock2" };
@@ -147,6 +154,16 @@ void CreateEnvironment(Scene& scene, const std::string& shader)
 		meshCompPtr->SetTexture("environment/rock.jpg");
 		meshCompPtr->SetShader(shader, shader);
 	}
+}
+
+void CreateMovingSpacePlane(Scene& scene, const std::string& shader)
+{
+	GameObject* saucer = scene.SpawnObject("saucer");
+	saucer->SetLocalScale(glm::vec3{ 5.f });
+	MeshComponent* meshCompPtr = saucer->AddComponent<MeshComponent>();
+	meshCompPtr->SetMesh("environment/saucer.obj");
+	meshCompPtr->SetTexture("environment/saucer.jpg");
+	meshCompPtr->SetShader(shader, shader);
 }
 
 void LoadSecondPipeline(Scene& scene)
