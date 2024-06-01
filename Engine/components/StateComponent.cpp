@@ -1,8 +1,9 @@
 #include "StateComponent.h"
 
-#include "DebugUtils.h"
-#include "GameObject.h"
-#include "GameObjectState.h"
+#include <iostream>
+
+#include "core/GameObject.h"
+#include "state/GameObjectState.h"
 
 using namespace mk;
 
@@ -42,14 +43,14 @@ void StateComponent::LateUpdate()
 	if (m_States.contains(newState))
 		SwitchState(newState);
 	else if (!newState.empty())
-		Print("State " + newState + "could not be switched to");
+		std::cout << "State " << newState << "could not be switched to";
 }
 
 bool StateComponent::AddState(std::string stateId, std::unique_ptr<IState>&& state)
 {
 	if (m_States.contains(stateId))
 	{
-		Print("State already added with id " + stateId);
+		std::cout << "State already added with id " << stateId;
 		return false;
 	}
 

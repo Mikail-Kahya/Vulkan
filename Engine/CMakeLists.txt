@@ -56,6 +56,10 @@ set(SOURCES
 # ------------------------COMPONENTS-------------------------------
 # -----------------------------------------------------------------
     "components/MeshComponent.cpp"
+    "components/ColliderComponent.cpp"
+    "components/cameracomponent.cpp"
+    "components/StateComponent.cpp"
+    "components/SpriteComponent.cpp"
 
 # -----------------------------------------------------------------
 # --------------------------CORE-----------------------------------
@@ -98,7 +102,6 @@ set(SOURCES
     "abstraction/Mesh3D.cpp"
     "abstraction/Mesh2D.cpp"
     "render/VulkanRenderer.cpp"
-    "components/cameracomponent.cpp"
 
 
 # -----------------------------------------------------------------
@@ -112,11 +115,17 @@ set(SOURCES
 # -----------------------------------------------------------------
     "physics/NullPhysicsSystem.h" 
     "physics/IPhysicsSystem.h" 
-    "physics/JoltPhysicsSystem.cpp" "components/ColliderComponent.cpp"
+    "physics/JoltPhysicsSystem.cpp" 
+
+# -----------------------------------------------------------------
+# ---------------------------STATE---------------------------------
+# -----------------------------------------------------------------
+    "state/IState.h" 
+    "state/GameObjectState.h" 
 )
 
 # Create the executable
-add_library(${ENGINE_NAME} STATIC ${SOURCES}  "components/SpriteComponent.cpp" "components/SpriteComponent.h")
+add_library(${ENGINE_NAME} STATIC ${SOURCES})
 target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # 
 # Link libraries

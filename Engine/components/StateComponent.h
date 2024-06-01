@@ -2,8 +2,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "IComponent.h"
-#include "IState.h"
+#include "core/IComponent.h"
+#include "state/IState.h"
 
 namespace mk
 {
