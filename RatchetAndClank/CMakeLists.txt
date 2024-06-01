@@ -28,7 +28,7 @@ add_custom_target(
 
 set(SOURCES
     "main.cpp"
-)
+ "SaucerStates.cpp")
 
 # Create the executable
 add_executable(${GAME_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}

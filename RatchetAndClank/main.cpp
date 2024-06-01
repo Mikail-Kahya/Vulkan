@@ -17,6 +17,9 @@
 
 #include "components/MeshComponent.h"
 #include "components/SpriteComponent.h"
+#include "components/StateComponent.h"
+
+#include "SaucerStates.h"
 using namespace mk;
 
 GameObject* CreateRatchetPart(Scene& scene, GameObject* ratchet, const std::string& part, const std::string& shader)
@@ -159,11 +162,14 @@ void CreateEnvironment(Scene& scene, const std::string& shader)
 void CreateMovingSpacePlane(Scene& scene, const std::string& shader)
 {
 	GameObject* saucer = scene.SpawnObject("saucer");
-	saucer->SetLocalScale(glm::vec3{ 5.f });
+	saucer->AddLocalOffset({ 200.f, 0.f, 200.f });
 	MeshComponent* meshCompPtr = saucer->AddComponent<MeshComponent>();
-	meshCompPtr->SetMesh("environment/saucer.obj");
-	meshCompPtr->SetTexture("environment/saucer.jpg");
+	meshCompPtr->SetMesh("saucer/Saucer.obj");
+	meshCompPtr->SetTexture("saucer/Saucer.png");
 	meshCompPtr->SetShader(shader, shader);
+
+	StateComponent* stateCompPtr = saucer->AddComponent<StateComponent>("Land", std::make_unique<LandingState>());
+	stateCompPtr->AddState("Hover", std::make_unique<FlyingState>());
 }
 
 void LoadSecondPipeline(Scene& scene)
@@ -198,6 +204,7 @@ void Load()
 
 	AddClank(scene, CreatePlayer(scene, shader3DName), shader3DName);
 	CreateEnvironment(scene, shader3DName);
+	CreateMovingSpacePlane(scene, shader3DName);
 	LoadSecondPipeline(scene);
 	
 
