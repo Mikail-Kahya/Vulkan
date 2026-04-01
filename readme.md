@@ -1,7 +1,8 @@
 # Vulkan Engine (Ratchet & Clank Demo)
 **Graphics Programming Project** - C++20, Vulkan API, GLFW | [GitHub Repo](https://github.com/Mikail-Kahya/Vulkan) | [Portfolio](https://mikailkahya.netlify.app/engine)
 
-![Screenshot]
+![vulkan-card](https://github.com/user-attachments/assets/92c1637d-45c3-4cb2-b7a5-3da7032ef2ff)
+
 
 ## Overview
 Custom game engine built from scratch to explore **low-level graphics programming** with Vulkan API. Features a **standalone graphics library** that links into any project via CMake, plus core engine systems for input, commands, and resource loading. Test demo loads Ratchet & Clank 3D model into massive open space where player can freely walk around using keyboard/XInput controllers.
@@ -49,7 +50,7 @@ Custom game engine built from scratch to explore **low-level graphics programmin
 ### Development
 - **Command pattern** - Undo/redo, unit selection (RTS-friendly)
 - Text-based UI - Screen size, debug info
-- **Custom 2D collision** pre-Vulkan [GitHub Repo](https://github.com/Mikail-Kahya/DAE-Prog4)
+- **Custom 2D collision** pre-Vulkan [GitHub Repo](https://github.com/Mikail-Kahya/custom-engine)
 - Resource management - Models, textures, shaders
 
 ## Build
