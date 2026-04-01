@@ -54,4 +54,8 @@ Custom game engine built from scratch to explore **low-level graphics programmin
 - Resource management - Models, textures, shaders
 
 ## Build
-I built it through MSVC but any way of compiling a CMake project will work. The launching of the project can be found in the Out folder.    
+I built it through MSVC but any way of compiling a CMake project will work. The launching of the project can be found in the Out folder. 
+
+## References
+- [Game Programming Patterns](https://gameprogrammingpatterns.com)
+- [Vulkan tutorial](https://vulkan-tutorial.com)
