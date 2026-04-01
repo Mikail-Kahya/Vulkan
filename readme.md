@@ -5,8 +5,8 @@
 
 
 ## Overview
-Custom game engine built from scratch to explore **low-level graphics programming** with Vulkan API. Features a **standalone graphics library** that links into any project via CMake, plus core engine systems for input, commands, and resource loading. Test demo loads Ratchet & Clank 3D model into massive open space where player can freely walk around using keyboard/XInput controllers.
-
+Custom game engine built from scratch to explore **low-level graphics programming** with Vulkan API. Features a **standalone graphics library** that links into any project via CMake, plus core engine systems for input, commands, and resource loading. Test demo loads Ratchet & Clank 3D model into massive open space where player can freely walk around using keyboard/XInput controllers.\
+\
 **Core goal:** Learn Vulkan render pipelines while maintaining clean engine architecture that supports multiple game projects.
 
 ## Design Philosophy
@@ -24,10 +24,10 @@ Custom game engine built from scratch to explore **low-level graphics programmin
 
 ## Architecture
 
-[Game Project]/n
-↑ (CMake)\n
-[Core Engine]\n
-↑ (CMake)\n
+[Game Project]\
+     ↑ (CMake)\
+[Core Engine]\
+     ↑ (CMake)\
 [Vulkan Graphics Library] (pimpl abstraction)
 
 **Key design decisions:**
