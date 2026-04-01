@@ -21,6 +21,7 @@ Custom game engine built from scratch to explore **low-level graphics programmin
 - GLFW (window/input)
 - CMake
 - Git
+- HLSL
 
 ## Architecture
 
