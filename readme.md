@@ -1,5 +1,5 @@
 # Vulkan Engine (Ratchet & Clank Demo)
-**Graphics Programming Project** - C++20, Vulkan API, GLFW | [GitHub Repo](https://github.com/Mikail-Kahya/Vulkan) | [Portfolio](https://mikailkahya.netlify.app/engine)
+**Graphics Programming Project** - C++20, Vulkan API, GLFW | [GitHub Repo](https://github.com/Mikail-Kahya/Vulkan) | [Portfolio](https://mikailkahya.netlify.app/vulkanengine)
 
 ![vulkan-card](https://github.com/user-attachments/assets/92c1637d-45c3-4cb2-b7a5-3da7032ef2ff)
 
